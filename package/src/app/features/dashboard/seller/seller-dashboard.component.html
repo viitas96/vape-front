@@ -1,0 +1,151 @@
+<div class="pos-wrapper" style="display:grid;grid-template-columns:1fr 360px;gap:16px;padding:16px;height:calc(100vh - 64px)">
+
+  <!-- Left: Barcode input + Cart -->
+  <div style="display:flex;flex-direction:column;gap:12px;overflow:hidden">
+
+    <!-- Barcode scanner input -->
+    <mat-card class="cardWithShadow">
+      <mat-card-content class="p-12">
+        <mat-form-field appearance="outline" style="width:100%">
+          <mat-label>Scan barcode / QR code</mat-label>
+          <input
+            matInput
+            #barcodeInput
+            [(ngModel)]="scanCode"
+            (keyup.enter)="onScan()"
+            (blur)="focusBarcode()"
+            placeholder="Scan or type code…"
+            autocomplete="off"
+          />
+          <mat-hint>Press Enter after typing or scanning. F5 to checkout.</mat-hint>
+        </mat-form-field>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Cart items -->
+    <mat-card class="cardWithShadow" style="flex:1;overflow:auto">
+      <mat-card-header>
+        <mat-card-title>Cart ({{ cart.length }} items)</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div *ngIf="cart.length === 0" style="color:#999;padding:24px;text-align:center">
+          Cart is empty — scan a product to add
+        </div>
+        <mat-list>
+          <mat-list-item *ngFor="let item of cart; let i = index">
+            <div style="display:flex;align-items:center;width:100%;gap:8px">
+              <span style="flex:1;font-weight:500">{{ item.product.name }}</span>
+              <span style="width:90px;text-align:right;color:#555">{{ formatMdl(item.product.price) }}</span>
+              <button mat-icon-button (click)="changeQty(item, -1)" class="btn-sm">
+                <mat-icon>remove</mat-icon>
+              </button>
+              <span style="width:28px;text-align:center">{{ item.quantity }}</span>
+              <button mat-icon-button (click)="changeQty(item, 1)" class="btn-sm">
+                <mat-icon>add</mat-icon>
+              </button>
+              <span style="width:100px;text-align:right;font-weight:600">
+                {{ formatMdl(item.product.price * item.quantity) }}
+              </span>
+              <button mat-icon-button color="warn" (click)="removeFromCart(i)">
+                <mat-icon>delete_outline</mat-icon>
+              </button>
+            </div>
+          </mat-list-item>
+        </mat-list>
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+
+  <!-- Right: Customer + Totals + Checkout -->
+  <div style="display:flex;flex-direction:column;gap:12px">
+
+    <!-- Customer panel -->
+    <mat-card class="cardWithShadow">
+      <mat-card-header>
+        <mat-card-title>Customer</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+
+        <div *ngIf="!customer" style="color:#999;font-size:13px">
+          Scan customer QR card to link
+        </div>
+
+        <div *ngIf="customer">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div>
+              <div style="font-weight:600">{{ customer.email }}</div>
+              <div style="font-size:12px;color:#888">ID: {{ customer.id }}</div>
+              <mat-chip-set style="margin-top:4px">
+                <mat-chip color="accent" highlighted>18+</mat-chip>
+              </mat-chip-set>
+            </div>
+            <button mat-icon-button (click)="clearCustomer()">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+
+          <mat-divider style="margin:12px 0"></mat-divider>
+
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+            <span>Points balance</span>
+            <strong>{{ customer.pointsBalance }} pts</strong>
+          </div>
+
+          <div class="m-b-12">
+            <mat-checkbox [(ngModel)]="usePoints">Use points</mat-checkbox>
+          </div>
+
+          <div style="font-size:12px;color:#666">
+            Max points for this purchase: <strong>{{ maxPointsForPurchase }}</strong> pts (≈ {{ formatMdl((maxPointsForPurchase * 100) / spendRate) }})
+          </div>
+        </div>
+
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Totals -->
+    <mat-card class="cardWithShadow">
+      <mat-card-content class="p-16">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+          <span>Subtotal</span>
+          <span>{{ formatMdl(grossTotal) }}</span>
+        </div>
+        <div *ngIf="discountCents > 0" style="display:flex;justify-content:space-between;color:#e53935;margin-bottom:8px">
+          <span>Points discount ({{ pointsUsed }} pts)</span>
+          <span>− {{ formatMdl(discountCents) }}</span>
+        </div>
+        <mat-divider></mat-divider>
+        <div style="display:flex;justify-content:space-between;margin-top:12px;font-size:20px;font-weight:700">
+          <span>TOTAL</span>
+          <span>{{ formatMdl(netTotal) }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Checkout button -->
+    <button
+      mat-raised-button
+      color="primary"
+      style="height:56px;font-size:18px;font-weight:700;letter-spacing:1px"
+      [disabled]="cart.length === 0 || loading"
+      (click)="checkout()"
+    >
+      <mat-icon>point_of_sale</mat-icon>
+      {{ loading ? 'Processing…' : 'CHECKOUT (F5)' }}
+    </button>
+
+    <!-- Last order summary -->
+    <mat-card *ngIf="lastOrder" class="cardWithShadow" style="background:#e8f5e9">
+      <mat-card-content class="p-12">
+        <div style="font-weight:600;color:#2e7d32">Order #{{ lastOrder.id }} completed</div>
+        <div style="font-size:13px;color:#555">
+          Total paid: {{ formatMdl(lastOrder.total) }}
+          <span *ngIf="lastOrder.discount"> · Discount: {{ formatMdl(lastOrder.discount) }}</span>
+          <span *ngIf="lastOrder.pointsEarned"> · Earned: {{ lastOrder.pointsEarned }} pts</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+</div>

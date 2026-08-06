@@ -1,0 +1,78 @@
+﻿<div class="p-24">
+  <mat-card class="cardWithShadow">
+    <mat-card-content class="p-32">
+
+      <div class="d-flex align-items-center justify-content-between m-b-24">
+        <h2 class="f-s-20 f-w-700">{{ 'USERS.TITLE' | translate }}</h2>
+        <button mat-flat-button color="primary" (click)="openCreateDialog()">
+          <mat-icon>person_add</mat-icon> {{ 'USERS.CREATE' | translate }}
+        </button>
+      </div>
+
+      @if (successMessage) {
+        <p class="text-success f-s-14 m-b-16">{{ successMessage }}</p>
+      }
+      @if (errorMessage) {
+        <p class="text-danger f-s-14 m-b-16">{{ errorMessage }}</p>
+      }
+
+      <mat-table [dataSource]="users">
+
+        <ng-container matColumnDef="id">
+          <mat-header-cell *matHeaderCellDef>ID</mat-header-cell>
+          <mat-cell *matCellDef="let u">{{ u.id }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="email">
+          <mat-header-cell *matHeaderCellDef>Email</mat-header-cell>
+          <mat-cell *matCellDef="let u">{{ u.email }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="roles">
+          <mat-header-cell *matHeaderCellDef>{{ 'USERS.ROLES' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let u">{{ u.roles.join(', ') }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <mat-header-cell *matHeaderCellDef>{{ 'USERS.STATUS' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let u">
+            <mat-chip [color]="u.banned ? 'warn' : 'primary'" highlighted>
+              {{ u.banned ? ('USERS.BANNED' | translate) : ('USERS.ACTIVE' | translate) }}
+            </mat-chip>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.ACTIONS' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let u">
+            <button mat-icon-button color="primary" (click)="openChangePasswordDialog(u)" title="Change Password">
+              <mat-icon>lock_reset</mat-icon>
+            </button>
+            <button mat-icon-button [color]="u.banned ? 'primary' : 'warn'" (click)="toggleBan(u)"
+              [title]="u.banned ? 'Unban' : 'Ban'">
+              <mat-icon>{{ u.banned ? 'lock_open' : 'block' }}</mat-icon>
+            </button>
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell p-16" [attr.colspan]="displayedColumns.length">{{ 'USERS.EMPTY' | translate }}</td>
+        </tr>
+
+      </mat-table>
+
+      <mat-paginator
+        [length]="totalElements"
+        [pageSize]="pageSize"
+        [pageIndex]="pageIndex"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="onPageChange($event)"
+        showFirstLastButtons>
+      </mat-paginator>
+
+    </mat-card-content>
+  </mat-card>
+</div>

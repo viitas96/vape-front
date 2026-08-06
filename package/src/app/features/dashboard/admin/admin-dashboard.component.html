@@ -1,0 +1,42 @@
+<div class="p-24">
+  <mat-card class="cardWithShadow">
+    <mat-card-content class="p-32">
+      <h2 class="f-s-20 f-w-700 m-b-24">Create User</h2>
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+
+        <mat-label class="f-s-14 f-w-600 m-b-12 d-block">Email</mat-label>
+        <mat-form-field appearance="outline" class="w-100">
+          <input matInput formControlName="email" type="email" placeholder="user@example.com" />
+          <mat-error>Enter a valid email address</mat-error>
+        </mat-form-field>
+
+        <mat-label class="f-s-14 f-w-600 m-b-12 d-block">Password</mat-label>
+        <mat-form-field appearance="outline" class="w-100">
+          <input matInput formControlName="password" type="password" />
+          <mat-error>Password must be at least 6 characters</mat-error>
+        </mat-form-field>
+
+        <mat-label class="f-s-14 f-w-600 m-b-12 d-block">Roles</mat-label>
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-select formControlName="roles" multiple placeholder="Select roles">
+            @for (role of roles; track role.id) {
+              <mat-option [value]="role.id">{{ role.name }}</mat-option>
+            }
+          </mat-select>
+          <mat-error>At least one role is required</mat-error>
+        </mat-form-field>
+
+        @if (successMessage) {
+          <p class="text-success f-s-14 m-b-16">{{ successMessage }}</p>
+        }
+        @if (errorMessage) {
+          <p class="text-danger f-s-14 m-b-16">{{ errorMessage }}</p>
+        }
+
+        <button type="submit" mat-flat-button color="primary">Create User</button>
+
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

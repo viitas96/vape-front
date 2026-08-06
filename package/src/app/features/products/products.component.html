@@ -1,0 +1,93 @@
+﻿<div class="p-24">
+  <mat-card class="cardWithShadow">
+    <mat-card-content class="p-32">
+
+      <div class="d-flex align-items-center justify-content-between m-b-24">
+        <h2 class="f-s-20 f-w-700">{{ 'PRODUCTS.TITLE' | translate }}</h2>
+        <button mat-flat-button color="primary" (click)="openDialog()">
+          <mat-icon>add</mat-icon> {{ 'PRODUCTS.ADD' | translate }}
+        </button>
+      </div>
+
+      @if (successMessage) {
+        <p class="text-success f-s-14 m-b-16">{{ successMessage }}</p>
+      }
+      @if (errorMessage) {
+        <p class="text-danger f-s-14 m-b-16">{{ errorMessage }}</p>
+      }
+
+      <mat-table [dataSource]="products">
+
+        <ng-container matColumnDef="id">
+          <mat-header-cell *matHeaderCellDef>ID</mat-header-cell>
+          <mat-cell *matCellDef="let p">{{ p.id }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+          <mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.NAME' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let p">{{ p.name }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="price">
+          <mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.PRICE' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let p">${{ formatPrice(p.price) }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="itemCode">
+          <mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.ITEM_CODE' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let p">{{ p.itemCode || '—' }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="barcode">
+          <mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.BARCODE' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let p">{{ p.barcode || '—' }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="matrixBarcode">
+          <mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.MATRIX_BARCODE' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let p">{{ p.matrixBarcode || '—' }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="qrCode">
+          <mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.QR_CODE' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let p">{{ p.qrCode || '—' }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="group">
+          <mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.GROUP' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let p">{{ p.group?.name || '—' }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.ACTIONS' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let p">
+            <button mat-icon-button color="primary" (click)="openDialog(p)" title="Edit">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="delete(p)" title="Delete">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell p-16" [attr.colspan]="displayedColumns.length">{{ 'PRODUCTS.EMPTY' | translate }}</td>
+        </tr>
+
+      </mat-table>
+
+      <mat-paginator
+        [length]="totalElements"
+        [pageSize]="pageSize"
+        [pageIndex]="pageIndex"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="onPageChange($event)"
+        showFirstLastButtons>
+      </mat-paginator>
+
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,27 +1,22 @@
-import { BreakpointObserver, MediaMatcher } from '@angular/cdk/layout';
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { Subscription } from 'rxjs';
+﻿import { BreakpointObserver } from '@angular/cdk/layout';
+import { Component, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatSidenav, MatSidenavContent } from '@angular/material/sidenav';
-import { CoreService } from 'src/app/services/core.service';
-
-import { filter } from 'rxjs/operators';
-import { NavigationEnd, Router } from '@angular/router';
-import { NavService } from '../../services/nav.service';
-import { RouterModule } from '@angular/router';
-import { MaterialModule } from 'src/app/material.module';
-
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { NgScrollbarModule } from 'ngx-scrollbar';
+import { Subscription, filter } from 'rxjs';
 import { TablerIconsModule } from 'angular-tabler-icons';
-import { HeaderComponent } from './header/header.component';
-import { SidebarComponent } from './sidebar/sidebar.component';
+import { buildSidebarNavItems } from 'src/app/core/routing/app-feature.routes';
+import { MaterialModule } from 'src/app/material.module';
+import { AuthService } from 'src/app/services/auth.service';
+import { CoreService } from 'src/app/services/core.service';
+import { LanguageService, SupportedLanguage } from 'src/app/services/language.service';
 import { AppNavItemComponent } from './sidebar/nav-item/nav-item.component';
-import { navItems } from './sidebar/sidebar-data';
-import { AppTopstripComponent } from './top-strip/topstrip.component';
-
+import { NavItem } from './sidebar/nav-item/nav-item';
+import { SidebarComponent } from './sidebar/sidebar.component';
+import { HeaderComponent } from './header/header.component';
 
 const MOBILE_VIEW = 'screen and (max-width: 768px)';
 const TABLET_VIEW = 'screen and (min-width: 769px) and (max-width: 1024px)';
-
 
 @Component({
   selector: 'app-full',
@@ -32,85 +27,81 @@ const TABLET_VIEW = 'screen and (min-width: 769px) and (max-width: 1024px)';
     SidebarComponent,
     NgScrollbarModule,
     TablerIconsModule,
-    HeaderComponent,
-    AppTopstripComponent
-],
+  ],
   templateUrl: './full.component.html',
-  styleUrls: [],
-  encapsulation: ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None,
 })
-export class FullComponent implements OnInit {
-  navItems = navItems;
-
-  @ViewChild('leftsidenav')
-  public sidenav: MatSidenav;
-  resView = false;
+export class FullComponent implements OnInit, OnDestroy {
+  @ViewChild('leftsidenav') sidenav?: MatSidenav;
   @ViewChild('content', { static: true }) content!: MatSidenavContent;
-  //get options from service
+
+  navItems: NavItem[] = [];
   options = this.settings.getOptions();
-  private layoutChangesSubscription = Subscription.EMPTY;
+
+  private readonly subscriptions = new Subscription();
   private isMobileScreen = false;
-  private isContentWidthFixed = true;
-  private isCollapsedWidthFixed = false;
-  private htmlElement!: HTMLHtmlElement;
 
   get isOver(): boolean {
     return this.isMobileScreen;
   }
 
-
   constructor(
-    private settings: CoreService,
-    private router: Router,
-    private breakpointObserver: BreakpointObserver,
+    private readonly settings: CoreService,
+    private readonly router: Router,
+    private readonly breakpointObserver: BreakpointObserver,
+    private readonly authService: AuthService,
+    private readonly languageService: LanguageService,
   ) {
-    this.htmlElement = document.querySelector('html')!;
-    this.layoutChangesSubscription = this.breakpointObserver
-      .observe([MOBILE_VIEW, TABLET_VIEW])
-      .subscribe((state) => {
-        // SidenavOpened must be reset true when layout changes
+    this.subscriptions.add(
+      this.breakpointObserver.observe([MOBILE_VIEW, TABLET_VIEW]).subscribe((state) => {
         this.options.sidenavOpened = true;
         this.isMobileScreen = state.breakpoints[MOBILE_VIEW];
-        if (this.options.sidenavCollapsed == false) {
+
+        if (!this.options.sidenavCollapsed) {
           this.options.sidenavCollapsed = state.breakpoints[TABLET_VIEW];
         }
-      });
+      }),
+    );
 
-    // Initialize project theme with options
-
-
-    // This is for scroll to top
-    this.router.events
-      .pipe(filter((event) => event instanceof NavigationEnd))
-      .subscribe((e) => {
+    this.subscriptions.add(
+      this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
         this.content.scrollTo({ top: 0 });
-      });
+      }),
+    );
   }
 
-  ngOnInit(): void { }
-
-  ngOnDestroy() {
-    this.layoutChangesSubscription.unsubscribe();
+  ngOnInit(): void {
+    this.navItems = buildSidebarNavItems(this.authService.getRoles());
   }
 
-  toggleCollapsed() {
-    this.isContentWidthFixed = false;
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
+  }
+
+  get currentLanguage(): SupportedLanguage {
+    return this.languageService.currentLanguage;
+  }
+
+  setLanguage(language: SupportedLanguage): void {
+    this.languageService.setLanguage(language);
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/authentication/login']);
+  }
+
+  toggleCollapsed(): void {
     this.options.sidenavCollapsed = !this.options.sidenavCollapsed;
-    this.resetCollapsedState();
+    this.settings.setOptions(this.options);
   }
 
-  resetCollapsedState(timer = 400) {
-    setTimeout(() => this.settings.setOptions(this.options), timer);
+  onSidenavClosedStart(): void {
+    this.settings.setOptions({ sidenavOpened: false });
   }
 
-  onSidenavClosedStart() {
-    this.isContentWidthFixed = false;
-  }
-
-  onSidenavOpenedChange(isOpened: boolean) {
-    this.isCollapsedWidthFixed = !this.isOver;
+  onSidenavOpenedChange(isOpened: boolean): void {
     this.options.sidenavOpened = isOpened;
-    //this.settings.setOptions(this.options);
+    this.settings.setOptions({ sidenavOpened: isOpened });
   }
-
 }

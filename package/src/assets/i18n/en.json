@@ -1,0 +1,112 @@
+﻿{
+    "HEADER":  {
+                   "LOGOUT":  "Logout"
+               },
+    "Management":  "Management",
+    "Product Groups":  "Product Groups",
+    "AUTH":  {
+                 "COMMON":  {
+                                "EMAIL":  "Email",
+                                "PASSWORD":  "Password"
+                            },
+                 "LOGIN":  {
+                               "GOOGLE":  "Sign in with Google",
+                               "FACEBOOK":  "Sign in with Facebook",
+                               "OR_EMAIL":  "or sign in with email",
+                               "INVALID_EMAIL":  "Enter a valid email address",
+                               "HIDE_PASSWORD":  "Hide password",
+                               "SHOW_PASSWORD":  "Show password",
+                               "PASSWORD_REQUIRED":  "Password is required",
+                               "REMEMBER_DEVICE":  "Remember this device",
+                               "FORGOT_PASSWORD":  "Forgot password?",
+                               "SUBMIT":  "Sign in",
+                               "NEW_TO_APP":  "New to Spike?",
+                               "CREATE_ACCOUNT":  "Create an account",
+                               "INVALID_CREDENTIALS":  "Invalid email or password"
+                           },
+                 "REGISTER":  {
+                                  "EMAIL":  "Email address",
+                                  "PASSWORD_LENGTH":  "Password must be at least 6 characters",
+                                  "DATE_OF_BIRTH":  "Date of birth",
+                                  "DATE_OF_BIRTH_REQUIRED":  "Date of birth is required",
+                                  "CREATING":  "Creating account...",
+                                  "SUBMIT":  "Create account",
+                                  "HAS_ACCOUNT":  "Already have an account?"
+                              }
+             },
+    "COMMON":  {
+                   "CANCEL":  "Cancel",
+                   "SAVE":  "Save",
+                   "CREATE":  "Create",
+                   "DELETE":  "Delete"
+               },
+    "GROUPS":  {
+                   "TITLE":  "Product groups",
+                   "ADD":  "Add group",
+                   "EDIT":  "Edit group",
+                   "EMPTY":  "No groups found.",
+                   "CATEGORY":  "Category",
+                   "CATEGORY_REQUIRED":  "Category is required"
+               },
+    "PRODUCTS":  {
+                     "TITLE":  "Products",
+                     "ADD":  "Add product",
+                     "NAME":  "Name",
+                     "PRICE":  "Price",
+                     "ITEM_CODE":  "Item code",
+                     "BARCODE":  "Barcode",
+                     "MATRIX_BARCODE":  "Matrix barcode",
+                     "QR_CODE":  "QR code",
+                     "GROUP":  "Group",
+                     "ACTIONS":  "Actions",
+                     "EMPTY":  "No products found.",
+                     "EDIT":  "Edit product",
+                     "NAME_REQUIRED":  "Name is required",
+                     "PRICE_INVALID":  "Price must be 0 or greater",
+                     "NO_GROUP":  "No group"
+                 },
+    "USERS":  {
+                  "TITLE":  "Users",
+                  "CREATE":  "Create user",
+                  "ROLES":  "Roles",
+                  "STATUS":  "Status",
+                  "BANNED":  "Banned",
+                  "ACTIVE":  "Active",
+                  "EMPTY":  "No users found.",
+                  "CREATING":  "Creating...",
+                  "SAVING":  "Saving...",
+                  "CHANGE_PASSWORD":  "Change password",
+                  "NEW_PASSWORD":  "New password"
+              },
+    "ORDERS":  {
+                   "TITLE":  "Orders",
+                   "ADD":  "Add order",
+                   "STATUS":  "Status",
+                   "ITEMS":  "Items",
+                   "POINTS_USED":  "Points used",
+                   "TOTAL":  "Total",
+                   "CREATED_BY":  "Created by",
+                   "CREATED_AT":  "Created at",
+                   "EMPTY":  "No orders found.",
+                   "AVAILABLE_POINTS":  "Available points",
+                   "WALK_IN":  "Customer is not in the system (walk-in)",
+                   "ADD_ITEM":  "Add item",
+                   "CUSTOMER":  "Customer",
+                   "EDIT":  "Edit order",
+                   "USE_POINTS":  "Use points"
+               },
+    "SETTINGS":  {
+                     "TITLE":  "Loyalty points settings",
+                     "SAVING":  "Saving...",
+                     "SAVE":  "Save settings",
+                     "SAVED":  "Settings saved.",
+                     "LOAD_FAILED":  "Failed to load settings",
+                     "SAVE_FAILED":  "Failed to save settings",
+                     "MIN_ERROR":  "Value must be at least 1",
+                     "SPEND_RATE":  "Spend rate — points per 1 MDL when redeeming",
+                     "SOUVENIR_SPLIT":  "Souvenir split (%) — points portion for souvenir purchases",
+                     "GOODS_CAP":  "General goods cap (%) — maximum payable with points",
+                     "EARN_RATE":  "Earn rate (%) — cashback points per 100 MDL paid",
+                     "BETWEEN_ERROR":  "Value must be between 1 and 100"
+                 }
+}

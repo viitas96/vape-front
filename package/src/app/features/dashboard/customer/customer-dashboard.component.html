@@ -1,0 +1,129 @@
+@if (profile) {
+<div class="m-16">
+
+  <!-- Digital Card -->
+  <mat-card class="cardWithShadow m-b-24" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%); color: white;">
+    <mat-card-content class="p-32 text-center">
+      <p class="f-s-12 f-w-400 m-b-8" style="opacity: 0.7; letter-spacing: 2px; text-transform: uppercase;">Loyalty Card</p>
+      <p class="f-s-12 m-b-4" style="opacity: 0.6;">{{ profile.email }}</p>
+
+      <!-- QR code -->
+      <div class="m-y-20" style="display: inline-block;">
+        <div style="background: white; border-radius: 12px; padding: 16px; display: inline-block;">
+          @if (qrDataUrl) {
+            <img [src]="qrDataUrl" alt="Loyalty QR" style="display: block; width: 180px; height: 180px;" />
+          } @else {
+            <div style="width: 180px; height: 180px; display: flex; align-items: center; justify-content: center;">
+              <mat-spinner diameter="40"></mat-spinner>
+            </div>
+          }
+        </div>
+        <p style="font-size: 11px; opacity: 0.6; margin: 8px 0 0;">Scan to link this customer to an order</p>
+      </div>
+
+      <!-- Points summary -->
+      <div class="d-flex justify-content-center gap-32 m-t-8">
+        <div>
+          <p class="f-s-32 f-w-700 m-b-0" style="line-height: 1;">{{ profile.pointsBalance }}</p>
+          <p class="f-s-12 m-t-4" style="opacity: 0.7;">Available points</p>
+        </div>
+        <div style="width: 1px; background: rgba(255,255,255,0.2);"></div>
+        <div>
+          <p class="f-s-32 f-w-700 m-b-0" style="line-height: 1;">{{ pointsValueMdl.toFixed(2) }}</p>
+          <p class="f-s-12 m-t-4" style="opacity: 0.7;">MDL value</p>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Souvenir Progress -->
+  <mat-card class="cardWithShadow m-b-24">
+    <mat-card-content class="p-24">
+      <div class="d-flex align-items-center justify-content-between m-b-12">
+        <p class="f-s-14 f-w-600 m-b-0">Progress toward top souvenir</p>
+        <span class="f-s-14 f-w-600 text-primary">{{ souvenirProgressPercent }}%</span>
+      </div>
+      <mat-progress-bar mode="determinate" [value]="souvenirProgressPercent" color="primary"></mat-progress-bar>
+      <p class="f-s-12 text-muted m-t-8 m-b-0">Keep earning points to unlock a souvenir at 90% off!</p>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Promotions Carousel -->
+  @if (promotions.length > 0) {
+    <mat-card class="cardWithShadow m-b-24">
+      <mat-card-header>
+        <mat-card-title class="f-s-16">Promotions</mat-card-title>
+      </mat-card-header>
+      <mat-card-content class="p-x-24 p-b-24">
+        <div style="min-height: 80px;">
+          <p class="f-s-16 f-w-600 m-b-8">{{ promotions[promoIndex].title }}</p>
+          <p class="f-s-14 text-muted m-b-0">{{ promotions[promoIndex].body }}</p>
+        </div>
+        @if (promotions.length > 1) {
+          <div class="d-flex align-items-center justify-content-between m-t-16">
+            <button mat-icon-button (click)="prevPromo()">
+              <mat-icon>chevron_left</mat-icon>
+            </button>
+            <span class="f-s-12 text-muted">{{ promoIndex + 1 }} / {{ promotions.length }}</span>
+            <button mat-icon-button (click)="nextPromo()">
+              <mat-icon>chevron_right</mat-icon>
+            </button>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+  }
+
+  <!-- Recent Orders -->
+  <mat-card class="cardWithShadow">
+    <mat-card-header>
+      <mat-card-title class="f-s-16">Recent Receipts</mat-card-title>
+    </mat-card-header>
+    <mat-card-content class="p-x-24 p-b-24">
+      @if (orders.length === 0) {
+        <div class="text-center p-24 text-muted">
+          No receipts yet. Start shopping!
+        </div>
+      } @else {
+        <mat-accordion>
+          @for (order of orders; track order.id) {
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title class="f-s-14 f-w-600">
+                  Receipt #{{ order.id }}
+                </mat-panel-title>
+                <mat-panel-description>
+                  {{ formatMdl(order.total) }} &nbsp;·&nbsp; {{ order.createdAt | date:'dd.MM.yyyy HH:mm' }} &nbsp;·&nbsp;
+                  <span [class]="order.status === 'COMPLETED' ? 'text-success' : 'text-muted'">{{ order.status }}</span>
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+
+              <table class="w-100" style="border-collapse: collapse;">
+                <thead>
+                  <tr style="border-bottom: 1px solid #eee;">
+                    <th class="f-s-12 f-w-600 p-b-8" style="text-align: left;">Product</th>
+                    <th class="f-s-12 f-w-600 p-b-8" style="text-align: right;">Qty</th>
+                    <th class="f-s-12 f-w-600 p-b-8" style="text-align: right;">Price</th>
+                    <th class="f-s-12 f-w-600 p-b-8" style="text-align: right;">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (item of order.items; track $index) {
+                    <tr style="border-bottom: 1px solid #f5f5f5;">
+                      <td class="f-s-13 p-y-8">{{ item.productName }}</td>
+                      <td class="f-s-13 p-y-8" style="text-align: right;">{{ item.quantity }}</td>
+                      <td class="f-s-13 p-y-8" style="text-align: right;">{{ formatMdl(item.unitPrice) }}</td>
+                      <td class="f-s-13 p-y-8" style="text-align: right;">{{ formatMdl(item.lineTotal) }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </mat-expansion-panel>
+          }
+        </mat-accordion>
+      }
+    </mat-card-content>
+  </mat-card>
+
+</div>
+}

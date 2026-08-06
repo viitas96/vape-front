@@ -1,51 +1,41 @@
 import { Routes } from '@angular/router';
 import { BlankComponent } from './layouts/blank/blank.component';
 import { FullComponent } from './layouts/full/full.component';
+import { APP_FEATURE_ROUTE_DEFINITIONS } from './core/routing/app-feature.routes';
+import { guestGuard } from './guards/guest.guard';
+import { homeRedirectGuard } from './guards/home-redirect.guard';
+import { roleGuard } from './guards/role.guard';
+
+const featureRoutes: Routes = APP_FEATURE_ROUTE_DEFINITIONS.map((definition) => ({
+  path: definition.path,
+  canActivate: [roleGuard],
+  data: {
+    title: definition.title,
+    roles: definition.roles,
+  },
+  loadComponent: definition.loadComponent,
+}));
 
 export const routes: Routes = [
   {
     path: '',
-    component: FullComponent,
-    children: [
-      {
-        path: '',
-        redirectTo: '/dashboard',
-        pathMatch: 'full',
-      },
-      {
-        path: 'dashboard',
-        loadChildren: () =>
-          import('./pages/pages.routes').then((m) => m.PagesRoutes),
-      },
-      {
-        path: 'ui-components',
-        loadChildren: () =>
-          import('./pages/ui-components/ui-components.routes').then(
-            (m) => m.UiComponentsRoutes
-          ),
-      },
-      {
-        path: 'extra',
-        loadChildren: () =>
-          import('./pages/extra/extra.routes').then((m) => m.ExtraRoutes),
-      },
-    ],
+    pathMatch: 'full',
+    canActivate: [homeRedirectGuard],
+    loadComponent: () => import('./shared/page/route-placeholder.component').then((m) => m.RoutePlaceholderComponent),
+  },
+  {
+    path: 'authentication',
+    component: BlankComponent,
+    canActivate: [guestGuard],
+    loadChildren: () => import('./features/auth/auth.routes').then((m) => m.AuthenticationRoutes),
   },
   {
     path: '',
-    component: BlankComponent,
-    children: [
-      {
-        path: 'authentication',
-        loadChildren: () =>
-          import('./pages/authentication/authentication.routes').then(
-            (m) => m.AuthenticationRoutes
-          ),
-      },
-    ],
+    component: FullComponent,
+    children: featureRoutes,
   },
   {
     path: '**',
-    redirectTo: 'authentication/error',
+    redirectTo: '',
   },
 ];

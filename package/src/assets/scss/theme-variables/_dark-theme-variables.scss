@@ -1,0 +1,34 @@
+html .dark-theme {
+  color-scheme: dark;
+  --mat-sys-corner-small: 7px;
+  --mat-sys-corner-medium: 16px;
+  --mat-sys-background: #20283a;
+  --mat-sys-surface-bright: #2a3447;
+  --mat-sys-surface: #2a3447;
+  --mat-sys-surface-container: #2a3447;
+  --mat-sys-surface-container-low: #2a3447;
+  --mat-sys-surface-container-high: #2a3447;
+  --mat-sys-on-background: #eaeff4;
+  --mat-sys-on-surface: #eaeff4;
+  --mat-sys-outline: #333f55;
+  --mat-sys-outline-variant: #333f55;
+  --mdc-outlined-text-field-hover-outline-color: #465670;
+  --mdc-checkbox-unselected-hover-state-layer-color: #465670;
+  --mat-menu-item-hover-state-layer-color: #333f55;
+  --mat-standard-button-toggle-state-layer-color: #333f55;
+  --mat-option-focus-state-layer-color: #333f55;
+  --mat-option-hover-state-layer-color: #333f55;
+  --mdc-switch-unselected-track-color: #333f55;
+  --mat-stepper-header-focus-state-layer-color: #333f55;
+  --mat-stepper-header-hover-state-layer-color: #333f55;
+  --mdc-dialog-supporting-text-color: var(--mat-sys-on-background);
+  --mat-expansion-header-hover-state-layer-color: #333f55;
+}
+
+// brighten section / module titles in dark mode so they stand out on dark cards
+html .dark-theme {
+  h1, h2, h3, h4, h5, h6,
+  .mat-mdc-card-title {
+    color: #ffffff;
+  }
+}

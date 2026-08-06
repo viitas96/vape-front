@@ -15,16 +15,9 @@ body {
 
 .mainWrapper {
   display: flex;
-  min-height: calc(100vh - 72px);
+  min-height: 100vh;
   width: 100%;
   flex: 1;
-  margin-top: 72px;
-}
-
-@media (max-width: 991px) {
-  .mainWrapper {
-    margin-top: 154px;
-  }
 }
 
 .container {

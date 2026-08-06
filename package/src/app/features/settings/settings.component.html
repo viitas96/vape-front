@@ -1,0 +1,58 @@
+﻿<div class="m-24">
+  <mat-card class="cardWithShadow">
+    <mat-card-content class="p-32">
+      <h2 class="mat-headline-5 m-b-4">{{ 'SETTINGS.TITLE' | translate }}</h2>
+      <p class="mat-body-2 text-muted m-b-24">
+        Exchange rates — earn 200 MDL → 20 points (at 10%); spend 10 points = 1 MDL.
+      </p>
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+
+        <mat-label class="f-s-14 f-w-600 m-b-8 d-block">
+          {{ 'SETTINGS.EARN_RATE' | translate }}</mat-label>
+        <mat-form-field appearance="outline" class="w-100 m-b-16">
+          <input matInput type="number" formControlName="earnRatePercent" min="1" max="100" />
+          <mat-hint>Default: 10% → 200 MDL paid = 20 points</mat-hint>
+          <mat-error>{{ 'SETTINGS.BETWEEN_ERROR' | translate }}</mat-error>
+        </mat-form-field>
+
+        <mat-label class="f-s-14 f-w-600 m-b-8 d-block">
+          {{ 'SETTINGS.SPEND_RATE' | translate }}</mat-label>
+        <mat-form-field appearance="outline" class="w-100 m-b-16">
+          <input matInput type="number" formControlName="spendRate" min="1" />
+          <mat-hint>Default: 10 → 10 points = 1 MDL discount</mat-hint>
+          <mat-error>{{ 'SETTINGS.MIN_ERROR' | translate }}</mat-error>
+        </mat-form-field>
+
+        <mat-label class="f-s-14 f-w-600 m-b-8 d-block">
+          {{ 'SETTINGS.GOODS_CAP' | translate }}</mat-label>
+        <mat-form-field appearance="outline" class="w-100 m-b-16">
+          <input matInput type="number" formControlName="goodsPointsCapPercent" min="1" max="100" />
+          <mat-hint>Default: 50% — points can cover at most half the goods total</mat-hint>
+          <mat-error>{{ 'SETTINGS.BETWEEN_ERROR' | translate }}</mat-error>
+        </mat-form-field>
+
+        <mat-label class="f-s-14 f-w-600 m-b-8 d-block">
+          {{ 'SETTINGS.SOUVENIR_SPLIT' | translate }}</mat-label>
+        <mat-form-field appearance="outline" class="w-100 m-b-24">
+          <input matInput type="number" formControlName="souvenirSplitPercent" min="1" max="100" />
+          <mat-hint>Default: 90% from points, 10% cash — field is locked for seller</mat-hint>
+          <mat-error>{{ 'SETTINGS.BETWEEN_ERROR' | translate }}</mat-error>
+        </mat-form-field>
+
+        @if (successMessage) {
+          <p class="text-success f-s-14 m-b-12">{{ successMessage }}</p>
+        }
+        @if (errorMessage) {
+          <p class="text-danger f-s-14 m-b-12">{{ errorMessage }}</p>
+        }
+
+        @if (canEdit) {
+          <button type="submit" mat-flat-button color="primary" [disabled]="loading">
+            {{ loading ? ('SETTINGS.SAVING' | translate) : ('SETTINGS.SAVE' | translate) }}
+          </button>
+        }
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

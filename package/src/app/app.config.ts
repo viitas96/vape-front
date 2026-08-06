@@ -1,13 +1,22 @@
 import {
   ApplicationConfig,
+  LOCALE_ID,
+  inject,
+  provideAppInitializer,
   provideZoneChangeDetection,
   importProvidersFrom,
 } from '@angular/core';
+import { registerLocaleData } from '@angular/common';
+import localeEnGb from '@angular/common/locales/en-GB';
+
+registerLocaleData(localeEnGb);
 import {
   HttpClient,
   provideHttpClient,
-  withInterceptorsFromDi,
+  withInterceptors,
 } from '@angular/common/http';
+import { jwtInterceptor } from './interceptors/jwt.interceptor';
+import { errorInterceptor } from './interceptors/error.interceptor';
 import { routes } from './app.routes';
 import {
   provideRouter,
@@ -16,8 +25,9 @@ import {
 } from '@angular/router';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideClientHydration } from '@angular/platform-browser';
-import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { provideTranslateService } from '@ngx-translate/core';
+import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
+import { LanguageService } from './services/language.service';
 
 // icons
 import { TablerIconsModule } from 'angular-tabler-icons';
@@ -33,6 +43,18 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
+    { provide: LOCALE_ID, useValue: 'en-GB' },
+    provideTranslateService({
+      lang: 'ro',
+      fallbackLang: 'en',
+      loader: provideTranslateHttpLoader({
+        prefix: './assets/i18n/',
+        suffix: '.json',
+      }),
+    }),
+    provideAppInitializer(() => {
+      inject(LanguageService);
+    }),
     provideRouter(
       routes,
       withInMemoryScrolling({
@@ -41,7 +63,7 @@ export const appConfig: ApplicationConfig = {
       }),
       withComponentInputBinding()
     ),
-    provideHttpClient(withInterceptorsFromDi()),
+    provideHttpClient(withInterceptors([jwtInterceptor, errorInterceptor])),
     provideClientHydration(),
     provideAnimationsAsync(),
     importProvidersFrom(

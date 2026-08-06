@@ -1,0 +1,22 @@
+﻿<div class="blank-layout-container justify-content-center align-items-center bg-light">
+  <div class="position-relative row w-100 h-100 bg-gredient justify-content-center">
+    <div class="col-lg-4 d-flex align-items-center">
+      <mat-card class="cardWithShadow boxed-auth">
+        <mat-card-content class="p-32">
+          <div class="text-center"><a [routerLink]="['/dashboard']"><img src="./assets/images/logos/dark-logo.svg" class="align-middle m-2" alt="logo" /></a></div>
+          <form [formGroup]="form" (ngSubmit)="submit()" class="m-t-30">
+            <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'AUTH.REGISTER.EMAIL' | translate }}</mat-label>
+            <mat-form-field appearance="outline" class="w-100" color="primary"><input matInput formControlName="email" type="email" placeholder="you@example.com" /><mat-error>{{ 'AUTH.LOGIN.INVALID_EMAIL' | translate }}</mat-error></mat-form-field>
+            <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'AUTH.COMMON.PASSWORD' | translate }}</mat-label>
+            <mat-form-field appearance="outline" class="w-100" color="primary"><input matInput [type]="showPassword ? 'text' : 'password'" formControlName="password" /><button mat-icon-button matSuffix type="button" (click)="showPassword = !showPassword" [attr.aria-label]="showPassword ? ('AUTH.LOGIN.HIDE_PASSWORD' | translate) : ('AUTH.LOGIN.SHOW_PASSWORD' | translate)"><mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon></button><mat-error>{{ 'AUTH.REGISTER.PASSWORD_LENGTH' | translate }}</mat-error></mat-form-field>
+            <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'AUTH.REGISTER.DATE_OF_BIRTH' | translate }}</mat-label>
+            <mat-form-field appearance="outline" class="w-100" color="primary"><input matInput formControlName="dateOfBirth" type="date" /><mat-error>{{ 'AUTH.REGISTER.DATE_OF_BIRTH_REQUIRED' | translate }}</mat-error></mat-form-field>
+            @if (errorMessage) {<p class="text-danger f-s-14 m-b-12">{{ errorMessage }}</p>}
+            <button type="submit" mat-flat-button color="primary" class="w-100" [disabled]="loading">{{ loading ? ('AUTH.REGISTER.CREATING' | translate) : ('AUTH.REGISTER.SUBMIT' | translate) }}</button>
+          </form>
+          <span class="d-block f-w-500 text-center m-t-24">{{ 'AUTH.REGISTER.HAS_ACCOUNT' | translate }} <a [routerLink]="['/authentication/login']" class="text-decoration-none text-primary f-w-500 f-s-14">{{ 'AUTH.LOGIN.SUBMIT' | translate }}</a></span>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

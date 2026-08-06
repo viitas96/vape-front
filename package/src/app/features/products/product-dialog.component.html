@@ -1,0 +1,56 @@
+﻿<h2 mat-dialog-title>{{ isEdit ? ('PRODUCTS.EDIT' | translate) : ('PRODUCTS.ADD' | translate) }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" id="product-form" (ngSubmit)="submit()" class="p-t-8">
+
+    <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.NAME' | translate }}</mat-label>
+    <mat-form-field appearance="outline" class="w-100">
+      <input matInput formControlName="name" placeholder="Product name" />
+      <mat-error>{{ 'PRODUCTS.NAME_REQUIRED' | translate }}</mat-error>
+    </mat-form-field>
+
+    <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.PRICE' | translate }}</mat-label>
+    <mat-form-field appearance="outline" class="w-100">
+      <input matInput formControlName="price" type="number" min="0" step="0.01" placeholder="0.00" />
+      <mat-error>{{ 'PRODUCTS.PRICE_INVALID' | translate }}</mat-error>
+    </mat-form-field>
+
+    <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.ITEM_CODE' | translate }}</mat-label>
+    <mat-form-field appearance="outline" class="w-100">
+      <input matInput formControlName="itemCode" placeholder="e.g. SKU-001" />
+    </mat-form-field>
+
+    <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.BARCODE' | translate }}</mat-label>
+    <mat-form-field appearance="outline" class="w-100">
+      <input matInput formControlName="barcode" placeholder="e.g. 012345678901" />
+    </mat-form-field>
+
+    <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.MATRIX_BARCODE' | translate }}</mat-label>
+    <mat-form-field appearance="outline" class="w-100">
+      <input matInput formControlName="matrixBarcode" placeholder="e.g. Data Matrix code" />
+    </mat-form-field>
+
+    <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.QR_CODE' | translate }}</mat-label>
+    <mat-form-field appearance="outline" class="w-100">
+      <input matInput formControlName="qrCode" placeholder="e.g. QR code value" />
+    </mat-form-field>
+
+    <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.GROUP' | translate }}</mat-label>
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-select formControlName="groupId" placeholder="No group">
+        <mat-option [value]="null">{{ 'PRODUCTS.NO_GROUP' | translate }}</mat-option>
+        @for (g of data.groups; track g.id) {
+          <mat-option [value]="g.id">{{ g.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button mat-dialog-close>{{ 'COMMON.CANCEL' | translate }}</button>
+  <button mat-flat-button color="primary" form="product-form" type="submit">
+    {{ isEdit ? ('COMMON.SAVE' | translate) : ('COMMON.CREATE' | translate) }}
+  </button>
+</mat-dialog-actions>
