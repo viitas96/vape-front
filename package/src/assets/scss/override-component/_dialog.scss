@@ -13,3 +13,44 @@
     supporting-text-tracking: unset,
   )
 );
+
+@media (max-width: 768px) {
+  .cdk-overlay-pane.mat-mdc-dialog-panel {
+    width: calc(100vw - 24px) !important;
+    max-width: calc(100vw - 24px) !important;
+  }
+
+  .mat-mdc-dialog-title {
+    padding: 20px 16px 8px !important;
+  }
+
+  .mat-mdc-dialog-content {
+    max-height: calc(100vh - 150px);
+    padding: 0 16px 16px !important;
+  }
+
+  .mat-mdc-dialog-actions {
+    align-items: stretch !important;
+    flex-direction: column-reverse;
+    gap: 8px;
+    padding: 12px 16px 16px !important;
+
+    button {
+      width: 100%;
+      margin-left: 0 !important;
+    }
+  }
+
+  .order-dialog-item-row {
+    align-items: stretch !important;
+    flex-direction: column;
+
+    mat-form-field {
+      width: 100% !important;
+    }
+
+    button {
+      align-self: flex-end;
+    }
+  }
+}

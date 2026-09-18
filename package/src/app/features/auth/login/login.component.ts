@@ -9,6 +9,7 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
   selector: 'app-login',
   imports: [RouterModule, MaterialModule, FormsModule, ReactiveFormsModule, TranslatePipe],
   templateUrl: './login.component.html',
+  standalone: true
 })
 export class AppLoginComponent {
   errorMessage = '';

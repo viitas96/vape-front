@@ -10,10 +10,11 @@ import { MaterialModule } from 'src/app/material.module';
 import { AuthService } from 'src/app/services/auth.service';
 import { CoreService } from 'src/app/services/core.service';
 import { LanguageService, SupportedLanguage } from 'src/app/services/language.service';
+import { ThemeService } from 'src/app/services/theme.service';
+import { TranslatePipe } from '@ngx-translate/core';
 import { AppNavItemComponent } from './sidebar/nav-item/nav-item.component';
 import { NavItem } from './sidebar/nav-item/nav-item';
 import { SidebarComponent } from './sidebar/sidebar.component';
-import { HeaderComponent } from './header/header.component';
 
 const MOBILE_VIEW = 'screen and (max-width: 768px)';
 const TABLET_VIEW = 'screen and (min-width: 769px) and (max-width: 1024px)';
@@ -27,6 +28,7 @@ const TABLET_VIEW = 'screen and (min-width: 769px) and (max-width: 1024px)';
     SidebarComponent,
     NgScrollbarModule,
     TablerIconsModule,
+    TranslatePipe,
   ],
   templateUrl: './full.component.html',
   encapsulation: ViewEncapsulation.None,
@@ -37,9 +39,11 @@ export class FullComponent implements OnInit, OnDestroy {
 
   navItems: NavItem[] = [];
   options = this.settings.getOptions();
+  isSidenavHovered = false;
 
   private readonly subscriptions = new Subscription();
   private isMobileScreen = false;
+  private hoverCloseTimer?: number;
 
   get isOver(): boolean {
     return this.isMobileScreen;
@@ -51,9 +55,12 @@ export class FullComponent implements OnInit, OnDestroy {
     private readonly breakpointObserver: BreakpointObserver,
     private readonly authService: AuthService,
     private readonly languageService: LanguageService,
+    public readonly themeService: ThemeService,
   ) {
     this.subscriptions.add(
       this.breakpointObserver.observe([MOBILE_VIEW, TABLET_VIEW]).subscribe((state) => {
+        this.clearHoverCloseTimer();
+        this.isSidenavHovered = false;
         this.options.sidenavOpened = true;
         this.isMobileScreen = state.breakpoints[MOBILE_VIEW];
 
@@ -75,6 +82,7 @@ export class FullComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.clearHoverCloseTimer();
     this.subscriptions.unsubscribe();
   }
 
@@ -92,8 +100,65 @@ export class FullComponent implements OnInit, OnDestroy {
   }
 
   toggleCollapsed(): void {
+    this.clearHoverCloseTimer();
+    this.isSidenavHovered = false;
     this.options.sidenavCollapsed = !this.options.sidenavCollapsed;
     this.settings.setOptions(this.options);
+  }
+
+  collapseSidenavOnContentClick(): void {
+    if (this.isOver) {
+      return;
+    }
+
+    this.hideSidenavAfterSelection();
+  }
+
+  hideSidenavAfterSelection(): void {
+    this.clearHoverCloseTimer();
+    this.isSidenavHovered = false;
+
+    if (this.isOver) {
+      this.sidenav?.close();
+      return;
+    }
+
+    if (this.options.sidenavCollapsed) {
+      return;
+    }
+
+    this.options.sidenavCollapsed = true;
+    this.settings.setOptions(this.options);
+  }
+
+  showSidenavOnHover(): void {
+    if (this.isOver || !this.options.sidenavCollapsed) {
+      return;
+    }
+
+    this.clearHoverCloseTimer();
+    this.isSidenavHovered = true;
+  }
+
+  scheduleSidenavHideAfterHover(): void {
+    if (this.isOver || !this.options.sidenavCollapsed) {
+      return;
+    }
+
+    this.clearHoverCloseTimer();
+    this.hoverCloseTimer = window.setTimeout(() => {
+      this.isSidenavHovered = false;
+      this.hoverCloseTimer = undefined;
+    }, 500);
+  }
+
+  hideSidenavAfterHover(): void {
+    if (this.isOver || !this.options.sidenavCollapsed) {
+      return;
+    }
+
+    this.clearHoverCloseTimer();
+    this.isSidenavHovered = false;
   }
 
   onSidenavClosedStart(): void {
@@ -103,5 +168,14 @@ export class FullComponent implements OnInit, OnDestroy {
   onSidenavOpenedChange(isOpened: boolean): void {
     this.options.sidenavOpened = isOpened;
     this.settings.setOptions({ sidenavOpened: isOpened });
+  }
+
+  private clearHoverCloseTimer(): void {
+    if (this.hoverCloseTimer === undefined) {
+      return;
+    }
+
+    window.clearTimeout(this.hoverCloseTimer);
+    this.hoverCloseTimer = undefined;
   }
 }

@@ -1,13 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MaterialModule } from 'src/app/material.module';
 import { AdminService } from 'src/app/services/admin.service';
+import { getApiErrorMessage } from 'src/app/shared/http/api-error';
 import { RoleDTO } from '../../users/user.models';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [MaterialModule, ReactiveFormsModule],
+  imports: [MaterialModule, ReactiveFormsModule, TranslatePipe],
   templateUrl: './admin-dashboard.component.html',
 })
 export class AdminDashboardComponent implements OnInit {
@@ -21,12 +23,12 @@ export class AdminDashboardComponent implements OnInit {
     roles: new FormControl<number[]>([], { validators: [Validators.required], nonNullable: true }),
   });
 
-  constructor(private adminService: AdminService) {}
+  constructor(private adminService: AdminService, private translateService: TranslateService) {}
 
   ngOnInit(): void {
     this.adminService.getRoles().subscribe({
       next: (roles) => (this.roles = roles),
-      error: () => (this.errorMessage = 'Failed to load roles'),
+      error: () => (this.errorMessage = this.translateService.instant('USERS.ROLES_LOAD_FAILED')),
     });
   }
 
@@ -44,11 +46,14 @@ export class AdminDashboardComponent implements OnInit {
     this.errorMessage = '';
     this.adminService.createUser(email!, password!, roles!).subscribe({
       next: () => {
-        this.successMessage = `User ${email} created successfully.`;
+        this.successMessage = this.translateService.instant('USERS.CREATED');
         this.form.reset();
       },
       error: (error) => {
-        this.errorMessage = error.error?.message ?? 'Failed to create user';
+        this.errorMessage = getApiErrorMessage(
+          error,
+          this.translateService.instant('USERS.CREATE_FAILED'),
+        );
       },
     });
   }

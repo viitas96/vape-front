@@ -1,4 +1,13 @@
-export type ProductGroupCategory = 'GENERAL_GOODS' | 'SOUVENIR';
+export interface ProductGroupCategory {
+  id: number;
+  name: string;
+  systemName?: string;
+}
+
+export interface ProductGroupCategoryDTO {
+  name: string;
+  systemName?: string;
+}
 
 export interface ProductGroup {
   id: number;
@@ -8,5 +17,5 @@ export interface ProductGroup {
 
 export interface ProductGroupDTO {
   name: string;
-  category: ProductGroupCategory;
+  categoryId: number;
 }

@@ -2,7 +2,7 @@
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MaterialModule } from 'src/app/material.module';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AdminService } from 'src/app/services/admin.service';
 import { UserResponse } from './user.models';
 
@@ -15,12 +15,12 @@ import { UserResponse } from './user.models';
 
     <mat-dialog-content>
       <form [formGroup]="form" id="change-password-form" (ngSubmit)="submit()" class="p-t-8">
-        <p class="f-s-14 m-b-16">User: <strong>{{ data.user.email }}</strong></p>
+        <p class="f-s-14 m-b-16">{{ 'USERS.USER' | translate }}: <strong>{{ data.user.email }}</strong></p>
 
         <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'USERS.NEW_PASSWORD' | translate }}</mat-label>
         <mat-form-field appearance="outline" class="w-100">
-          <input matInput formControlName="newPassword" type="password" placeholder="Min. 6 characters" />
-          <mat-error>Password must be at least 6 characters</mat-error>
+          <input matInput formControlName="newPassword" type="password" [placeholder]="'USERS.PASSWORD_PLACEHOLDER' | translate" />
+          <mat-error>{{ 'AUTH.REGISTER.PASSWORD_LENGTH' | translate }}</mat-error>
         </mat-form-field>
 
         @if (errorMessage) {
@@ -48,6 +48,7 @@ export class ChangePasswordDialogComponent {
   constructor(
     private adminService: AdminService,
     private dialogRef: MatDialogRef<ChangePasswordDialogComponent>,
+    private translateService: TranslateService,
     @Inject(MAT_DIALOG_DATA) public data: { user: UserResponse },
   ) {}
 
@@ -61,7 +62,7 @@ export class ChangePasswordDialogComponent {
     this.adminService.changePassword(this.data.user.id, this.form.value.newPassword!).subscribe({
       next: () => this.dialogRef.close(true),
       error: (error) => {
-        this.errorMessage = error.error?.message ?? 'Failed to update password';
+        this.errorMessage = error.error?.message ?? this.translateService.instant('USERS.PASSWORD_UPDATE_FAILED');
         this.loading = false;
       },
     });

@@ -10,7 +10,7 @@
     <mat-form-field appearance="outline" class="w-100">
       <mat-select formControlName="status">
         @for (s of statuses; track s) {
-          <mat-option [value]="s">{{ s }}</mat-option>
+          <mat-option [value]="s">{{ 'ORDERS.STATUS_' + s | translate }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
@@ -18,7 +18,7 @@
     <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'ORDERS.CUSTOMER' | translate }}</mat-label>
     <mat-form-field appearance="outline" class="w-100">
       <input matInput formControlName="customer" [matAutocomplete]="customerAuto"
-             placeholder="Search by email or UUIDвЂ¦" />
+             [placeholder]="'ORDERS.PLACEHOLDER_CUSTOMER' | translate" />
       <mat-autocomplete #customerAuto="matAutocomplete" [autoActiveFirstOption]="true"
                         [displayWith]="displayCustomer">
         @for (u of filterCustomers(form.controls.customer.value); track u.uuid) {
@@ -40,7 +40,7 @@
         <div class="f-s-12 text-muted m-t-4">
           {{ 'ORDERS.AVAILABLE_POINTS' | translate }}: <strong>{{ selectedCustomer.pointsBalance }}</strong>
           @if (settings) {
-            <span> В· Max points for this purchase: <strong>{{ maxPointsForPurchase }}</strong></span>
+            <span> В· {{ 'ORDERS.MAX_POINTS_FOR_PURCHASE' | translate }}: <strong>{{ maxPointsForPurchase }}</strong></span>
           }
         </div>
       }
@@ -50,34 +50,45 @@
 
     <div formArrayName="items">
       @for (item of items.controls; track item; let i = $index) {
-        <div [formGroupName]="i" class="d-flex align-items-center gap-8 m-b-8">
+        <div [formGroupName]="i" class="d-flex align-items-center gap-8 m-b-8 order-dialog-item-row">
 
           <mat-form-field appearance="outline" class="flex-grow-1 m-b-0">
-            <input matInput formControlName="product" [matAutocomplete]="auto"
-                   placeholder="Scan barcode or search product" />
-            <mat-autocomplete #auto="matAutocomplete" [autoActiveFirstOption]="true"
-                              [displayWith]="displayProduct" (optionSelected)="onProductSelected(i)">
-              @for (p of filterProducts(item.controls.product.value); track p.id) {
-                <mat-option [value]="p">
-                  {{ p.name }}
-                  @if (p.barcode || p.itemCode) {
-                    <span style="opacity: 0.6; font-size: 12px"> В· {{ p.barcode || p.itemCode }}</span>
+            <mat-select formControlName="product" [placeholder]="'ORDERS.PLACEHOLDER_PRODUCT' | translate"
+                        [compareWith]="compareProducts" (selectionChange)="onProductSelected(i)">
+              @for (category of productTree; track category.name) {
+                <mat-option disabled>{{ category.name }}</mat-option>
+                @for (group of category.groups; track group.name) {
+                  <mat-option disabled>
+                    <span style="padding-left: 16px">{{ group.name }}</span>
+                  </mat-option>
+                  @for (gamma of group.gammas; track gamma.name) {
+                    <mat-option disabled>
+                      <span style="padding-left: 32px">{{ gamma.name }}</span>
+                    </mat-option>
+                    @for (p of gamma.products; track p.id) {
+                      <mat-option [value]="p">
+                        <span style="padding-left: 48px">{{ p.name }}</span>
+                        @if (p.barcode || p.itemCode) {
+                          <span style="opacity: 0.6; font-size: 12px"> В· {{ p.barcode || p.itemCode }}</span>
+                        }
+                      </mat-option>
+                    }
                   }
-                </mat-option>
+                }
               }
-            </mat-autocomplete>
+            </mat-select>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="m-b-0" style="width: 110px">
-            <input matInput formControlName="unitPrice" type="number" min="0" step="0.01" placeholder="Price ($)" />
+            <input matInput formControlName="unitPrice" type="number" min="0" step="0.01" [placeholder]="'ORDERS.PLACEHOLDER_PRICE' | translate" />
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="m-b-0" style="width: 90px">
-            <input matInput formControlName="quantity" type="number" min="1" step="1" placeholder="Qty" />
+            <input matInput formControlName="quantity" type="number" min="1" step="1" [placeholder]="'ORDERS.PLACEHOLDER_QUANTITY' | translate" />
           </mat-form-field>
 
           <button mat-icon-button color="warn" type="button" (click)="removeItem(i)"
-                  [disabled]="items.length === 1" title="Remove item">
+                  [disabled]="items.length === 1" [title]="'ORDERS.REMOVE_ITEM' | translate">
             <mat-icon>delete</mat-icon>
           </button>
         </div>

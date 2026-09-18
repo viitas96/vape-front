@@ -69,8 +69,8 @@ export class SellerDashboardComponent implements OnInit {
     let totalPoints = 0;
     for (const item of this.cart) {
       const lineTotalCents = item.product.price * item.quantity;
-      const category = item.product.group?.category ?? 'GENERAL_GOODS';
-      if (category === 'SOUVENIR') {
+      const systemName = item.product.group?.category?.systemName;
+      if (systemName === 'SOUVENIR') {
         const pointsPortionCents = Math.floor((lineTotalCents * this.souvenirSplitPercent) / 100);
         totalPoints += Math.floor((pointsPortionCents * this.spendRate) / 100);
         continue;

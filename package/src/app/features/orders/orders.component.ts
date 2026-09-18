@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { forkJoin } from 'rxjs';
 import { MaterialModule } from 'src/app/material.module';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AdminService } from 'src/app/services/admin.service';
 import { UserResponse } from '../users/user.models';
 import { OrderService } from 'src/app/services/order.service';
@@ -30,7 +30,8 @@ export class OrdersComponent extends PagedListPageState implements OnInit {
   orders: Order[] = [];
   products: Product[] = [];
   users: UserResponse[] = [];
-  displayedColumns = ['id', 'status', 'items', 'pointsUsed', 'total', 'createdBy', 'createdAt', 'actions'];
+  displayedColumns = ['id', 'status', 'items', 'pointsUsed', 'total', 'createdBy', 'createdAt', 'actions', 'expand'];
+  override sortDirection = 'desc' as const;
 
   constructor(
     private readonly orderService: OrderService,
@@ -38,6 +39,7 @@ export class OrdersComponent extends PagedListPageState implements OnInit {
     private readonly adminService: AdminService,
     private readonly dialog: MatDialog,
     private readonly confirmDialog: ConfirmDialogService,
+    private readonly translateService: TranslateService,
   ) {
     super();
   }
@@ -71,11 +73,11 @@ export class OrdersComponent extends PagedListPageState implements OnInit {
 
       request.subscribe({
         next: (savedOrder) => {
-          this.setSuccess(order ? `Order #${order.id} updated.` : `Order #${savedOrder.id} created.`);
+          this.setSuccess(this.translateService.instant(order ? 'ORDERS.UPDATED' : 'ORDERS.CREATED', { id: order?.id ?? savedOrder.id }));
           this.loadPage();
         },
         error: (error) => {
-          this.setError(error.error?.message ?? `Failed to ${order ? 'update' : 'create'} order`);
+          this.setError(error.error?.message ?? this.translateService.instant(order ? 'ORDERS.UPDATE_FAILED' : 'ORDERS.CREATE_FAILED'));
         },
       });
     });
@@ -83,9 +85,9 @@ export class OrdersComponent extends PagedListPageState implements OnInit {
 
   delete(order: Order): void {
     this.confirmDialog.confirm({
-      title: 'Delete Order',
-      message: `Delete order #${order.id}?`,
-      confirmLabel: 'Delete',
+      title: this.translateService.instant('ORDERS.DELETE_TITLE'),
+      message: this.translateService.instant('ORDERS.DELETE_MESSAGE', { id: order.id }),
+      confirmLabel: this.translateService.instant('COMMON.DELETE'),
       confirmColor: 'warn',
     }).subscribe((confirmed) => {
       if (!confirmed) {
@@ -94,24 +96,24 @@ export class OrdersComponent extends PagedListPageState implements OnInit {
 
       this.orderService.delete(order.id).subscribe({
         next: () => {
-          this.setSuccess(`Order #${order.id} deleted.`);
+          this.setSuccess(this.translateService.instant('ORDERS.DELETED', { id: order.id }));
           this.loadPage();
         },
         error: () => {
-          this.setError('Failed to delete order');
+          this.setError(this.translateService.instant('ORDERS.DELETE_FAILED'));
         },
       });
     });
   }
 
   protected override loadPage(): void {
-    this.orderService.getAll(this.pageIndex, this.pageSize).subscribe({
+    this.orderService.getAll(this.pageIndex, this.pageSize, this.sortBy, this.sortDirection).subscribe({
       next: (response) => {
         this.orders = response.content;
         this.updateTotal(response.totalElements);
       },
       error: () => {
-        this.setError('Failed to load orders');
+        this.setError(this.translateService.instant('ORDERS.LOAD_FAILED'));
       },
     });
   }
@@ -126,7 +128,7 @@ export class OrdersComponent extends PagedListPageState implements OnInit {
         this.users = users.content;
       },
       error: () => {
-        this.setError('Failed to load order reference data');
+        this.setError(this.translateService.instant('ORDERS.REFERENCE_LOAD_FAILED'));
       },
     });
   }

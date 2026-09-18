@@ -1,5 +1,50 @@
 @use "../variables" as *;
 
+.mainWrapper,
+.contentWrapper {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.mat-drawer-content.contentWrapper {
+  margin-left: 0 !important;
+}
+
+
+.sidebarHeader {
+  position: relative;
+  min-width: 0;
+}
+
+.sidebarHeader app-branding,
+.sidebarHeader .logodark {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.sidebarHeader .logodark img {
+  max-width: 145px;
+}
+
+
+.mat-drawer.sidebarNav,
+.mat-drawer.sidebarNav .mat-drawer-inner-container,
+.mat-drawer.sidebarNav .flex-layout,
+.mat-drawer.sidebarNav ng-scrollbar,
+.mat-drawer.sidebarNav .ng-scrollbar,
+.mat-drawer.sidebarNav .ng-scroll-viewport,
+.mat-drawer.sidebarNav .ng-scroll-content {
+  max-width: 100%;
+  overflow-x: hidden !important;
+}
+
+
+.sidebar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .mat-drawer.sidebarNav {
   width: $sidenav-desktop;
   flex-shrink: 0;
@@ -17,6 +62,37 @@
   }
 }
 
+
+.sidebarFloatingToggle {
+  position: fixed !important;
+  top: $layout-padding;
+  left: $layout-padding;
+  z-index: 10000 !important;
+  background-color: var(--mat-sys-primary) !important;
+  color: var(--mat-sys-on-primary) !important;
+  box-shadow: var(--mat-sys-level3) !important;
+}
+
+.mobileMenuToggle {
+  position: fixed !important;
+  top: 12px;
+  left: 12px;
+  z-index: 10000 !important;
+  background-color: var(--mat-sys-primary) !important;
+  color: var(--mat-sys-on-primary) !important;
+  box-shadow: var(--mat-sys-level3) !important;
+}
+
+@media (max-width: 768px) {
+  .mat-drawer.sidebarNav {
+    width: min(#{$sidenav-desktop}, calc(100vw - 48px));
+  }
+
+  .branding {
+    padding: 16px;
+  }
+}
+
 @media (min-width: 1099px) {
   .mat-drawer.sidebarNav {
     top: $layout-padding !important;
@@ -30,11 +106,6 @@
   padding: 20px;
 }
 
-@media (min-width: 1024px) {
-  .contentWrapper {
-    margin-left: calc(#{$sidenav-desktop} + #{$layout-padding}) !important;
-  }
-}
 
 body {
   .sidebar-list {

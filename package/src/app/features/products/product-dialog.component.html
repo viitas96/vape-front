@@ -1,50 +1,76 @@
 ﻿<h2 mat-dialog-title>{{ isEdit ? ('PRODUCTS.EDIT' | translate) : ('PRODUCTS.ADD' | translate) }}</h2>
 
 <mat-dialog-content>
-  <form [formGroup]="form" id="product-form" (ngSubmit)="submit()" class="p-t-8">
+  <form [formGroup]="form" id="product-form" (ngSubmit)="submit()" class="product-form p-t-8">
+    <div class="product-form-field">
+      <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.NAME' | translate }}</mat-label>
+      <mat-form-field appearance="outline" class="w-100">
+        <input matInput formControlName="name" [placeholder]="'PRODUCTS.PLACEHOLDER_NAME' | translate" />
+        <mat-error>{{ 'PRODUCTS.NAME_REQUIRED' | translate }}</mat-error>
+      </mat-form-field>
+    </div>
 
-    <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.NAME' | translate }}</mat-label>
-    <mat-form-field appearance="outline" class="w-100">
-      <input matInput formControlName="name" placeholder="Product name" />
-      <mat-error>{{ 'PRODUCTS.NAME_REQUIRED' | translate }}</mat-error>
-    </mat-form-field>
+    <div class="product-form-field">
+      <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.PRICE' | translate }}</mat-label>
+      <mat-form-field appearance="outline" class="w-100">
+        <input matInput formControlName="price" type="number" min="0" step="0.01" placeholder="0.00" />
+        <mat-error>{{ 'PRODUCTS.PRICE_INVALID' | translate }}</mat-error>
+      </mat-form-field>
+    </div>
 
-    <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.PRICE' | translate }}</mat-label>
-    <mat-form-field appearance="outline" class="w-100">
-      <input matInput formControlName="price" type="number" min="0" step="0.01" placeholder="0.00" />
-      <mat-error>{{ 'PRODUCTS.PRICE_INVALID' | translate }}</mat-error>
-    </mat-form-field>
+    <!-- Group selector removed from the UI; kept on the model/backend for future use.
+    <div class="product-form-field">
+      <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.GROUP' | translate }}</mat-label>
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-select formControlName="groupId" [placeholder]="'PRODUCTS.NO_GROUP' | translate">
+          <mat-option [value]="null">{{ 'PRODUCTS.NO_GROUP' | translate }}</mat-option>
+          @for (g of data.groups; track g.id) {
+            <mat-option [value]="g.id">{{ g.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+    -->
 
-    <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.ITEM_CODE' | translate }}</mat-label>
-    <mat-form-field appearance="outline" class="w-100">
-      <input matInput formControlName="itemCode" placeholder="e.g. SKU-001" />
-    </mat-form-field>
+    <div class="product-form-field">
+      <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.GAMMA' | translate }}</mat-label>
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-select formControlName="gammaId" [placeholder]="'PRODUCTS.NO_GAMMA' | translate" (selectionChange)="onGammaSelected($event.value)">
+          <mat-option [value]="null">{{ 'PRODUCTS.NO_GAMMA' | translate }}</mat-option>
+          @for (gamma of data.gammas; track gamma.id) {
+            <mat-option [value]="gamma.id">{{ gamma.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
 
-    <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.BARCODE' | translate }}</mat-label>
-    <mat-form-field appearance="outline" class="w-100">
-      <input matInput formControlName="barcode" placeholder="e.g. 012345678901" />
-    </mat-form-field>
+    <div class="product-form-field">
+      <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.ITEM_CODE' | translate }}</mat-label>
+      <mat-form-field appearance="outline" class="w-100">
+        <input matInput formControlName="itemCode" [placeholder]="'PRODUCTS.PLACEHOLDER_ITEM_CODE' | translate" />
+      </mat-form-field>
+    </div>
 
-    <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.MATRIX_BARCODE' | translate }}</mat-label>
-    <mat-form-field appearance="outline" class="w-100">
-      <input matInput formControlName="matrixBarcode" placeholder="e.g. Data Matrix code" />
-    </mat-form-field>
+    <div class="product-form-field">
+      <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.BARCODE' | translate }}</mat-label>
+      <mat-form-field appearance="outline" class="w-100">
+        <input matInput formControlName="barcode" [placeholder]="'PRODUCTS.PLACEHOLDER_BARCODE' | translate" />
+      </mat-form-field>
+    </div>
 
-    <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.QR_CODE' | translate }}</mat-label>
-    <mat-form-field appearance="outline" class="w-100">
-      <input matInput formControlName="qrCode" placeholder="e.g. QR code value" />
-    </mat-form-field>
+    <div class="product-form-field">
+      <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.MATRIX_BARCODE' | translate }}</mat-label>
+      <mat-form-field appearance="outline" class="w-100">
+        <input matInput formControlName="matrixBarcode" [placeholder]="'PRODUCTS.PLACEHOLDER_MATRIX_BARCODE' | translate" />
+      </mat-form-field>
+    </div>
 
-    <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.GROUP' | translate }}</mat-label>
-    <mat-form-field appearance="outline" class="w-100">
-      <mat-select formControlName="groupId" placeholder="No group">
-        <mat-option [value]="null">{{ 'PRODUCTS.NO_GROUP' | translate }}</mat-option>
-        @for (g of data.groups; track g.id) {
-          <mat-option [value]="g.id">{{ g.name }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-
+    <div class="product-form-field">
+      <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.QR_CODE' | translate }}</mat-label>
+      <mat-form-field appearance="outline" class="w-100">
+        <input matInput formControlName="qrCode" [placeholder]="'PRODUCTS.PLACEHOLDER_QR_CODE' | translate" />
+      </mat-form-field>
+    </div>
   </form>
 </mat-dialog-content>
 

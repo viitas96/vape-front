@@ -89,6 +89,39 @@
   margin: 0 auto;
 }
 
+.auth-login-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(360px, 480px);
+  align-items: center;
+  justify-content: center;
+  gap: 64px;
+  padding: 32px;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.auth-brand-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-brand-logo {
+  width: min(420px, 80%);
+  height: auto;
+}
+
+.auth-form-panel {
+  width: 100%;
+}
+
+.auth-logo {
+  width: 170px;
+  max-width: 40%;
+  height: auto;
+  margin: 0 auto;
+}
+
 .max-width-form {
   max-width: 450px;
 }
@@ -106,4 +139,20 @@
   position: absolute;
   top: -19px;
   right: 3px;
+}
+
+@media (max-width: 991px) {
+  .auth-login-layout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 24px;
+  }
+
+  .auth-brand-panel {
+    justify-content: center;
+  }
+
+  .auth-brand-logo {
+    width: 160px;
+  }
 }

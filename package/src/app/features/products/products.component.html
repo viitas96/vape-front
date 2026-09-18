@@ -1,8 +1,8 @@
 ﻿<div class="p-24">
-  <mat-card class="cardWithShadow">
-    <mat-card-content class="p-32">
+  <mat-card class="cardWithShadow admin-data-card admin-products-page">
+    <mat-card-content class="p-32 admin-data-content">
 
-      <div class="d-flex align-items-center justify-content-between m-b-24">
+      <div class="d-flex align-items-center justify-content-between m-b-24 admin-page-header">
         <h2 class="f-s-20 f-w-700">{{ 'PRODUCTS.TITLE' | translate }}</h2>
         <button mat-flat-button color="primary" (click)="openDialog()">
           <mat-icon>add</mat-icon> {{ 'PRODUCTS.ADD' | translate }}
@@ -16,62 +16,171 @@
         <p class="text-danger f-s-14 m-b-16">{{ errorMessage }}</p>
       }
 
-      <mat-table [dataSource]="products">
+      <div class="d-flex align-items-center justify-content-between gap-12 flex-wrap m-b-16 admin-filter-bar">
+        <div class="d-flex align-items-center gap-12 flex-wrap admin-filter-fields">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="m-b-0" style="min-width: 220px">
+            <mat-label>{{ 'PRODUCTS.FILTER_NAME' | translate }}</mat-label>
+            <input matInput [(ngModel)]="nameFilter" [placeholder]="'PRODUCTS.PLACEHOLDER_NAME' | translate" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="m-b-0" style="min-width: 200px">
+            <mat-label>{{ 'PRODUCTS.GAMMA' | translate }}</mat-label>
+            <mat-select [(ngModel)]="gammaIdFilter">
+              <mat-option [value]="null">{{ 'PRODUCTS.ALL_GAMMAS' | translate }}</mat-option>
+              @for (gamma of gammas; track gamma.id) {
+                <mat-option [value]="gamma.id">{{ gamma.name }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="m-b-0" style="min-width: 200px">
+            <mat-label>{{ 'GROUPS.CATEGORY' | translate }}</mat-label>
+            <mat-select [(ngModel)]="categoryIdFilter">
+              <mat-option [value]="null">{{ 'PRODUCTS.ALL_CATEGORIES' | translate }}</mat-option>
+              @for (category of categories; track category.id) {
+                <mat-option [value]="category.id">{{ category.name }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="d-flex align-items-center gap-12 admin-filter-actions">
+          <button mat-flat-button color="primary" type="button" (click)="applyFilters()">
+            <mat-icon>filter_alt</mat-icon> {{ 'COMMON.APPLY' | translate }}
+          </button>
+          <button mat-stroked-button type="button" (click)="clearFilters()">
+            <mat-icon>restart_alt</mat-icon> {{ 'COMMON.CLEAR' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <mat-table [dataSource]="products" matSort [matSortActive]="sortBy" [matSortDirection]="sortDirection" (matSortChange)="onSortChange($event)" multiTemplateDataRows>
 
         <ng-container matColumnDef="id">
-          <mat-header-cell *matHeaderCellDef>ID</mat-header-cell>
-          <mat-cell *matCellDef="let p">{{ p.id }}</mat-cell>
+          <mat-header-cell *matHeaderCellDef mat-sort-header="id">{{ 'COMMON.NO' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let p; let i = dataIndex">{{ rowNumber(i) }}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="name">
-          <mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.NAME' | translate }}</mat-header-cell>
-          <mat-cell *matCellDef="let p">{{ p.name }}</mat-cell>
+          <mat-header-cell *matHeaderCellDef mat-sort-header="name">{{ 'PRODUCTS.NAME' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let p">
+            <span>
+              {{ p.name }}
+              <span class="admin-mobile-secondary">{{ p.gamma?.name || '—' }}</span>
+            </span>
+          </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="price">
-          <mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.PRICE' | translate }}</mat-header-cell>
+          <mat-header-cell *matHeaderCellDef mat-sort-header="price">{{ 'PRODUCTS.PRICE' | translate }}</mat-header-cell>
           <mat-cell *matCellDef="let p">${{ formatPrice(p.price) }}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="itemCode">
-          <mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.ITEM_CODE' | translate }}</mat-header-cell>
+          <mat-header-cell *matHeaderCellDef mat-sort-header="itemCode">{{ 'PRODUCTS.ITEM_CODE' | translate }}</mat-header-cell>
           <mat-cell *matCellDef="let p">{{ p.itemCode || '—' }}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="barcode">
-          <mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.BARCODE' | translate }}</mat-header-cell>
+          <mat-header-cell *matHeaderCellDef mat-sort-header="barcode">{{ 'PRODUCTS.BARCODE' | translate }}</mat-header-cell>
           <mat-cell *matCellDef="let p">{{ p.barcode || '—' }}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="matrixBarcode">
-          <mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.MATRIX_BARCODE' | translate }}</mat-header-cell>
+          <mat-header-cell *matHeaderCellDef mat-sort-header="matrixBarcode">{{ 'PRODUCTS.MATRIX_BARCODE' | translate }}</mat-header-cell>
           <mat-cell *matCellDef="let p">{{ p.matrixBarcode || '—' }}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="qrCode">
-          <mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.QR_CODE' | translate }}</mat-header-cell>
+          <mat-header-cell *matHeaderCellDef mat-sort-header="qrCode">{{ 'PRODUCTS.QR_CODE' | translate }}</mat-header-cell>
           <mat-cell *matCellDef="let p">{{ p.qrCode || '—' }}</mat-cell>
         </ng-container>
 
+        <!-- Group column removed from the UI; kept on the model/backend for future use.
         <ng-container matColumnDef="group">
-          <mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.GROUP' | translate }}</mat-header-cell>
+          <mat-header-cell *matHeaderCellDef mat-sort-header="group.name">{{ 'PRODUCTS.GROUP' | translate }}</mat-header-cell>
           <mat-cell *matCellDef="let p">{{ p.group?.name || '—' }}</mat-cell>
+        </ng-container>
+        -->
+
+        <ng-container matColumnDef="gamma">
+          <mat-header-cell *matHeaderCellDef mat-sort-header="gamma.name">{{ 'PRODUCTS.GAMMA' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let p">{{ p.gamma?.name || '—' }}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="actions">
           <mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.ACTIONS' | translate }}</mat-header-cell>
           <mat-cell *matCellDef="let p">
-            <button mat-icon-button color="primary" (click)="openDialog(p)" title="Edit">
+            <button mat-icon-button color="primary" (click)="openDialog(p)" [title]="'COMMON.EDIT' | translate">
               <mat-icon>edit</mat-icon>
             </button>
-            <button mat-icon-button color="warn" (click)="delete(p)" title="Delete">
+            <button mat-icon-button color="warn" (click)="delete(p)" [title]="'COMMON.DELETE' | translate">
               <mat-icon>delete</mat-icon>
             </button>
           </mat-cell>
         </ng-container>
 
+        <ng-container matColumnDef="expand">
+          <mat-header-cell *matHeaderCellDef></mat-header-cell>
+          <mat-cell *matCellDef="let p">
+            <button mat-icon-button type="button" (click)="toggleRowDetails(p.id)"
+              [attr.aria-label]="'COMMON.DETAILS' | translate" [attr.aria-expanded]="isRowDetailsExpanded(p.id)">
+              <mat-icon class="admin-table-expand-icon" [class.admin-table-expand-icon-open]="isRowDetailsExpanded(p.id)">expand_more</mat-icon>
+            </button>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="expandedDetail">
+          <mat-cell *matCellDef="let p; let i = dataIndex">
+            <div class="admin-table-detail">
+              <dl class="admin-table-detail-grid">
+                <div class="admin-table-detail-field">
+                  <dt>{{ 'COMMON.NO' | translate }}</dt>
+                  <dd>{{ rowNumber(i) }}</dd>
+                </div>
+                <div class="admin-table-detail-field">
+                  <dt>{{ 'PRODUCTS.ITEM_CODE' | translate }}</dt>
+                  <dd>{{ p.itemCode || '—' }}</dd>
+                </div>
+                <div class="admin-table-detail-field">
+                  <dt>{{ 'PRODUCTS.BARCODE' | translate }}</dt>
+                  <dd>{{ p.barcode || '—' }}</dd>
+                </div>
+                <div class="admin-table-detail-field">
+                  <dt>{{ 'PRODUCTS.MATRIX_BARCODE' | translate }}</dt>
+                  <dd>{{ p.matrixBarcode || '—' }}</dd>
+                </div>
+                <div class="admin-table-detail-field">
+                  <dt>{{ 'PRODUCTS.QR_CODE' | translate }}</dt>
+                  <dd>{{ p.qrCode || '—' }}</dd>
+                </div>
+                <!-- Group detail removed from the UI; kept on the model/backend for future use.
+                <div class="admin-table-detail-field">
+                  <dt>{{ 'PRODUCTS.GROUP' | translate }}</dt>
+                  <dd>{{ p.group?.name || '—' }}</dd>
+                </div>
+                -->
+                <div class="admin-table-detail-field">
+                  <dt>{{ 'PRODUCTS.GAMMA' | translate }}</dt>
+                  <dd>{{ p.gamma?.name || '—' }}</dd>
+                </div>
+              </dl>
+              <div class="admin-table-detail-actions">
+                <button mat-stroked-button color="primary" type="button" (click)="openDialog(p)">
+                  <mat-icon>edit</mat-icon> {{ 'COMMON.EDIT' | translate }}
+                </button>
+                <button mat-stroked-button color="warn" type="button" (click)="delete(p)">
+                  <mat-icon>delete</mat-icon> {{ 'COMMON.DELETE' | translate }}
+                </button>
+              </div>
+            </div>
+          </mat-cell>
+        </ng-container>
+
         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
         <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+        <mat-row *matRowDef="let row; columns: expandedDetailColumns"
+          class="admin-table-detail-row" [class.admin-table-detail-row-open]="isRowDetailsExpanded(row.id)"></mat-row>
 
         <tr class="mat-row" *matNoDataRow>
           <td class="mat-cell p-16" [attr.colspan]="displayedColumns.length">{{ 'PRODUCTS.EMPTY' | translate }}</td>

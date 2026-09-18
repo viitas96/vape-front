@@ -23,15 +23,15 @@ export class AdminService {
     });
   }
 
-  getUsers(page = 0, size = 10): Observable<PageResponse<UserResponse>> {
+  getUsers(page = 0, size = 10, sortBy = 'id', sortDirection = 'asc'): Observable<PageResponse<UserResponse>> {
     return this.http.get<PageResponse<UserResponse>>(`${this.API_URL}/users`, {
-      params: { page, size },
+      params: { page, size, sortBy, sortDirection },
     });
   }
 
-  getCustomers(page = 0, size = 10): Observable<PageResponse<UserResponse>> {
+  getCustomers(page = 0, size = 10, sortBy = 'id', sortDirection = 'asc'): Observable<PageResponse<UserResponse>> {
     return this.http.get<PageResponse<UserResponse>>(`${this.API_URL}/users/customers`, {
-      params: { page, size },
+      params: { page, size, sortBy, sortDirection },
     });
   }
 

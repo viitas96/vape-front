@@ -109,3 +109,362 @@
         }
     }
 }
+
+.customer-dashboard,
+.admin-dashboard,
+.admin-data-card,
+.admin-settings-card {
+    max-width: 100%;
+}
+
+.admin-data-card {
+    mat-table {
+        display: block;
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    mat-header-row,
+    mat-row {
+        min-width: 760px;
+    }
+
+    .mat-column-expand,
+    .admin-table-detail-row {
+        display: none;
+    }
+}
+
+.admin-mobile-secondary {
+    display: none;
+}
+
+.admin-products-page {
+    mat-header-row,
+    mat-row {
+        min-width: 1120px;
+    }
+}
+
+.admin-orders-page {
+    mat-header-row,
+    mat-row {
+        min-width: 900px;
+    }
+}
+
+.admin-product-groups-page,
+.admin-product-categories-page,
+.admin-product-gammas-page {
+    mat-header-row,
+    mat-row {
+        min-width: 560px;
+    }
+}
+
+// Widen the boxed page layout for the admin management tables so they have more
+// breathing room on smaller/15" monitors, instead of being capped at $boxedWidth.
+.pageWrapper.maxWidth:has(.admin-products-page, .admin-product-groups-page, .admin-product-categories-page, .admin-product-gammas-page) {
+    max-width: 90%;
+}
+
+.customer-email {
+    overflow-wrap: anywhere;
+}
+
+.customer-receipt-table {
+    max-width: 100%;
+    overflow-x: auto;
+
+    table {
+        min-width: 520px;
+    }
+}
+
+@media (max-width: 768px) {
+    .customer-dashboard,
+    .admin-dashboard,
+    .admin-data-card,
+    .admin-settings-card {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .customer-loyalty-content,
+    .admin-dashboard-content,
+    .admin-data-content,
+    .admin-settings-content {
+        padding: 20px !important;
+    }
+
+    .admin-page-header {
+        align-items: stretch !important;
+        flex-direction: column;
+        gap: 12px;
+
+        h2 {
+            margin-bottom: 0;
+        }
+
+        button {
+            width: 100%;
+        }
+    }
+
+    .admin-filter-bar,
+    .admin-filter-fields,
+    .admin-filter-actions {
+        align-items: stretch !important;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .admin-filter-fields mat-form-field,
+    .admin-filter-actions button {
+        width: 100%;
+        min-width: 0 !important;
+    }
+
+    .admin-data-card {
+        mat-table {
+            overflow-x: visible;
+        }
+
+        mat-header-row,
+        mat-row {
+            min-width: 0 !important;
+            width: 100%;
+        }
+
+        mat-header-cell,
+        mat-cell {
+            min-width: 0;
+            overflow-wrap: anywhere;
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+
+        .mat-column-actions {
+            display: none;
+        }
+
+        .mat-column-expand {
+            display: flex;
+            flex: 0 0 48px;
+            justify-content: flex-end;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        .admin-table-detail-row {
+            display: none;
+            min-height: 0;
+        }
+
+        .admin-table-detail-row-open {
+            display: flex;
+        }
+
+        .mat-column-expandedDetail {
+            display: block;
+            flex: 1 1 100%;
+            padding: 0;
+        }
+    }
+
+    .admin-users-page {
+        .mat-column-id,
+        .mat-column-roles {
+            display: none;
+        }
+
+        .mat-column-status {
+            flex: 0 0 88px;
+        }
+    }
+
+    .admin-products-page {
+        .mat-column-id,
+        .mat-column-itemCode,
+        .mat-column-barcode,
+        .mat-column-matrixBarcode,
+        .mat-column-qrCode,
+        .mat-column-gamma {
+            display: none;
+        }
+
+        .mat-column-price {
+            flex: 0 0 76px;
+        }
+    }
+
+    .admin-orders-page {
+        .mat-column-items,
+        .mat-column-pointsUsed,
+        .mat-column-createdBy,
+        .mat-column-createdAt {
+            display: none;
+        }
+
+        .mat-column-id {
+            flex: 0 0 48px;
+        }
+
+        .mat-column-total {
+            flex: 0 0 76px;
+        }
+    }
+
+    .admin-product-groups-page .mat-column-id,
+    .admin-product-categories-page .mat-column-id,
+    .admin-product-gammas-page .mat-column-id {
+        display: none;
+    }
+
+    .admin-product-gammas-page .mat-column-price {
+        flex: 0 0 76px;
+    }
+
+    .admin-mobile-secondary {
+        color: var(--mat-sys-on-surface-variant);
+        display: block;
+        font-size: 12px;
+        line-height: 18px;
+        margin-top: 2px;
+    }
+
+    .admin-table-expand-icon {
+        transition: transform 150ms ease;
+    }
+
+    .admin-table-expand-icon-open {
+        transform: rotate(180deg);
+    }
+
+    .admin-table-detail {
+        background-color: var(--mat-sys-surface-container-low);
+        padding: 16px 12px 20px;
+        width: 100%;
+    }
+
+    .admin-table-detail-grid {
+        display: grid;
+        gap: 10px;
+        margin: 0;
+    }
+
+    .admin-table-detail-field {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: minmax(88px, 0.8fr) minmax(0, 1.2fr);
+
+        dt {
+            color: var(--mat-sys-on-surface-variant);
+            font-weight: 600;
+        }
+
+        dd {
+            margin: 0;
+            min-width: 0;
+            overflow-wrap: anywhere;
+            text-align: right;
+        }
+    }
+
+    .admin-table-detail-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 16px;
+
+        button {
+            flex: 1 1 120px;
+        }
+    }
+
+    .admin-data-card mat-paginator {
+        .mat-mdc-paginator-container {
+            align-items: stretch;
+            flex-direction: column;
+            justify-content: center;
+            padding: 8px 0;
+        }
+
+        .mat-mdc-paginator-page-size {
+            justify-content: center;
+            margin-right: 0;
+            width: 100%;
+        }
+
+        .mat-mdc-paginator-range-actions {
+            justify-content: center;
+            width: 100%;
+        }
+
+        .mat-mdc-paginator-range-label {
+            margin: 0 12px 0 0;
+        }
+    }
+
+    .customer-qr-frame {
+        padding: 12px !important;
+    }
+
+    .customer-qr-image,
+    .customer-qr-loader {
+        width: min(160px, calc(100vw - 112px)) !important;
+        height: min(160px, calc(100vw - 112px)) !important;
+    }
+
+    .customer-points-summary {
+        align-items: stretch;
+        gap: 16px !important;
+    }
+
+    .customer-points-summary > div:not(.customer-points-divider) {
+        flex: 1 1 0;
+        min-width: 0;
+    }
+
+    .customer-points-summary .f-s-32 {
+        font-size: 24px !important;
+    }
+
+    .customer-dashboard mat-card-header,
+    .customer-dashboard mat-card-content {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+
+    .customer-dashboard mat-expansion-panel-header {
+        height: auto;
+        min-height: 64px;
+        padding: 12px 16px;
+    }
+
+    .customer-dashboard .mat-expansion-panel-header-title,
+    .customer-dashboard .mat-expansion-panel-header-description {
+        margin-right: 8px;
+        min-width: 0;
+    }
+
+    .customer-dashboard .mat-expansion-panel-header-description {
+        display: block;
+        font-size: 12px;
+        line-height: 18px;
+    }
+
+    .admin-submit-button,
+    .admin-settings-submit {
+        width: 100%;
+    }
+}
+
+@media (max-width: 420px) {
+    .admin-data-card mat-paginator {
+        .mat-mdc-paginator-navigation-first,
+        .mat-mdc-paginator-navigation-last {
+            display: none;
+        }
+    }
+}

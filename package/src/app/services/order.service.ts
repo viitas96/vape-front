@@ -11,9 +11,9 @@ export class OrderService {
 
   constructor(private http: HttpClient) {}
 
-  getAll(page = 0, size = 10): Observable<PageResponse<Order>> {
+  getAll(page = 0, size = 10, sortBy = 'id', sortDirection = 'desc'): Observable<PageResponse<Order>> {
     return this.http.get<PageResponse<Order>>(this.API_URL, {
-      params: { page, size },
+      params: { page, size, sortBy, sortDirection },
     });
   }
 

@@ -1,18 +1,16 @@
-﻿<div class="d-flex align-items-center justify-content-between p-x-20 p-y-16">
+﻿<div class="sidebarHeader d-flex align-items-center justify-content-between p-x-20 p-y-16">
   <app-branding></app-branding>
 
-  <div class="d-flex align-items-center gap-8">
-    <a href="javascript:void(0)" (click)="themeService.toggle()"
-      class="d-flex justify-content-center icon-40 align-items-center"
-      [title]="themeService.isDark() ? 'Switch to light theme' : 'Switch to dark theme'">
-      <i-tabler [name]="themeService.isDark() ? 'sun' : 'moon'" class="icon-20 d-flex"></i-tabler>
-    </a>
-
-    @if(showToggle) {
-    <a href="javascript:void(0)" (click)="toggleMobileNav.emit()"
-      class="d-flex justify-content-center icon-40 align-items-center">
-      <i-tabler name="x" class="icon-20 d-flex"></i-tabler>
-    </a>
-    }
-  </div>
+  @if(showToggle) {
+  <a href="javascript:void(0)" (click)="toggleMobileNav.emit()"
+    class="d-flex justify-content-center icon-40 align-items-center">
+    <i-tabler name="x" class="icon-20 d-flex"></i-tabler>
+  </a>
+  } @else {
+  <a href="javascript:void(0)" (click)="toggleCollapsed.emit()"
+    class="d-flex justify-content-center icon-40 align-items-center"
+    [title]="(collapsed ? 'NAV.EXPAND' : 'NAV.COLLAPSE') | translate">
+    <i-tabler [name]="collapsed ? 'menu-2' : 'layout-sidebar-left-collapse'" class="icon-20 d-flex"></i-tabler>
+  </a>
+  }
 </div>

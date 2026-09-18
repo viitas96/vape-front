@@ -1,8 +1,8 @@
 ﻿<div class="p-24">
-  <mat-card class="cardWithShadow">
-    <mat-card-content class="p-32">
+  <mat-card class="cardWithShadow admin-data-card admin-orders-page">
+    <mat-card-content class="p-32 admin-data-content">
 
-      <div class="d-flex align-items-center justify-content-between m-b-24">
+      <div class="d-flex align-items-center justify-content-between m-b-24 admin-page-header">
         <h2 class="f-s-20 f-w-700">{{ 'ORDERS.TITLE' | translate }}</h2>
         <button mat-flat-button color="primary" (click)="openDialog()">
           <mat-icon>add</mat-icon> {{ 'ORDERS.ADD' | translate }}
@@ -16,16 +16,16 @@
         <p class="text-danger f-s-14 m-b-16">{{ errorMessage }}</p>
       }
 
-      <mat-table [dataSource]="orders">
+      <mat-table [dataSource]="orders" matSort [matSortActive]="sortBy" [matSortDirection]="sortDirection" (matSortChange)="onSortChange($event)" multiTemplateDataRows>
 
         <ng-container matColumnDef="id">
-          <mat-header-cell *matHeaderCellDef>ID</mat-header-cell>
+          <mat-header-cell *matHeaderCellDef mat-sort-header="id">ID</mat-header-cell>
           <mat-cell *matCellDef="let o">{{ o.id }}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="status">
-          <mat-header-cell *matHeaderCellDef>{{ 'ORDERS.STATUS' | translate }}</mat-header-cell>
-          <mat-cell *matCellDef="let o">{{ o.status }}</mat-cell>
+          <mat-header-cell *matHeaderCellDef mat-sort-header="status">{{ 'ORDERS.STATUS' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let o">{{ 'ORDERS.STATUS_' + o.status | translate }}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="items">
@@ -34,17 +34,17 @@
         </ng-container>
 
         <ng-container matColumnDef="pointsUsed">
-          <mat-header-cell *matHeaderCellDef>{{ 'ORDERS.POINTS_USED' | translate }}</mat-header-cell>
+          <mat-header-cell *matHeaderCellDef mat-sort-header="pointsUsed">{{ 'ORDERS.POINTS_USED' | translate }}</mat-header-cell>
           <mat-cell *matCellDef="let o">{{ o.pointsUsed || 0 }}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="total">
-          <mat-header-cell *matHeaderCellDef>{{ 'ORDERS.TOTAL' | translate }}</mat-header-cell>
+          <mat-header-cell *matHeaderCellDef mat-sort-header="total">{{ 'ORDERS.TOTAL' | translate }}</mat-header-cell>
           <mat-cell *matCellDef="let o">${{ formatPrice(o.total) }}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="createdBy">
-          <mat-header-cell *matHeaderCellDef>{{ 'ORDERS.CREATED_BY' | translate }}</mat-header-cell>
+          <mat-header-cell *matHeaderCellDef mat-sort-header="createdBy">{{ 'ORDERS.CREATED_BY' | translate }}</mat-header-cell>
           <mat-cell *matCellDef="let o">
             <span class="d-block" [matTooltip]="o.createdBy" [matTooltipDisabled]="!o.createdBy"
                   style="max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: default;">
@@ -54,24 +54,69 @@
         </ng-container>
 
         <ng-container matColumnDef="createdAt">
-          <mat-header-cell *matHeaderCellDef>{{ 'ORDERS.CREATED_AT' | translate }}</mat-header-cell>
+          <mat-header-cell *matHeaderCellDef mat-sort-header="createdAt">{{ 'ORDERS.CREATED_AT' | translate }}</mat-header-cell>
           <mat-cell *matCellDef="let o">{{ o.createdAt | date:'short' }}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="actions">
           <mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.ACTIONS' | translate }}</mat-header-cell>
           <mat-cell *matCellDef="let o">
-            <button mat-icon-button color="primary" (click)="openDialog(o)" title="Edit">
+            <button mat-icon-button color="primary" (click)="openDialog(o)" [title]="'COMMON.EDIT' | translate">
               <mat-icon>edit</mat-icon>
             </button>
-            <button mat-icon-button color="warn" (click)="delete(o)" title="Delete">
+            <button mat-icon-button color="warn" (click)="delete(o)" [title]="'COMMON.DELETE' | translate">
               <mat-icon>delete</mat-icon>
             </button>
           </mat-cell>
         </ng-container>
 
+        <ng-container matColumnDef="expand">
+          <mat-header-cell *matHeaderCellDef></mat-header-cell>
+          <mat-cell *matCellDef="let o">
+            <button mat-icon-button type="button" (click)="toggleRowDetails(o.id)"
+              [attr.aria-label]="'COMMON.DETAILS' | translate" [attr.aria-expanded]="isRowDetailsExpanded(o.id)">
+              <mat-icon class="admin-table-expand-icon" [class.admin-table-expand-icon-open]="isRowDetailsExpanded(o.id)">expand_more</mat-icon>
+            </button>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="expandedDetail">
+          <mat-cell *matCellDef="let o">
+            <div class="admin-table-detail">
+              <dl class="admin-table-detail-grid">
+                <div class="admin-table-detail-field">
+                  <dt>{{ 'ORDERS.ITEMS' | translate }}</dt>
+                  <dd>{{ o.items.length }}</dd>
+                </div>
+                <div class="admin-table-detail-field">
+                  <dt>{{ 'ORDERS.POINTS_USED' | translate }}</dt>
+                  <dd>{{ o.pointsUsed || 0 }}</dd>
+                </div>
+                <div class="admin-table-detail-field">
+                  <dt>{{ 'ORDERS.CREATED_BY' | translate }}</dt>
+                  <dd>{{ o.createdBy || '-' }}</dd>
+                </div>
+                <div class="admin-table-detail-field">
+                  <dt>{{ 'ORDERS.CREATED_AT' | translate }}</dt>
+                  <dd>{{ o.createdAt | date:'short' }}</dd>
+                </div>
+              </dl>
+              <div class="admin-table-detail-actions">
+                <button mat-stroked-button color="primary" type="button" (click)="openDialog(o)">
+                  <mat-icon>edit</mat-icon> {{ 'COMMON.EDIT' | translate }}
+                </button>
+                <button mat-stroked-button color="warn" type="button" (click)="delete(o)">
+                  <mat-icon>delete</mat-icon> {{ 'COMMON.DELETE' | translate }}
+                </button>
+              </div>
+            </div>
+          </mat-cell>
+        </ng-container>
+
         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
         <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+        <mat-row *matRowDef="let row; columns: expandedDetailColumns"
+          class="admin-table-detail-row" [class.admin-table-detail-row-open]="isRowDetailsExpanded(row.id)"></mat-row>
 
         <tr class="mat-row" *matNoDataRow>
           <td class="mat-cell p-16" [attr.colspan]="displayedColumns.length">{{ 'ORDERS.EMPTY' | translate }}</td>

@@ -2,8 +2,9 @@
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MaterialModule } from 'src/app/material.module';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { AdminService } from 'src/app/services/admin.service';
+import { getApiErrorMessage } from 'src/app/shared/http/api-error';
 import { RoleDTO } from './user.models';
 
 @Component({
@@ -16,26 +17,26 @@ import { RoleDTO } from './user.models';
     <mat-dialog-content style="padding-bottom: 24px;">
       <form [formGroup]="form" id="createUserForm" (ngSubmit)="submit()">
 
-        <mat-label class="f-s-14 f-w-600 m-b-12 d-block">Email</mat-label>
+        <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'AUTH.COMMON.EMAIL' | translate }}</mat-label>
         <mat-form-field appearance="outline" class="w-100">
-          <input matInput formControlName="email" type="email" placeholder="user@example.com" />
-          <mat-error>Enter a valid email address</mat-error>
+          <input matInput formControlName="email" type="email" [placeholder]="'USERS.EMAIL_PLACEHOLDER' | translate" />
+          <mat-error>{{ 'AUTH.LOGIN.INVALID_EMAIL' | translate }}</mat-error>
         </mat-form-field>
 
-        <mat-label class="f-s-14 f-w-600 m-b-12 d-block">Password</mat-label>
+        <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'AUTH.COMMON.PASSWORD' | translate }}</mat-label>
         <mat-form-field appearance="outline" class="w-100">
-          <input matInput formControlName="password" type="password" placeholder="Min. 6 characters" />
-          <mat-error>Password must be at least 6 characters</mat-error>
+          <input matInput formControlName="password" type="password" [placeholder]="'USERS.PASSWORD_PLACEHOLDER' | translate" />
+          <mat-error>{{ 'AUTH.REGISTER.PASSWORD_LENGTH' | translate }}</mat-error>
         </mat-form-field>
 
-        <mat-label class="f-s-14 f-w-600 m-b-12 d-block">Roles</mat-label>
+        <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'USERS.ROLES' | translate }}</mat-label>
         <mat-form-field appearance="outline" class="w-100">
-          <mat-select formControlName="roles" multiple placeholder="Select roles">
+          <mat-select formControlName="roles" multiple [placeholder]="'USERS.SELECT_ROLES' | translate">
             @for (role of roles; track role.id) {
               <mat-option [value]="role.id">{{ role.name }}</mat-option>
             }
           </mat-select>
-          <mat-error>At least one role is required</mat-error>
+          <mat-error>{{ 'USERS.ROLES_REQUIRED' | translate }}</mat-error>
         </mat-form-field>
 
         @if (errorMessage) {
@@ -67,12 +68,13 @@ export class CreateUserDialogComponent implements OnInit {
   constructor(
     private adminService: AdminService,
     private dialogRef: MatDialogRef<CreateUserDialogComponent>,
+    private translateService: TranslateService,
   ) {}
 
   ngOnInit(): void {
     this.adminService.getRoles().subscribe({
       next: (roles) => (this.roles = roles),
-      error: () => (this.errorMessage = 'Failed to load roles'),
+      error: () => (this.errorMessage = this.translateService.instant('USERS.ROLES_LOAD_FAILED')),
     });
   }
 
@@ -87,7 +89,10 @@ export class CreateUserDialogComponent implements OnInit {
     this.adminService.createUser(email!, password!, roles!).subscribe({
       next: () => this.dialogRef.close(true),
       error: (error) => {
-        this.errorMessage = error.error?.message ?? 'Failed to create user';
+        this.errorMessage = getApiErrorMessage(
+          error,
+          this.translateService.instant('USERS.CREATE_FAILED'),
+        );
         this.loading = false;
       },
     });

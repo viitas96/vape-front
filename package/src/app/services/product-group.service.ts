@@ -10,8 +10,10 @@ export class ProductGroupService {
 
   constructor(private http: HttpClient) {}
 
-  getAll(): Observable<ProductGroup[]> {
-    return this.http.get<ProductGroup[]>(this.API_URL);
+  getAll(sortBy = 'id', sortDirection = 'asc'): Observable<ProductGroup[]> {
+    return this.http.get<ProductGroup[]>(this.API_URL, {
+      params: { sortBy, sortDirection },
+    });
   }
 
   create(dto: ProductGroupDTO): Observable<ProductGroup> {

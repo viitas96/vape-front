@@ -3,6 +3,7 @@ import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
 import { Router, RouterModule } from '@angular/router';
 import { MaterialModule } from 'src/app/material.module';
 import { AuthService } from 'src/app/services/auth.service';
+import { getApiErrorMessage } from 'src/app/shared/http/api-error';
 import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
@@ -42,7 +43,7 @@ export class AppRegisterComponent {
     this.authService.register(email!, password!, dateOfBirth!).subscribe({
       next: () => this.router.navigate(['/customer']),
       error: (error) => {
-        this.errorMessage = error.error?.message ?? 'Registration failed';
+        this.errorMessage = getApiErrorMessage(error, 'Registration failed');
         this.loading = false;
       },
     });

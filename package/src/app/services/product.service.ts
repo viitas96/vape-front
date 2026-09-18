@@ -5,15 +5,41 @@ import { environment } from '../../environments/environment';
 import { Product, ProductDTO } from '../features/products/product.models';
 import { PageResponse } from '../shared/models/page-response.model';
 
+export interface ProductFilters {
+  name?: string;
+  gammaId?: number | null;
+  categoryId?: number | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ProductService {
   private readonly API_URL = `${environment.apiBaseUrl}/products`;
 
   constructor(private http: HttpClient) {}
 
-  getAll(page = 0, size = 10): Observable<PageResponse<Product>> {
+  getAll(
+    page = 0,
+    size = 10,
+    sortBy = 'id',
+    sortDirection = 'asc',
+    filters: ProductFilters = {},
+  ): Observable<PageResponse<Product>> {
+    const params: Record<string, string | number> = { page, size, sortBy, sortDirection };
+
+    if (filters.name) {
+      params['name'] = filters.name;
+    }
+
+    if (filters.gammaId) {
+      params['gammaId'] = filters.gammaId;
+    }
+
+    if (filters.categoryId) {
+      params['categoryId'] = filters.categoryId;
+    }
+
     return this.http.get<PageResponse<Product>>(this.API_URL, {
-      params: { page, size },
+      params,
     });
   }
 

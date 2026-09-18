@@ -21,7 +21,7 @@ import { NavItem } from './nav-item';
   styleUrls: [],
 })
 export class AppNavItemComponent implements OnChanges {
-  @Output() notify = new EventEmitter<boolean>();
+  @Output() notify = new EventEmitter<void>();
   @Input() item!: NavItem;
   @Input() depth = 0;
   @HostBinding('attr.aria-expanded') ariaExpanded = false;
@@ -48,6 +48,7 @@ export class AppNavItemComponent implements OnChanges {
   onItemSelected(item: NavItem): void {
     if (!item.children?.length && item.route) {
       this.router.navigateByUrl(item.route);
+      this.notify.emit();
     }
 
     if (item.children?.length) {
@@ -59,20 +60,11 @@ export class AppNavItemComponent implements OnChanges {
       left: 0,
       behavior: 'smooth',
     });
-
-    if (!this.expanded && window.innerWidth < 1024) {
-      this.notify.emit();
-    }
   }
 
   openExternalLink(url: string): void {
     if (url) {
       window.open(url, '_blank');
-    }
-  }
-
-  onSubItemSelected(item: NavItem): void {
-    if (!item.children?.length && this.expanded && window.innerWidth < 1024) {
       this.notify.emit();
     }
   }

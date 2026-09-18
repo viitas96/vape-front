@@ -7,6 +7,7 @@ import { ProductGroup, ProductGroupCategory, ProductGroupDTO } from './product-g
 
 export interface ProductGroupDialogData {
   group: ProductGroup | null;
+  categories: ProductGroupCategory[];
 }
 
 @Component({
@@ -18,7 +19,7 @@ export interface ProductGroupDialogData {
 export class ProductGroupDialogComponent {
   form = new FormGroup({
     name: new FormControl('', [Validators.required]),
-    category: new FormControl<ProductGroupCategory>('GENERAL_GOODS', [Validators.required]),
+    categoryId: new FormControl<number | null>(null, [Validators.required]),
   });
 
   constructor(
@@ -26,7 +27,12 @@ export class ProductGroupDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: ProductGroupDialogData,
   ) {
     if (data.group) {
-      this.form.setValue({ name: data.group.name, category: data.group.category });
+      this.form.setValue({ name: data.group.name, categoryId: data.group.category.id });
+      return;
+    }
+
+    if (data.categories.length) {
+      this.form.controls.categoryId.setValue(data.categories[0].id);
     }
   }
 
@@ -39,7 +45,7 @@ export class ProductGroupDialogComponent {
       return;
     }
 
-    const { name, category } = this.form.value;
-    this.dialogRef.close({ name: name!, category: category! });
+    const { name, categoryId } = this.form.value;
+    this.dialogRef.close({ name: name!, categoryId: categoryId! });
   }
 }

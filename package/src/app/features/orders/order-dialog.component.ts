@@ -30,6 +30,21 @@ interface ItemForm {
   quantity: FormControl<number | null>;
 }
 
+interface ProductTreeGamma {
+  name: string;
+  products: Product[];
+}
+
+interface ProductTreeGroup {
+  name: string;
+  gammas: ProductTreeGamma[];
+}
+
+interface ProductTreeCategory {
+  name: string;
+  groups: ProductTreeGroup[];
+}
+
 @Component({
   selector: 'app-order-dialog',
   standalone: true,
@@ -41,7 +56,7 @@ export class OrderDialogComponent {
   settings?: StoreSettings;
 
   form = new FormGroup({
-    status: new FormControl<OrderStatus>('PENDING', { nonNullable: true }),
+    status: new FormControl<OrderStatus>('COMPLETED', { nonNullable: true }),
     isWalkIn: new FormControl<boolean>(false, { nonNullable: true }),
     customer: new FormControl<UserResponse | string | null>(null),
     items: new FormArray<FormGroup<ItemForm>>([]),
@@ -110,6 +125,43 @@ export class OrderDialogComponent {
     return cust && typeof cust === 'object' && 'uuid' in cust ? (cust as UserResponse) : null;
   }
 
+  get productTree(): ProductTreeCategory[] {
+    const categories = new Map<string, Map<string, Map<string, Product[]>>>();
+
+    for (const product of this.data.products) {
+      const categoryName = product.group?.category?.name ?? 'No category';
+      const groupName = product.group?.name ?? 'No group';
+      const gammaName = product.gamma?.name ?? 'No gamma';
+
+      if (!categories.has(categoryName)) {
+        categories.set(categoryName, new Map<string, Map<string, Product[]>>());
+      }
+
+      const groups = categories.get(categoryName)!;
+      if (!groups.has(groupName)) {
+        groups.set(groupName, new Map<string, Product[]>());
+      }
+
+      const gammas = groups.get(groupName)!;
+      if (!gammas.has(gammaName)) {
+        gammas.set(gammaName, []);
+      }
+
+      gammas.get(gammaName)!.push(product);
+    }
+
+    return Array.from(categories.entries()).map(([categoryName, groups]) => ({
+      name: categoryName,
+      groups: Array.from(groups.entries()).map(([groupName, gammas]) => ({
+        name: groupName,
+        gammas: Array.from(gammas.entries()).map(([gammaName, products]) => ({
+          name: gammaName,
+          products,
+        })),
+      })),
+    }));
+  }
+
   get maxPointsForPurchase(): number {
     if (!this.settings) return 0;
     let totalPoints = 0;
@@ -119,8 +171,8 @@ export class OrderDialogComponent {
         const price = g.controls.unitPrice.value ?? 0;
         const qty = g.controls.quantity.value ?? 0;
         const lineTotalCents = Math.round(price * qty * 100);
-        const category = product.group?.category ?? 'GENERAL_GOODS';
-        if (category === 'SOUVENIR') {
+        const systemName = product.group?.category?.systemName;
+        if (systemName === 'SOUVENIR') {
           const pointsPortionCents = Math.floor((lineTotalCents * this.settings.souvenirSplitPercent) / 100);
           totalPoints += Math.floor((pointsPortionCents * this.settings.spendRate) / 100);
         } else {
@@ -155,6 +207,16 @@ export class OrderDialogComponent {
 
   displayProduct(product: Product | string | null): string {
     return product && typeof product === 'object' ? product.name : '';
+  }
+
+  compareProducts(firstProduct: Product | string | null, secondProduct: Product | string | null): boolean {
+    return Boolean(
+      firstProduct &&
+      secondProduct &&
+      typeof firstProduct === 'object' &&
+      typeof secondProduct === 'object' &&
+      firstProduct.id === secondProduct.id
+    );
   }
 
   onProductSelected(index: number): void {

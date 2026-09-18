@@ -1,4 +1,5 @@
 import { ProductGroupCategory } from '../product-groups/product-group.models';
+import { ProductGamma } from '../product-gammas/product-gamma.models';
 
 export interface ProductGroupSummary {
   id: number;
@@ -16,6 +17,7 @@ export interface Product {
   matrixBarcode?: string;
   qrCode?: string;
   group?: ProductGroupSummary;
+  gamma?: ProductGamma;
 }
 
 export interface ProductDTO {
@@ -26,4 +28,5 @@ export interface ProductDTO {
   matrixBarcode?: string;
   qrCode?: string;
   groupId?: number;
+  gammaId?: number;
 }

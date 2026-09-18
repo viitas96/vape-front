@@ -4,9 +4,11 @@ import { MaterialModule } from 'src/app/material.module';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ProductGroupService } from 'src/app/services/product-group.service';
 import { ConfirmDialogService } from 'src/app/shared/dialogs/confirm-dialog.service';
-import { FeedbackPageState } from 'src/app/shared/page/page-state';
+import { getApiErrorMessage } from 'src/app/shared/http/api-error';
+import { ExpandableRowsPageState } from 'src/app/shared/page/page-state';
 import { ProductGroupDialogComponent, ProductGroupDialogData } from './product-group-dialog.component';
-import { ProductGroup } from './product-group.models';
+import { ProductGroup, ProductGroupCategory } from './product-group.models';
+import { ProductGroupCategoryService } from 'src/app/services/product-group-category.service';
 
 @Component({
   selector: 'app-product-groups',
@@ -14,12 +16,16 @@ import { ProductGroup } from './product-group.models';
   imports: [MaterialModule, TranslatePipe],
   templateUrl: './product-groups.component.html',
 })
-export class ProductGroupsComponent extends FeedbackPageState implements OnInit {
+export class ProductGroupsComponent extends ExpandableRowsPageState implements OnInit {
   groups: ProductGroup[] = [];
-  displayedColumns = ['id', 'name', 'actions'];
+  categories: ProductGroupCategory[] = [];
+  displayedColumns = ['id', 'name', 'category', 'actions', 'expand'];
+  sortBy = 'id';
+  sortDirection: 'asc' | 'desc' = 'asc';
 
   constructor(
     private readonly productGroupService: ProductGroupService,
+    private readonly productGroupCategoryService: ProductGroupCategoryService,
     private readonly dialog: MatDialog,
     private readonly confirmDialog: ConfirmDialogService,
   ) {
@@ -28,10 +34,11 @@ export class ProductGroupsComponent extends FeedbackPageState implements OnInit 
 
   ngOnInit(): void {
     this.loadGroups();
+    this.loadCategories();
   }
 
   openDialog(group?: ProductGroup): void {
-    const data: ProductGroupDialogData = { group: group ?? null };
+    const data: ProductGroupDialogData = { group: group ?? null, categories: this.categories };
     this.dialog.open(ProductGroupDialogComponent, { width: '400px', data }).afterClosed().subscribe((dto) => {
       if (!dto) {
         return;
@@ -48,7 +55,7 @@ export class ProductGroupsComponent extends FeedbackPageState implements OnInit 
           this.loadGroups();
         },
         error: (error) => {
-          this.setError(error.error?.message ?? `Failed to ${group ? 'update' : 'create'} group`);
+          this.setError(getApiErrorMessage(error, `Failed to ${group ? 'update' : 'create'} group`));
         },
       });
     });
@@ -77,13 +84,31 @@ export class ProductGroupsComponent extends FeedbackPageState implements OnInit 
     });
   }
 
+  onSortChange(sort: { active: string; direction: '' | 'asc' | 'desc' }): void {
+    this.sortBy = sort.active || 'id';
+    this.sortDirection = sort.direction || 'asc';
+    this.collapseRowDetails();
+    this.loadGroups();
+  }
+
   private loadGroups(): void {
-    this.productGroupService.getAll().subscribe({
+    this.productGroupService.getAll(this.sortBy, this.sortDirection).subscribe({
       next: (groups) => {
         this.groups = groups;
       },
       error: () => {
         this.setError('Failed to load product groups');
+      },
+    });
+  }
+
+  private loadCategories(): void {
+    this.productGroupCategoryService.getAll().subscribe({
+      next: (categories) => {
+        this.categories = categories;
+      },
+      error: () => {
+        this.setError('Failed to load product group categories');
       },
     });
   }

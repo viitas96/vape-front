@@ -1,19 +1,17 @@
 @if (profile) {
-<div class="m-16">
+<div class="customer-dashboard m-16">
 
-  <!-- Digital Card -->
-  <mat-card class="cardWithShadow m-b-24" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%); color: white;">
-    <mat-card-content class="p-32 text-center">
+  <mat-card class="cardWithShadow m-b-24 customer-loyalty-card" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%); color: white;">
+    <mat-card-content class="p-32 text-center customer-loyalty-content">
       <p class="f-s-12 f-w-400 m-b-8" style="opacity: 0.7; letter-spacing: 2px; text-transform: uppercase;">Loyalty Card</p>
-      <p class="f-s-12 m-b-4" style="opacity: 0.6;">{{ profile.email }}</p>
+      <p class="f-s-12 m-b-4 customer-email" style="opacity: 0.6;">{{ profile.email }}</p>
 
-      <!-- QR code -->
       <div class="m-y-20" style="display: inline-block;">
-        <div style="background: white; border-radius: 12px; padding: 16px; display: inline-block;">
+        <div class="customer-qr-frame" style="background: white; border-radius: 12px; padding: 16px; display: inline-block;">
           @if (qrDataUrl) {
-            <img [src]="qrDataUrl" alt="Loyalty QR" style="display: block; width: 180px; height: 180px;" />
+            <img class="customer-qr-image" [src]="qrDataUrl" alt="Loyalty QR" style="display: block; width: 180px; height: 180px;" />
           } @else {
-            <div style="width: 180px; height: 180px; display: flex; align-items: center; justify-content: center;">
+            <div class="customer-qr-loader" style="width: 180px; height: 180px; display: flex; align-items: center; justify-content: center;">
               <mat-spinner diameter="40"></mat-spinner>
             </div>
           }
@@ -21,13 +19,12 @@
         <p style="font-size: 11px; opacity: 0.6; margin: 8px 0 0;">Scan to link this customer to an order</p>
       </div>
 
-      <!-- Points summary -->
-      <div class="d-flex justify-content-center gap-32 m-t-8">
+      <div class="d-flex justify-content-center gap-32 m-t-8 customer-points-summary">
         <div>
           <p class="f-s-32 f-w-700 m-b-0" style="line-height: 1;">{{ profile.pointsBalance }}</p>
           <p class="f-s-12 m-t-4" style="opacity: 0.7;">Available points</p>
         </div>
-        <div style="width: 1px; background: rgba(255,255,255,0.2);"></div>
+        <div class="customer-points-divider" style="width: 1px; background: rgba(255,255,255,0.2);"></div>
         <div>
           <p class="f-s-32 f-w-700 m-b-0" style="line-height: 1;">{{ pointsValueMdl.toFixed(2) }}</p>
           <p class="f-s-12 m-t-4" style="opacity: 0.7;">MDL value</p>
@@ -36,7 +33,6 @@
     </mat-card-content>
   </mat-card>
 
-  <!-- Souvenir Progress -->
   <mat-card class="cardWithShadow m-b-24">
     <mat-card-content class="p-24">
       <div class="d-flex align-items-center justify-content-between m-b-12">
@@ -48,7 +44,6 @@
     </mat-card-content>
   </mat-card>
 
-  <!-- Promotions Carousel -->
   @if (promotions.length > 0) {
     <mat-card class="cardWithShadow m-b-24">
       <mat-card-header>
@@ -74,7 +69,6 @@
     </mat-card>
   }
 
-  <!-- Recent Orders -->
   <mat-card class="cardWithShadow">
     <mat-card-header>
       <mat-card-title class="f-s-16">Recent Receipts</mat-card-title>
@@ -98,26 +92,28 @@
                 </mat-panel-description>
               </mat-expansion-panel-header>
 
-              <table class="w-100" style="border-collapse: collapse;">
-                <thead>
-                  <tr style="border-bottom: 1px solid #eee;">
-                    <th class="f-s-12 f-w-600 p-b-8" style="text-align: left;">Product</th>
-                    <th class="f-s-12 f-w-600 p-b-8" style="text-align: right;">Qty</th>
-                    <th class="f-s-12 f-w-600 p-b-8" style="text-align: right;">Price</th>
-                    <th class="f-s-12 f-w-600 p-b-8" style="text-align: right;">Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (item of order.items; track $index) {
-                    <tr style="border-bottom: 1px solid #f5f5f5;">
-                      <td class="f-s-13 p-y-8">{{ item.productName }}</td>
-                      <td class="f-s-13 p-y-8" style="text-align: right;">{{ item.quantity }}</td>
-                      <td class="f-s-13 p-y-8" style="text-align: right;">{{ formatMdl(item.unitPrice) }}</td>
-                      <td class="f-s-13 p-y-8" style="text-align: right;">{{ formatMdl(item.lineTotal) }}</td>
+              <div class="customer-receipt-table">
+                <table class="w-100" style="border-collapse: collapse;">
+                  <thead>
+                    <tr style="border-bottom: 1px solid #eee;">
+                      <th class="f-s-12 f-w-600 p-b-8" style="text-align: left;">Product</th>
+                      <th class="f-s-12 f-w-600 p-b-8" style="text-align: right;">Qty</th>
+                      <th class="f-s-12 f-w-600 p-b-8" style="text-align: right;">Price</th>
+                      <th class="f-s-12 f-w-600 p-b-8" style="text-align: right;">Total</th>
                     </tr>
-                  }
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    @for (item of order.items; track $index) {
+                      <tr style="border-bottom: 1px solid #f5f5f5;">
+                        <td class="f-s-13 p-y-8">{{ item.productName }}</td>
+                        <td class="f-s-13 p-y-8" style="text-align: right;">{{ item.quantity }}</td>
+                        <td class="f-s-13 p-y-8" style="text-align: right;">{{ formatMdl(item.unitPrice) }}</td>
+                        <td class="f-s-13 p-y-8" style="text-align: right;">{{ formatMdl(item.lineTotal) }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
             </mat-expansion-panel>
           }
         </mat-accordion>

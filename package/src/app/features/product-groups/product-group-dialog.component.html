@@ -11,9 +11,10 @@
 
     <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'GROUPS.CATEGORY' | translate }}</mat-label>
     <mat-form-field appearance="outline" class="w-100">
-      <mat-select formControlName="category">
-        <mat-option value="GENERAL_GOODS">General Goods (vape, liquids, alcohol)</mat-option>
-        <mat-option value="SOUVENIR">Souvenir / Merch (hoodie, capвЂ¦)</mat-option>
+      <mat-select formControlName="categoryId">
+        @for (category of data.categories; track category.id) {
+          <mat-option [value]="category.id">{{ category.name }}</mat-option>
+        }
       </mat-select>
       <mat-error>{{ 'GROUPS.CATEGORY_REQUIRED' | translate }}</mat-error>
     </mat-form-field>

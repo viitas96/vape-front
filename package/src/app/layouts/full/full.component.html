@@ -1,36 +1,51 @@
-﻿<mat-sidenav-container class="mainWrapper" autosize autoFocus dir="ltr">
-  <mat-sidenav #leftsidenav [mode]="isOver ? 'over' : 'side'" [opened]="!isOver"
-    (openedChange)="onSidenavOpenedChange($event)" (closedStart)="onSidenavClosedStart()" class="sidebarNav">
+﻿<mat-sidenav-container class="mainWrapper" autosize autoFocus dir="ltr" [hasBackdrop]="isOver">
+  <mat-sidenav #leftsidenav mode="over" [opened]="!isOver && (!options.sidenavCollapsed || isSidenavHovered)"
+    (openedChange)="onSidenavOpenedChange($event)" (closedStart)="onSidenavClosedStart()" class="sidebarNav"
+    (mouseenter)="showSidenavOnHover()" (mouseleave)="hideSidenavAfterHover()"
+    [class.sidebarNavCollapsed]="!isOver && options.sidenavCollapsed">
     <div class="flex-layout">
-      <app-sidebar (toggleMobileNav)="sidenav?.toggle()" [showToggle]="isOver"></app-sidebar>
+      <app-sidebar (toggleMobileNav)="sidenav?.toggle()" (toggleCollapsed)="toggleCollapsed()"
+        [showToggle]="isOver" [collapsed]="options.sidenavCollapsed"></app-sidebar>
       <ng-scrollbar class="position-relative" style="height: 100%">
         <mat-nav-list class="sidebar-list">
           @for(item of navItems; track item) {
-          <app-nav-item [item]="item" (notify)="sidenav?.toggle()">
+          <app-nav-item [item]="item" (notify)="hideSidenavAfterSelection()">
           </app-nav-item>
           }
         </mat-nav-list>
-        <div class="p-x-16 p-b-16">
+        <div class="p-x-16 p-b-16 sidebar-actions">
           <button mat-stroked-button class="w-100" [matMenuTriggerFor]="languageMenu">
             <i-tabler name="language" class="icon-18 d-inline-flex m-r-8"></i-tabler>
-            {{ currentLanguage === 'ro' ? 'Română' : 'English' }}
+            <span>{{ (currentLanguage === 'ro' ? 'LANGUAGE.RO' : 'LANGUAGE.EN') | translate }}</span>
           </button>
           <mat-menu #languageMenu="matMenu">
-            <button mat-menu-item (click)="setLanguage('ro')">Română</button>
-            <button mat-menu-item (click)="setLanguage('en')">English</button>
+            <button mat-menu-item (click)="setLanguage('ro')">{{ 'LANGUAGE.RO' | translate }}</button>
+            <button mat-menu-item (click)="setLanguage('en')">{{ 'LANGUAGE.EN' | translate }}</button>
           </mat-menu>
+
+          <button mat-stroked-button class="w-100" (click)="themeService.toggle()"
+            [title]="(themeService.isDark() ? 'THEME.SWITCH_TO_LIGHT' : 'THEME.SWITCH_TO_DARK') | translate">
+            <i-tabler [name]="themeService.isDark() ? 'sun' : 'moon'" class="icon-18 d-inline-flex m-r-8"></i-tabler>
+            <span>{{ (themeService.isDark() ? 'THEME.LIGHT' : 'THEME.DARK') | translate }}</span>
+          </button>
         </div>
       </ng-scrollbar>
       <div class="p-24">
         <button mat-stroked-button class="w-100 sidebar-logout-btn" (click)="logout()">
           <i-tabler name="logout" class="icon-18 d-flex"></i-tabler>
-          <span>Logout</span>
+          <span>{{ 'HEADER.LOGOUT' | translate }}</span>
         </button>
       </div>
     </div>
   </mat-sidenav>
 
-  <mat-sidenav-content class="contentWrapper" #content>
+
+  <mat-sidenav-content class="contentWrapper" #content (click)="collapseSidenavOnContentClick()">
+    @if(isOver) {
+    <button mat-fab class="mobileMenuToggle" (click)="$event.stopPropagation(); leftsidenav.toggle()" [title]="'NAV.EXPAND' | translate">
+      <i-tabler name="menu-2" class="icon-22 d-flex"></i-tabler>
+    </button>
+    }
     <main class="pageWrapper maxWidth">
       <div>
         <router-outlet></router-outlet>
@@ -38,3 +53,10 @@
     </main>
   </mat-sidenav-content>
 </mat-sidenav-container>
+
+@if(!isOver && options.sidenavCollapsed) {
+<button mat-fab class="sidebarFloatingToggle" (click)="toggleCollapsed()" (mouseenter)="showSidenavOnHover()"
+  (mouseleave)="scheduleSidenavHideAfterHover()" [title]="'NAV.EXPAND' | translate">
+  <i-tabler name="menu-2" class="icon-22 d-flex"></i-tabler>
+</button>
+}

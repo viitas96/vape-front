@@ -16,7 +16,7 @@ export interface AppFeatureRouteDefinition {
 }
 
 export const APP_ROLE_HOME_PATHS: ReadonlyArray<readonly [AppRole, string]> = [
-  ['ADMIN', '/admin'],
+  ['ADMIN', '/products'],
   ['DIRECTOR', '/admin'],
   ['SELLER', '/seller'],
   ['ACCOUNTANT', '/accountant'],
@@ -55,6 +55,20 @@ export const APP_FEATURE_ROUTE_DEFINITIONS: readonly AppFeatureRouteDefinition[]
     roles: ['ADMIN', 'DIRECTOR', 'OPERATOR', 'SELLER'],
     sidebar: { label: 'Products', iconName: 'package', bgcolor: 'success' },
     loadComponent: () => import('../../features/products/products.component').then((m) => m.ProductsComponent),
+  },
+  {
+    path: 'product-gammas',
+    title: 'Gammas',
+    roles: ['ADMIN', 'DIRECTOR', 'OPERATOR'],
+    sidebar: { label: 'Gammas', iconName: 'tags', bgcolor: 'success' },
+    loadComponent: () => import('../../features/product-gammas/product-gammas.component').then((m) => m.ProductGammasComponent),
+  },
+  {
+    path: 'product-group-categories',
+    title: 'Categories',
+    roles: ['ADMIN', 'DIRECTOR', 'OPERATOR'],
+    sidebar: { label: 'Categories', iconName: 'category', bgcolor: 'primary' },
+    loadComponent: () => import('../../features/product-group-categories/product-group-categories.component').then((m) => m.ProductGroupCategoriesComponent),
   },
   {
     path: 'product-groups',

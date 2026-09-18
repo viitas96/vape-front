@@ -13,6 +13,20 @@ export const navItems: NavItem[] = [
     roles: ['ADMIN', 'DIRECTOR', 'OPERATOR', 'SELLER'],
   },
   {
+    displayName: 'Gammas',
+    iconName: 'tags',
+    route: '/product-gammas',
+    bgcolor: 'success',
+    roles: ['ADMIN', 'DIRECTOR', 'OPERATOR'],
+  },
+  {
+    displayName: 'Categories',
+    iconName: 'category',
+    route: '/product-group-categories',
+    bgcolor: 'primary',
+    roles: ['ADMIN', 'DIRECTOR', 'OPERATOR'],
+  },
+  {
     displayName: 'Product Groups',
     iconName: 'layout-grid',
     route: '/product-groups',

@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { getRoleHomePath } from '../core/routing/app-feature.routes';
+import { ProductCreationPreferencesService } from './product-creation-preferences.service';
 
 interface LoginResponse {
   token: string;
@@ -23,7 +24,10 @@ export class AuthService {
 
   private readonly apiUrl = `${environment.apiBaseUrl}/auth`;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private readonly http: HttpClient,
+    private readonly productCreationPreferencesService: ProductCreationPreferencesService,
+  ) {}
 
   register(email: string, password: string, dateOfBirth: string): Observable<{ token: string }> {
     return this.http.post<{ token: string }>(`${this.apiUrl}/register`, { email, password, dateOfBirth }).pipe(
@@ -60,6 +64,7 @@ export class AuthService {
     localStorage.removeItem(AuthService.TOKEN_KEY);
     localStorage.removeItem(AuthService.REFRESH_TOKEN_KEY);
     localStorage.removeItem(AuthService.ROLES_KEY);
+    this.productCreationPreferencesService.clearPreferences();
   }
 
   getToken(): string | null {

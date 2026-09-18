@@ -1,0 +1,92 @@
+<div class="p-24">
+  <mat-card class="cardWithShadow admin-data-card admin-product-gammas-page">
+    <mat-card-content class="p-32 admin-data-content">
+
+      <div class="d-flex align-items-center justify-content-between m-b-24 admin-page-header">
+        <h2 class="f-s-20 f-w-700">{{ 'GAMMAS.TITLE' | translate }}</h2>
+        <button mat-flat-button color="primary" (click)="openDialog()">
+          <mat-icon>add</mat-icon> {{ 'GAMMAS.ADD' | translate }}
+        </button>
+      </div>
+
+      @if (successMessage) {
+        <p class="text-success f-s-14 m-b-16">{{ successMessage }}</p>
+      }
+      @if (errorMessage) {
+        <p class="text-danger f-s-14 m-b-16">{{ errorMessage }}</p>
+      }
+
+      <mat-table [dataSource]="gammas" matSort [matSortActive]="sortBy" [matSortDirection]="sortDirection" (matSortChange)="onSortChange($event)" multiTemplateDataRows>
+
+        <ng-container matColumnDef="id">
+          <mat-header-cell *matHeaderCellDef mat-sort-header="id">{{ 'COMMON.NO' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let gamma; let i = dataIndex">{{ rowNumber(i) }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+          <mat-header-cell *matHeaderCellDef mat-sort-header="name">{{ 'PRODUCTS.NAME' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let gamma">{{ gamma.name }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="price">
+          <mat-header-cell *matHeaderCellDef mat-sort-header="price">{{ 'PRODUCTS.PRICE' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let gamma">${{ formatPrice(gamma.price) }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.ACTIONS' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let gamma">
+            <button mat-icon-button color="primary" (click)="openDialog(gamma)" title="Edit">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="delete(gamma)" title="Delete">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="expand">
+          <mat-header-cell *matHeaderCellDef></mat-header-cell>
+          <mat-cell *matCellDef="let gamma">
+            <button mat-icon-button type="button" (click)="toggleRowDetails(gamma.id)"
+              [attr.aria-label]="'COMMON.DETAILS' | translate" [attr.aria-expanded]="isRowDetailsExpanded(gamma.id)">
+              <mat-icon class="admin-table-expand-icon" [class.admin-table-expand-icon-open]="isRowDetailsExpanded(gamma.id)">expand_more</mat-icon>
+            </button>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="expandedDetail">
+          <mat-cell *matCellDef="let gamma; let i = dataIndex">
+            <div class="admin-table-detail">
+              <dl class="admin-table-detail-grid">
+                <div class="admin-table-detail-field">
+                  <dt>{{ 'COMMON.NO' | translate }}</dt>
+                  <dd>{{ rowNumber(i) }}</dd>
+                </div>
+              </dl>
+              <div class="admin-table-detail-actions">
+                <button mat-stroked-button color="primary" type="button" (click)="openDialog(gamma)">
+                  <mat-icon>edit</mat-icon> {{ 'COMMON.EDIT' | translate }}
+                </button>
+                <button mat-stroked-button color="warn" type="button" (click)="delete(gamma)">
+                  <mat-icon>delete</mat-icon> {{ 'COMMON.DELETE' | translate }}
+                </button>
+              </div>
+            </div>
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+        <mat-row *matRowDef="let row; columns: expandedDetailColumns"
+          class="admin-table-detail-row" [class.admin-table-detail-row-open]="isRowDetailsExpanded(row.id)"></mat-row>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell p-16" [attr.colspan]="displayedColumns.length">{{ 'GAMMAS.EMPTY' | translate }}</td>
+        </tr>
+
+      </mat-table>
+
+    </mat-card-content>
+  </mat-card>
+</div>

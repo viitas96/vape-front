@@ -1,10 +1,10 @@
 ﻿<div class="p-24">
-  <mat-card class="cardWithShadow">
-    <mat-card-content class="p-32">
+  <mat-card class="cardWithShadow admin-data-card admin-product-groups-page">
+    <mat-card-content class="p-32 admin-data-content">
 
-      <div class="d-flex align-items-center justify-content-between m-b-24">
+      <div class="d-flex align-items-center justify-content-between m-b-24 admin-page-header">
         <h2 class="f-s-20 f-w-700">{{ 'GROUPS.TITLE' | translate }}</h2>
-        <button mat-flat-button color="primary" (click)="openDialog()">
+        <button mat-flat-button color="primary" (click)="openDialog()" [disabled]="!categories.length">
           <mat-icon>add</mat-icon> {{ 'GROUPS.ADD' | translate }}
         </button>
       </div>
@@ -16,16 +16,21 @@
         <p class="text-danger f-s-14 m-b-16">{{ errorMessage }}</p>
       }
 
-      <mat-table [dataSource]="groups">
+      <mat-table [dataSource]="groups" matSort [matSortActive]="sortBy" [matSortDirection]="sortDirection" (matSortChange)="onSortChange($event)" multiTemplateDataRows>
 
         <ng-container matColumnDef="id">
-          <mat-header-cell *matHeaderCellDef>ID</mat-header-cell>
-          <mat-cell *matCellDef="let g">{{ g.id }}</mat-cell>
+          <mat-header-cell *matHeaderCellDef mat-sort-header="id">{{ 'COMMON.NO' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let g; let i = dataIndex">{{ rowNumber(i) }}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="name">
-          <mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.NAME' | translate }}</mat-header-cell>
+          <mat-header-cell *matHeaderCellDef mat-sort-header="name">{{ 'PRODUCTS.NAME' | translate }}</mat-header-cell>
           <mat-cell *matCellDef="let g">{{ g.name }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="category">
+          <mat-header-cell *matHeaderCellDef mat-sort-header="category.name">{{ 'GROUPS.CATEGORY' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let g">{{ g.category.name }}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="actions">
@@ -40,8 +45,41 @@
           </mat-cell>
         </ng-container>
 
+        <ng-container matColumnDef="expand">
+          <mat-header-cell *matHeaderCellDef></mat-header-cell>
+          <mat-cell *matCellDef="let g">
+            <button mat-icon-button type="button" (click)="toggleRowDetails(g.id)"
+              [attr.aria-label]="'COMMON.DETAILS' | translate" [attr.aria-expanded]="isRowDetailsExpanded(g.id)">
+              <mat-icon class="admin-table-expand-icon" [class.admin-table-expand-icon-open]="isRowDetailsExpanded(g.id)">expand_more</mat-icon>
+            </button>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="expandedDetail">
+          <mat-cell *matCellDef="let g; let i = dataIndex">
+            <div class="admin-table-detail">
+              <dl class="admin-table-detail-grid">
+                <div class="admin-table-detail-field">
+                  <dt>{{ 'COMMON.NO' | translate }}</dt>
+                  <dd>{{ rowNumber(i) }}</dd>
+                </div>
+              </dl>
+              <div class="admin-table-detail-actions">
+                <button mat-stroked-button color="primary" type="button" (click)="openDialog(g)">
+                  <mat-icon>edit</mat-icon> {{ 'COMMON.EDIT' | translate }}
+                </button>
+                <button mat-stroked-button color="warn" type="button" (click)="delete(g)">
+                  <mat-icon>delete</mat-icon> {{ 'COMMON.DELETE' | translate }}
+                </button>
+              </div>
+            </div>
+          </mat-cell>
+        </ng-container>
+
         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
         <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+        <mat-row *matRowDef="let row; columns: expandedDetailColumns"
+          class="admin-table-detail-row" [class.admin-table-detail-row-open]="isRowDetailsExpanded(row.id)"></mat-row>
 
         <tr class="mat-row" *matNoDataRow>
           <td class="mat-cell p-16" [attr.colspan]="displayedColumns.length">{{ 'GROUPS.EMPTY' | translate }}</td>

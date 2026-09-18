@@ -40,6 +40,6 @@
 }
 
 @if(expanded) { @for(child of item.children; track child) {
-<app-nav-item [item]="child" (click)="onSubItemSelected(child)" [depth]="depth + 1">
+<app-nav-item [item]="child" (notify)="notify.emit()" [depth]="depth + 1">
 </app-nav-item>
 } }

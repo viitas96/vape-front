@@ -1,0 +1,27 @@
+<h2 mat-dialog-title>{{ isEdit ? ('CATEGORIES.EDIT' | translate) : ('CATEGORIES.ADD' | translate) }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" id="category-form" (ngSubmit)="submit()" class="p-t-8">
+
+    <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.NAME' | translate }}</mat-label>
+    <mat-form-field appearance="outline" class="w-100">
+      <input matInput formControlName="name" [placeholder]="'CATEGORIES.PLACEHOLDER_NAME' | translate" />
+      <mat-error>{{ 'PRODUCTS.NAME_REQUIRED' | translate }}</mat-error>
+    </mat-form-field>
+
+    <!-- systemName removed from the UI; kept on the model/backend for future use.
+    <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'CATEGORIES.SYSTEM_NAME' | translate }}</mat-label>
+    <mat-form-field appearance="outline" class="w-100">
+      <input matInput formControlName="systemName" [placeholder]="'CATEGORIES.PLACEHOLDER_SYSTEM_NAME' | translate" />
+    </mat-form-field>
+    -->
+
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button mat-dialog-close>{{ 'COMMON.CANCEL' | translate }}</button>
+  <button mat-flat-button color="primary" form="category-form" type="submit">
+    {{ isEdit ? ('COMMON.SAVE' | translate) : ('COMMON.CREATE' | translate) }}
+  </button>
+</mat-dialog-actions>
