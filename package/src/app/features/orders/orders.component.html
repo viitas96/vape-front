@@ -4,9 +4,11 @@
 
       <div class="d-flex align-items-center justify-content-between m-b-24 admin-page-header">
         <h2 class="f-s-20 f-w-700">{{ 'ORDERS.TITLE' | translate }}</h2>
-        <button mat-flat-button color="primary" (click)="openDialog()">
-          <mat-icon>add</mat-icon> {{ 'ORDERS.ADD' | translate }}
-        </button>
+        @if (canManage) {
+          <button mat-flat-button color="primary" (click)="openDialog()">
+            <mat-icon>add</mat-icon> {{ 'ORDERS.ADD' | translate }}
+          </button>
+        }
       </div>
 
       @if (successMessage) {
@@ -61,12 +63,17 @@
         <ng-container matColumnDef="actions">
           <mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.ACTIONS' | translate }}</mat-header-cell>
           <mat-cell *matCellDef="let o">
-            <button mat-icon-button color="primary" (click)="openDialog(o)" [title]="'COMMON.EDIT' | translate">
-              <mat-icon>edit</mat-icon>
+            <button mat-icon-button (click)="openViewDialog(o)" [title]="'ORDERS.VIEW' | translate">
+              <mat-icon>visibility</mat-icon>
             </button>
-            <button mat-icon-button color="warn" (click)="delete(o)" [title]="'COMMON.DELETE' | translate">
-              <mat-icon>delete</mat-icon>
-            </button>
+            @if (canManage) {
+              <button mat-icon-button color="primary" (click)="openDialog(o)" [title]="'COMMON.EDIT' | translate">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="delete(o)" [title]="'COMMON.DELETE' | translate">
+                <mat-icon>delete</mat-icon>
+              </button>
+            }
           </mat-cell>
         </ng-container>
 
@@ -102,12 +109,17 @@
                 </div>
               </dl>
               <div class="admin-table-detail-actions">
-                <button mat-stroked-button color="primary" type="button" (click)="openDialog(o)">
-                  <mat-icon>edit</mat-icon> {{ 'COMMON.EDIT' | translate }}
+                <button mat-stroked-button type="button" (click)="openViewDialog(o)">
+                  <mat-icon>visibility</mat-icon> {{ 'ORDERS.VIEW' | translate }}
                 </button>
-                <button mat-stroked-button color="warn" type="button" (click)="delete(o)">
-                  <mat-icon>delete</mat-icon> {{ 'COMMON.DELETE' | translate }}
-                </button>
+                @if (canManage) {
+                  <button mat-stroked-button color="primary" type="button" (click)="openDialog(o)">
+                    <mat-icon>edit</mat-icon> {{ 'COMMON.EDIT' | translate }}
+                  </button>
+                  <button mat-stroked-button color="warn" type="button" (click)="delete(o)">
+                    <mat-icon>delete</mat-icon> {{ 'COMMON.DELETE' | translate }}
+                  </button>
+                }
               </div>
             </div>
           </mat-cell>
@@ -124,14 +136,13 @@
 
       </mat-table>
 
-      <mat-paginator
+      <app-table-paginator
         [length]="totalElements"
         [pageSize]="pageSize"
         [pageIndex]="pageIndex"
         [pageSizeOptions]="pageSizeOptions"
-        (page)="onPageChange($event)"
-        showFirstLastButtons>
-      </mat-paginator>
+        (page)="onPageChange($event)">
+      </app-table-paginator>
 
     </mat-card-content>
   </mat-card>

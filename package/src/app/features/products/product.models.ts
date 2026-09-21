@@ -1,32 +1,26 @@
-import { ProductGroupCategory } from '../product-groups/product-group.models';
+import { ProductGroupCategory } from '../product-group-categories/product-group-category.models';
 import { ProductGamma } from '../product-gammas/product-gamma.models';
-
-export interface ProductGroupSummary {
-  id: number;
-  name: string;
-  category?: ProductGroupCategory;
-}
 
 export interface Product {
   id: number;
   name: string;
-  price: number;
+  price: number | null;
   stock?: number;
   itemCode?: string;
   barcode?: string;
   matrixBarcode?: string;
   qrCode?: string;
-  group?: ProductGroupSummary;
+  category?: ProductGroupCategory;
   gamma?: ProductGamma;
 }
 
 export interface ProductDTO {
   name: string;
-  price: number;
+  price?: number;
   itemCode?: string;
   barcode?: string;
   matrixBarcode?: string;
   qrCode?: string;
-  groupId?: number;
+  categoryId?: number;
   gammaId?: number;
 }

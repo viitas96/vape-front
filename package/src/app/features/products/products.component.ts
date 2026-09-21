@@ -5,7 +5,6 @@ import { PageEvent } from '@angular/material/paginator';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MaterialModule } from 'src/app/material.module';
 import { ProductGroupCategoryService } from 'src/app/services/product-group-category.service';
-import { ProductGroupService } from 'src/app/services/product-group.service';
 import { ProductGammaService } from 'src/app/services/product-gamma.service';
 import { ProductCreationPreferencesService } from 'src/app/services/product-creation-preferences.service';
 import { ProductPageSizePreferencesService } from 'src/app/services/product-page-size-preferences.service';
@@ -13,8 +12,9 @@ import { ProductFilters, ProductService } from 'src/app/services/product.service
 import { ConfirmDialogService } from 'src/app/shared/dialogs/confirm-dialog.service';
 import { getApiErrorMessage, isDuplicateValueError } from 'src/app/shared/http/api-error';
 import { PagedListPageState } from 'src/app/shared/page/page-state';
+import { TablePaginatorComponent } from 'src/app/shared/page/table-paginator.component';
 import { ProductDialogComponent, ProductDialogData } from './product-dialog.component';
-import { ProductGroup, ProductGroupCategory } from '../product-groups/product-group.models';
+import { ProductGroupCategory } from '../product-group-categories/product-group-category.models';
 import { ProductGamma } from '../product-gammas/product-gamma.models';
 import { Product } from './product.models';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
@@ -22,25 +22,22 @@ import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 @Component({
   selector: 'app-products',
   standalone: true,
-  imports: [MaterialModule, TranslatePipe, FormsModule],
+  imports: [MaterialModule, TranslatePipe, FormsModule, TablePaginatorComponent],
   templateUrl: './products.component.html',
 })
 export class ProductsComponent extends PagedListPageState implements OnInit {
   override pageSize = 50;
   products: Product[] = [];
-  groups: ProductGroup[] = [];
   gammas: ProductGamma[] = [];
   categories: ProductGroupCategory[] = [];
   nameFilter = '';
   gammaIdFilter: number | null = null;
   categoryIdFilter: number | null = null;
   appliedFilters: ProductFilters = {};
-  // 'group' column removed from the UI; kept on the model/backend for future use.
-  displayedColumns = ['id', 'name', 'price', 'itemCode', 'barcode', 'matrixBarcode', 'qrCode', 'gamma', 'actions', 'expand'];
+  displayedColumns =['id', 'name', 'price', 'itemCode', 'barcode', 'category', 'gamma', 'actions', 'expand'];
 
   constructor(
     private readonly productService: ProductService,
-    private readonly productGroupService: ProductGroupService,
     private readonly productGammaService: ProductGammaService,
     private readonly productGroupCategoryService: ProductGroupCategoryService,
     private readonly productCreationPreferencesService: ProductCreationPreferencesService,
@@ -56,13 +53,20 @@ export class ProductsComponent extends PagedListPageState implements OnInit {
   ngOnInit(): void {
     this.restorePageSize();
     this.loadPage();
-    this.loadGroups();
     this.loadGammas();
     this.loadCategories();
   }
 
-  formatPrice(cents: number): string {
+  formatPrice(cents: number | null): string {
+    if (cents === null || cents === undefined) {
+      return '—';
+    }
+
     return (cents / 100).toFixed(2);
+  }
+
+  categoryName(product: Product): string {
+    return product.category?.name ?? '—';
   }
 
   override onPageChange(event: PageEvent): void {
@@ -71,21 +75,21 @@ export class ProductsComponent extends PagedListPageState implements OnInit {
   }
 
   openDialog(product?: Product): void {
-    let initialGroupId: number | null = null;
+    let initialCategoryId: number | null = null;
     let initialGammaId: number | null = null;
     if (!product) {
       const preferences = this.productCreationPreferencesService.getPreferences();
       if (preferences) {
-        initialGroupId = preferences.groupId;
+        initialCategoryId = preferences.categoryId;
         initialGammaId = preferences.gammaId;
       }
     }
 
     const data: ProductDialogData = {
       product: product ?? null,
-      groups: this.groups,
+      categories: this.categories,
       gammas: this.gammas,
-      initialGroupId,
+      initialCategoryId,
       initialGammaId,
     };
     this.dialog.open(ProductDialogComponent, {
@@ -106,7 +110,7 @@ export class ProductsComponent extends PagedListPageState implements OnInit {
         next: () => {
           if (!product) {
             this.productCreationPreferencesService.savePreferences({
-              groupId: dto.groupId ?? null,
+              categoryId: dto.categoryId ?? null,
               gammaId: dto.gammaId ?? null,
             });
           }
@@ -170,17 +174,6 @@ export class ProductsComponent extends PagedListPageState implements OnInit {
       },
       error: () => {
         this.setError(this.translateService.instant('PRODUCTS.LOAD_FAILED'));
-      },
-    });
-  }
-
-  private loadGroups(): void {
-    this.productGroupService.getAll().subscribe({
-      next: (groups) => {
-        this.groups = groups;
-      },
-      error: () => {
-        this.setError(this.translateService.instant('PRODUCTS.GROUPS_LOAD_FAILED'));
       },
     });
   }

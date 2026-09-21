@@ -14,15 +14,6 @@
           }
         </mat-nav-list>
         <div class="p-x-16 p-b-16 sidebar-actions">
-          <button mat-stroked-button class="w-100" [matMenuTriggerFor]="languageMenu">
-            <i-tabler name="language" class="icon-18 d-inline-flex m-r-8"></i-tabler>
-            <span>{{ (currentLanguage === 'ro' ? 'LANGUAGE.RO' : 'LANGUAGE.EN') | translate }}</span>
-          </button>
-          <mat-menu #languageMenu="matMenu">
-            <button mat-menu-item (click)="setLanguage('ro')">{{ 'LANGUAGE.RO' | translate }}</button>
-            <button mat-menu-item (click)="setLanguage('en')">{{ 'LANGUAGE.EN' | translate }}</button>
-          </mat-menu>
-
           <button mat-stroked-button class="w-100" (click)="themeService.toggle()"
             [title]="(themeService.isDark() ? 'THEME.SWITCH_TO_LIGHT' : 'THEME.SWITCH_TO_DARK') | translate">
             <i-tabler [name]="themeService.isDark() ? 'sun' : 'moon'" class="icon-18 d-inline-flex m-r-8"></i-tabler>

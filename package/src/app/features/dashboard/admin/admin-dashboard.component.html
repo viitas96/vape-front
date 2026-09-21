@@ -21,7 +21,7 @@
         <mat-form-field appearance="outline" class="w-100">
           <mat-select formControlName="roles" multiple [placeholder]="'USERS.SELECT_ROLES' | translate">
             @for (role of roles; track role.id) {
-              <mat-option [value]="role.id">{{ role.name }}</mat-option>
+              <mat-option [value]="role.id">{{ role.name | appRole }}</mat-option>
             }
           </mat-select>
           <mat-error>{{ 'USERS.ROLES_REQUIRED' | translate }}</mat-error>

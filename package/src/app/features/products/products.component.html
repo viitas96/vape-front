@@ -34,7 +34,7 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline" subscriptSizing="dynamic" class="m-b-0" style="min-width: 200px">
-            <mat-label>{{ 'GROUPS.CATEGORY' | translate }}</mat-label>
+            <mat-label>{{ 'PRODUCTS.CATEGORY' | translate }}</mat-label>
             <mat-select [(ngModel)]="categoryIdFilter">
               <mat-option [value]="null">{{ 'PRODUCTS.ALL_CATEGORIES' | translate }}</mat-option>
               @for (category of categories; track category.id) {
@@ -73,7 +73,7 @@
 
         <ng-container matColumnDef="price">
           <mat-header-cell *matHeaderCellDef mat-sort-header="price">{{ 'PRODUCTS.PRICE' | translate }}</mat-header-cell>
-          <mat-cell *matCellDef="let p">${{ formatPrice(p.price) }}</mat-cell>
+          <mat-cell *matCellDef="let p">{{ formatPrice(p.price) }}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="itemCode">
@@ -86,22 +86,10 @@
           <mat-cell *matCellDef="let p">{{ p.barcode || '—' }}</mat-cell>
         </ng-container>
 
-        <ng-container matColumnDef="matrixBarcode">
-          <mat-header-cell *matHeaderCellDef mat-sort-header="matrixBarcode">{{ 'PRODUCTS.MATRIX_BARCODE' | translate }}</mat-header-cell>
-          <mat-cell *matCellDef="let p">{{ p.matrixBarcode || '—' }}</mat-cell>
+        <ng-container matColumnDef="category">
+          <mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.CATEGORY' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let p">{{ categoryName(p) }}</mat-cell>
         </ng-container>
-
-        <ng-container matColumnDef="qrCode">
-          <mat-header-cell *matHeaderCellDef mat-sort-header="qrCode">{{ 'PRODUCTS.QR_CODE' | translate }}</mat-header-cell>
-          <mat-cell *matCellDef="let p">{{ p.qrCode || '—' }}</mat-cell>
-        </ng-container>
-
-        <!-- Group column removed from the UI; kept on the model/backend for future use.
-        <ng-container matColumnDef="group">
-          <mat-header-cell *matHeaderCellDef mat-sort-header="group.name">{{ 'PRODUCTS.GROUP' | translate }}</mat-header-cell>
-          <mat-cell *matCellDef="let p">{{ p.group?.name || '—' }}</mat-cell>
-        </ng-container>
-        -->
 
         <ng-container matColumnDef="gamma">
           <mat-header-cell *matHeaderCellDef mat-sort-header="gamma.name">{{ 'PRODUCTS.GAMMA' | translate }}</mat-header-cell>
@@ -145,21 +133,10 @@
                 <div class="admin-table-detail-field">
                   <dt>{{ 'PRODUCTS.BARCODE' | translate }}</dt>
                   <dd>{{ p.barcode || '—' }}</dd>
+                </div>                <div class="admin-table-detail-field">
+                  <dt>{{ 'PRODUCTS.CATEGORY' | translate }}</dt>
+                  <dd>{{ categoryName(p) }}</dd>
                 </div>
-                <div class="admin-table-detail-field">
-                  <dt>{{ 'PRODUCTS.MATRIX_BARCODE' | translate }}</dt>
-                  <dd>{{ p.matrixBarcode || '—' }}</dd>
-                </div>
-                <div class="admin-table-detail-field">
-                  <dt>{{ 'PRODUCTS.QR_CODE' | translate }}</dt>
-                  <dd>{{ p.qrCode || '—' }}</dd>
-                </div>
-                <!-- Group detail removed from the UI; kept on the model/backend for future use.
-                <div class="admin-table-detail-field">
-                  <dt>{{ 'PRODUCTS.GROUP' | translate }}</dt>
-                  <dd>{{ p.group?.name || '—' }}</dd>
-                </div>
-                -->
                 <div class="admin-table-detail-field">
                   <dt>{{ 'PRODUCTS.GAMMA' | translate }}</dt>
                   <dd>{{ p.gamma?.name || '—' }}</dd>
@@ -188,14 +165,13 @@
 
       </mat-table>
 
-      <mat-paginator
+      <app-table-paginator
         [length]="totalElements"
         [pageSize]="pageSize"
         [pageIndex]="pageIndex"
         [pageSizeOptions]="pageSizeOptions"
-        (page)="onPageChange($event)"
-        showFirstLastButtons>
-      </mat-paginator>
+        (page)="onPageChange($event)">
+      </app-table-paginator>
 
     </mat-card-content>
   </mat-card>

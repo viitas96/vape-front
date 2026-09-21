@@ -28,6 +28,13 @@ import { provideClientHydration } from '@angular/platform-browser';
 import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
 import { LanguageService } from './services/language.service';
+import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
+import { DdMmYyyyDateAdapter } from './shared/date/dd-mm-yyyy.date-adapter';
+import { DD_MM_YYYY_DATE_FORMATS } from './shared/date/date-formats';
+import { MatPaginatorIntl } from '@angular/material/paginator';
+import { TranslatedPaginatorIntl } from './shared/page/translated-paginator-intl';
+import { MatDatepickerIntl } from '@angular/material/datepicker';
+import { TranslatedDatepickerIntl } from './shared/date/translated-datepicker-intl';
 
 // icons
 import { TablerIconsModule } from 'angular-tabler-icons';
@@ -44,6 +51,11 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     { provide: LOCALE_ID, useValue: 'en-GB' },
+    { provide: MAT_DATE_LOCALE, useValue: 'ro-RO' },
+    { provide: DateAdapter, useClass: DdMmYyyyDateAdapter },
+    { provide: MAT_DATE_FORMATS, useValue: DD_MM_YYYY_DATE_FORMATS },
+    { provide: MatPaginatorIntl, useClass: TranslatedPaginatorIntl },
+    { provide: MatDatepickerIntl, useClass: TranslatedDatepickerIntl },
     provideTranslateService({
       lang: 'ro',
       fallbackLang: 'en',

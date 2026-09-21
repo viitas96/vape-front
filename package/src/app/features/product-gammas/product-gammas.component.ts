@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ProductGammaService } from 'src/app/services/product-gamma.service';
+import { ProductGroupCategoryService } from 'src/app/services/product-group-category.service';
 import { MaterialModule } from 'src/app/material.module';
 import { ConfirmDialogService } from 'src/app/shared/dialogs/confirm-dialog.service';
 import { getApiErrorMessage } from 'src/app/shared/http/api-error';
 import { ExpandableRowsPageState } from 'src/app/shared/page/page-state';
+import { ProductGroupCategory } from '../product-group-categories/product-group-category.models';
 import { ProductGamma } from './product-gamma.models';
 import { ProductGammaDialogComponent, ProductGammaDialogData } from './product-gamma-dialog.component';
 
@@ -17,28 +19,40 @@ import { ProductGammaDialogComponent, ProductGammaDialogData } from './product-g
 })
 export class ProductGammasComponent extends ExpandableRowsPageState implements OnInit {
   gammas: ProductGamma[] = [];
-  displayedColumns = ['id', 'name', 'price', 'actions', 'expand'];
+  categories: ProductGroupCategory[] = [];
+  displayedColumns = ['id', 'name', 'price', 'category', 'actions', 'expand'];
   sortBy = 'id';
   sortDirection: 'asc' | 'desc' = 'asc';
 
   constructor(
     private readonly productGammaService: ProductGammaService,
+    private readonly productGroupCategoryService: ProductGroupCategoryService,
     private readonly dialog: MatDialog,
     private readonly confirmDialog: ConfirmDialogService,
+    private readonly translateService: TranslateService,
   ) {
     super();
   }
 
   ngOnInit(): void {
     this.loadGammas();
+    this.loadCategories();
   }
 
-  formatPrice(cents: number): string {
+  formatPrice(cents: number | null): string {
+    if (cents === null || cents === undefined) {
+      return '—';
+    }
+
     return (cents / 100).toFixed(2);
   }
 
+  categoryName(gamma: ProductGamma): string {
+    return gamma.category?.name ?? '—';
+  }
+
   openDialog(gamma?: ProductGamma): void {
-    const data: ProductGammaDialogData = { gamma: gamma ?? null };
+    const data: ProductGammaDialogData = { gamma: gamma ?? null, categories: this.categories };
     this.dialog.open(ProductGammaDialogComponent, { width: '400px', data }).afterClosed().subscribe((dto) => {
       if (!dto) {
         return;
@@ -51,11 +65,12 @@ export class ProductGammasComponent extends ExpandableRowsPageState implements O
 
       request.subscribe({
         next: () => {
-          this.setSuccess(`Gamma "${dto.name}" ${gamma ? 'updated' : 'created'}.`);
+          this.setSuccess(this.translateService.instant(gamma ? 'GAMMAS.UPDATED' : 'GAMMAS.CREATED', { name: dto.name }));
           this.loadGammas();
         },
         error: (error) => {
-          this.setError(getApiErrorMessage(error, `Failed to ${gamma ? 'update' : 'create'} gamma`));
+          const fallback = this.translateService.instant(gamma ? 'GAMMAS.UPDATE_FAILED' : 'GAMMAS.CREATE_FAILED');
+          this.setError(getApiErrorMessage(error, fallback));
         },
       });
     });
@@ -63,9 +78,9 @@ export class ProductGammasComponent extends ExpandableRowsPageState implements O
 
   delete(gamma: ProductGamma): void {
     this.confirmDialog.confirm({
-      title: 'Delete Gamma',
-      message: `Delete gamma "${gamma.name}"?`,
-      confirmLabel: 'Delete',
+      title: this.translateService.instant('GAMMAS.DELETE_TITLE'),
+      message: this.translateService.instant('GAMMAS.DELETE_MESSAGE', { name: gamma.name }),
+      confirmLabel: this.translateService.instant('COMMON.DELETE'),
       confirmColor: 'warn',
     }).subscribe((confirmed) => {
       if (!confirmed) {
@@ -74,11 +89,11 @@ export class ProductGammasComponent extends ExpandableRowsPageState implements O
 
       this.productGammaService.delete(gamma.id).subscribe({
         next: () => {
-          this.setSuccess(`Gamma "${gamma.name}" deleted.`);
+          this.setSuccess(this.translateService.instant('GAMMAS.DELETED', { name: gamma.name }));
           this.loadGammas();
         },
         error: (error) => {
-          this.setError(error.error?.message ?? 'Failed to delete gamma');
+          this.setError(getApiErrorMessage(error, this.translateService.instant('GAMMAS.DELETE_FAILED')));
         },
       });
     });
@@ -97,7 +112,18 @@ export class ProductGammasComponent extends ExpandableRowsPageState implements O
         this.gammas = gammas;
       },
       error: () => {
-        this.setError('Failed to load gammas');
+        this.setError(this.translateService.instant('GAMMAS.LOAD_FAILED'));
+      },
+    });
+  }
+
+  private loadCategories(): void {
+    this.productGroupCategoryService.getAll().subscribe({
+      next: (categories) => {
+        this.categories = categories;
+      },
+      error: () => {
+        this.setError(this.translateService.instant('PRODUCTS.CATEGORIES_LOAD_FAILED'));
       },
     });
   }

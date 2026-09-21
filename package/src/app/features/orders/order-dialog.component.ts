@@ -15,7 +15,7 @@ import { Product } from '../products/product.models';
 import { UserResponse } from '../users/user.models';
 import { StoreSettingsService } from 'src/app/services/store-settings.service';
 import { StoreSettings } from '../settings/store-settings.models';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 export interface OrderDialogData {
   order: Order | null;
@@ -35,14 +35,9 @@ interface ProductTreeGamma {
   products: Product[];
 }
 
-interface ProductTreeGroup {
-  name: string;
-  gammas: ProductTreeGamma[];
-}
-
 interface ProductTreeCategory {
   name: string;
-  groups: ProductTreeGroup[];
+  gammas: ProductTreeGamma[];
 }
 
 @Component({
@@ -67,6 +62,7 @@ export class OrderDialogComponent {
     public dialogRef: MatDialogRef<OrderDialogComponent, OrderDTO>,
     @Inject(MAT_DIALOG_DATA) public data: OrderDialogData,
     private storeSettingsService: StoreSettingsService,
+    private translateService: TranslateService,
   ) {
     this.storeSettingsService.get().subscribe((s) => (this.settings = s));
     this.form.controls.customer.setValidators([this.customerValidator]);
@@ -126,23 +122,17 @@ export class OrderDialogComponent {
   }
 
   get productTree(): ProductTreeCategory[] {
-    const categories = new Map<string, Map<string, Map<string, Product[]>>>();
+    const categories = new Map<string, Map<string, Product[]>>();
 
     for (const product of this.data.products) {
-      const categoryName = product.group?.category?.name ?? 'No category';
-      const groupName = product.group?.name ?? 'No group';
-      const gammaName = product.gamma?.name ?? 'No gamma';
+      const categoryName = product.category?.name ?? this.translateService.instant('PRODUCTS.NO_CATEGORY');
+      const gammaName = product.gamma?.name ?? this.translateService.instant('PRODUCTS.NO_GAMMA');
 
       if (!categories.has(categoryName)) {
-        categories.set(categoryName, new Map<string, Map<string, Product[]>>());
+        categories.set(categoryName, new Map<string, Product[]>());
       }
 
-      const groups = categories.get(categoryName)!;
-      if (!groups.has(groupName)) {
-        groups.set(groupName, new Map<string, Product[]>());
-      }
-
-      const gammas = groups.get(groupName)!;
+      const gammas = categories.get(categoryName)!;
       if (!gammas.has(gammaName)) {
         gammas.set(gammaName, []);
       }
@@ -150,14 +140,11 @@ export class OrderDialogComponent {
       gammas.get(gammaName)!.push(product);
     }
 
-    return Array.from(categories.entries()).map(([categoryName, groups]) => ({
+    return Array.from(categories.entries()).map(([categoryName, gammas]) => ({
       name: categoryName,
-      groups: Array.from(groups.entries()).map(([groupName, gammas]) => ({
-        name: groupName,
-        gammas: Array.from(gammas.entries()).map(([gammaName, products]) => ({
-          name: gammaName,
-          products,
-        })),
+      gammas: Array.from(gammas.entries()).map(([gammaName, products]) => ({
+        name: gammaName,
+        products,
       })),
     }));
   }
@@ -171,7 +158,7 @@ export class OrderDialogComponent {
         const price = g.controls.unitPrice.value ?? 0;
         const qty = g.controls.quantity.value ?? 0;
         const lineTotalCents = Math.round(price * qty * 100);
-        const systemName = product.group?.category?.systemName;
+        const systemName = product.category?.systemName;
         if (systemName === 'SOUVENIR') {
           const pointsPortionCents = Math.floor((lineTotalCents * this.settings.souvenirSplitPercent) / 100);
           totalPoints += Math.floor((pointsPortionCents * this.settings.spendRate) / 100);
@@ -222,9 +209,11 @@ export class OrderDialogComponent {
   onProductSelected(index: number): void {
     const group = this.items.at(index);
     const product = group.controls.product.value;
-    // selecting a product resets the line price to that product's current price (seller can then discount)
+    // selecting a product resets the line price to that product's current price (seller can then discount);
+    // a product without a price leaves the field empty for the seller to fill in
     if (product && typeof product === 'object') {
-      group.controls.unitPrice.setValue(product.price / 100);
+      const price = product.price;
+      group.controls.unitPrice.setValue(price === null || price === undefined ? null : price / 100);
     }
   }
 

@@ -6,7 +6,7 @@ import { ProductGroupCategoryService } from 'src/app/services/product-group-cate
 import { ConfirmDialogService } from 'src/app/shared/dialogs/confirm-dialog.service';
 import { getApiErrorMessage } from 'src/app/shared/http/api-error';
 import { ExpandableRowsPageState } from 'src/app/shared/page/page-state';
-import { ProductGroupCategory } from '../product-groups/product-group.models';
+import { ProductGroupCategory } from './product-group-category.models';
 import {
   ProductGroupCategoryDialogComponent,
   ProductGroupCategoryDialogData,

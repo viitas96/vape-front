@@ -30,7 +30,12 @@
 
         <ng-container matColumnDef="price">
           <mat-header-cell *matHeaderCellDef mat-sort-header="price">{{ 'PRODUCTS.PRICE' | translate }}</mat-header-cell>
-          <mat-cell *matCellDef="let gamma">${{ formatPrice(gamma.price) }}</mat-cell>
+          <mat-cell *matCellDef="let gamma">{{ formatPrice(gamma.price) }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="category">
+          <mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.CATEGORY' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let gamma">{{ categoryName(gamma) }}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="actions">

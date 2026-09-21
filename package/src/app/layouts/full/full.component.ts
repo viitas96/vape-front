@@ -9,7 +9,6 @@ import { buildSidebarNavItems } from 'src/app/core/routing/app-feature.routes';
 import { MaterialModule } from 'src/app/material.module';
 import { AuthService } from 'src/app/services/auth.service';
 import { CoreService } from 'src/app/services/core.service';
-import { LanguageService, SupportedLanguage } from 'src/app/services/language.service';
 import { ThemeService } from 'src/app/services/theme.service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AppNavItemComponent } from './sidebar/nav-item/nav-item.component';
@@ -54,7 +53,6 @@ export class FullComponent implements OnInit, OnDestroy {
     private readonly router: Router,
     private readonly breakpointObserver: BreakpointObserver,
     private readonly authService: AuthService,
-    private readonly languageService: LanguageService,
     public readonly themeService: ThemeService,
   ) {
     this.subscriptions.add(
@@ -84,14 +82,6 @@ export class FullComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.clearHoverCloseTimer();
     this.subscriptions.unsubscribe();
-  }
-
-  get currentLanguage(): SupportedLanguage {
-    return this.languageService.currentLanguage;
-  }
-
-  setLanguage(language: SupportedLanguage): void {
-    this.languageService.setLanguage(language);
   }
 
   logout(): void {

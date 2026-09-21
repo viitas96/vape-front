@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 export interface ProductCreationPreferences {
-  groupId: number | null;
+  categoryId: number | null;
   gammaId: number | null;
 }
 
@@ -41,7 +41,7 @@ export class ProductCreationPreferencesService {
     }
 
     const preferences = value as Record<string, unknown>;
-    return this.isNullableId(preferences['groupId']) && this.isNullableId(preferences['gammaId']);
+    return this.isNullableId(preferences['categoryId']) && this.isNullableId(preferences['gammaId']);
   }
 
   private isNullableId(value: unknown): value is number | null {

@@ -3,7 +3,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MaterialModule } from 'src/app/material.module';
-import { ProductGroupCategory, ProductGroupCategoryDTO } from '../product-groups/product-group.models';
+import { ProductGroupCategory, ProductGroupCategoryDTO } from './product-group-category.models';
 
 export interface ProductGroupCategoryDialogData {
   category: ProductGroupCategory | null;

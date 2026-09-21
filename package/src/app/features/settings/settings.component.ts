@@ -29,7 +29,7 @@ export class SettingsComponent extends FeedbackPageState implements OnInit {
     private readonly translateService: TranslateService,
   ) {
     super();
-    this.canEdit = authService.hasAnyRole(['ADMIN', 'DIRECTOR']);
+    this.canEdit = authService.hasAnyRole(['ADMIN']);
   }
 
   ngOnInit(): void {

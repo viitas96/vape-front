@@ -1,0 +1,130 @@
+<div class="p-24">
+  <mat-card class="cardWithShadow admin-data-card admin-customers-page">
+    <mat-card-content class="p-32 admin-data-content">
+
+      <div class="d-flex align-items-center justify-content-between m-b-24 admin-page-header">
+        <h2 class="f-s-20 f-w-700">{{ 'CUSTOMERS.TITLE' | translate }}</h2>
+        <button mat-flat-button color="primary" (click)="openCreateDialog()">
+          <mat-icon>person_add</mat-icon> {{ 'CUSTOMERS.CREATE' | translate }}
+        </button>
+      </div>
+
+      @if (successMessage) {
+        <p class="text-success f-s-14 m-b-16">{{ successMessage }}</p>
+      }
+      @if (errorMessage) {
+        <p class="text-danger f-s-14 m-b-16">{{ errorMessage }}</p>
+      }
+
+      <mat-table [dataSource]="customers" matSort [matSortActive]="sortBy" [matSortDirection]="sortDirection" (matSortChange)="onSortChange($event)" multiTemplateDataRows>
+
+        <ng-container matColumnDef="id">
+          <mat-header-cell *matHeaderCellDef mat-sort-header="id">ID</mat-header-cell>
+          <mat-cell *matCellDef="let c">{{ c.id }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+          <mat-header-cell *matHeaderCellDef>{{ 'CUSTOMERS.NAME' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let c">{{ fullName(c) || '—' }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="email">
+          <mat-header-cell *matHeaderCellDef mat-sort-header="email">{{ 'AUTH.COMMON.EMAIL' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let c">{{ c.email }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="phone">
+          <mat-header-cell *matHeaderCellDef mat-sort-header="phone">{{ 'CUSTOMERS.PHONE' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let c">{{ c.phone || '—' }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="points">
+          <mat-header-cell *matHeaderCellDef mat-sort-header="pointsBalance">{{ 'CUSTOMERS.POINTS' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let c">{{ c.pointsBalance }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <mat-header-cell *matHeaderCellDef mat-sort-header="banned">{{ 'USERS.STATUS' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let c">
+            <mat-chip [color]="c.banned ? 'warn' : 'primary'" highlighted>
+              {{ c.banned ? ('USERS.BANNED' | translate) : ('USERS.ACTIVE' | translate) }}
+            </mat-chip>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.ACTIONS' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let c">
+            <button mat-icon-button color="primary" (click)="openEditDialog(c)" [title]="'CUSTOMERS.EDIT' | translate">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button [color]="c.banned ? 'primary' : 'warn'" (click)="toggleBan(c)"
+                    [title]="(c.banned ? 'USERS.UNBAN' : 'USERS.BAN') | translate">
+              <mat-icon>{{ c.banned ? 'lock_open' : 'block' }}</mat-icon>
+            </button>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="expand">
+          <mat-header-cell *matHeaderCellDef></mat-header-cell>
+          <mat-cell *matCellDef="let c">
+            <button mat-icon-button type="button" (click)="toggleRowDetails(c.id)"
+              [attr.aria-label]="'COMMON.DETAILS' | translate" [attr.aria-expanded]="isRowDetailsExpanded(c.id)">
+              <mat-icon class="admin-table-expand-icon" [class.admin-table-expand-icon-open]="isRowDetailsExpanded(c.id)">expand_more</mat-icon>
+            </button>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="expandedDetail">
+          <mat-cell *matCellDef="let c">
+            <div class="admin-table-detail">
+              <dl class="admin-table-detail-grid">
+                <div class="admin-table-detail-field">
+                  <dt>ID</dt>
+                  <dd>{{ c.id }}</dd>
+                </div>
+                <div class="admin-table-detail-field">
+                  <dt>{{ 'CUSTOMERS.NAME' | translate }}</dt>
+                  <dd>{{ fullName(c) || '—' }}</dd>
+                </div>
+                <div class="admin-table-detail-field">
+                  <dt>{{ 'CUSTOMERS.PHONE' | translate }}</dt>
+                  <dd>{{ c.phone || '—' }}</dd>
+                </div>
+                <div class="admin-table-detail-field">
+                  <dt>{{ 'CUSTOMERS.POINTS' | translate }}</dt>
+                  <dd>{{ c.pointsBalance }}</dd>
+                </div>
+              </dl>
+              <div class="admin-table-detail-actions">
+                <button mat-stroked-button type="button" [color]="c.banned ? 'primary' : 'warn'" (click)="toggleBan(c)">
+                  <mat-icon>{{ c.banned ? 'lock_open' : 'block' }}</mat-icon>
+                  {{ (c.banned ? 'USERS.UNBAN' : 'USERS.BAN') | translate }}
+                </button>
+              </div>
+            </div>
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+        <mat-row *matRowDef="let row; columns: expandedDetailColumns"
+          class="admin-table-detail-row" [class.admin-table-detail-row-open]="isRowDetailsExpanded(row.id)"></mat-row>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell p-16" [attr.colspan]="displayedColumns.length">{{ 'CUSTOMERS.EMPTY' | translate }}</td>
+        </tr>
+
+      </mat-table>
+
+      <app-table-paginator
+        [length]="totalElements"
+        [pageSize]="pageSize"
+        [pageIndex]="pageIndex"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="onPageChange($event)">
+      </app-table-paginator>
+
+    </mat-card-content>
+  </mat-card>
+</div>

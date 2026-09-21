@@ -2,6 +2,7 @@ import { DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { forkJoin } from 'rxjs';
 import { toDataURL } from 'qrcode';
+import { TranslatePipe } from '@ngx-translate/core';
 import { MaterialModule } from 'src/app/material.module';
 import { MeService } from 'src/app/services/me.service';
 import { MyOrder, MyProfile, Promotion } from './customer.models';
@@ -12,7 +13,7 @@ import { StoreSettings } from '../../settings/store-settings.models';
 @Component({
   selector: 'app-customer-dashboard',
   standalone: true,
-  imports: [MaterialModule, DatePipe],
+  imports: [MaterialModule, DatePipe, TranslatePipe],
   templateUrl: './customer-dashboard.component.html',
 })
 export class CustomerDashboardComponent implements OnInit {
@@ -50,15 +51,6 @@ export class CustomerDashboardComponent implements OnInit {
     }
 
     return Math.floor((this.profile.pointsBalance * 100) / this.settings.spendRate) / 100;
-  }
-
-  get souvenirProgressPercent(): number {
-    if (!this.profile || !this.settings) {
-      return 0;
-    }
-
-    const targetPoints = (15000 * this.settings.spendRate) / 100;
-    return Math.min(100, Math.round((this.profile.pointsBalance / targetPoints) * 100));
   }
 
   prevPromo(): void {

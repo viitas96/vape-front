@@ -3,12 +3,20 @@
     "LOGOUT": "Logout"
   },
   "Management": "Management",
-  "Product Groups": "Product Groups",
+  "Cash Register": "POS",
   "Categories": "Categories",
   "Gammas": "Gammas",
   "LANGUAGE": {
     "RO": "Romanian",
     "EN": "English"
+  },
+  "ROLE": {
+    "ADMIN": "Administrator",
+    "DIRECTOR": "Director",
+    "SELLER": "Seller",
+    "ACCOUNTANT": "Accountant",
+    "OPERATOR": "Operator",
+    "CUSTOMER": "Customer"
   },
   "THEME": {
     "LIGHT": "Light theme",
@@ -47,12 +55,64 @@
       "DATE_OF_BIRTH_REQUIRED": "Date of birth is required",
       "CREATING": "Creating account...",
       "SUBMIT": "Create account",
-      "HAS_ACCOUNT": "Already have an account?"
+      "HAS_ACCOUNT": "Already have an account?",
+      "FAILED": "Registration failed"
     }
+  },
+  "CUSTOMERS": {
+    "TITLE": "Customers",
+    "CREATE": "Add customer",
+    "EDIT": "Edit customer",
+    "NAME": "Name",
+    "FIRST_NAME": "First name",
+    "FIRST_NAME_PLACEHOLDER": "e.g. Ion",
+    "FIRST_NAME_REQUIRED": "First name is required",
+    "LAST_NAME": "Last name",
+    "LAST_NAME_PLACEHOLDER": "e.g. Popescu",
+    "LAST_NAME_REQUIRED": "Last name is required",
+    "PHONE": "Phone",
+    "PHONE_PLACEHOLDER": "e.g. 069123456",
+    "PHONE_HINT": "Moldovan number, e.g. 069123456",
+    "PHONE_INVALID": "Enter a valid phone number",
+    "POINTS": "Points",
+    "EMPTY": "No customers found.",
+    "CREATED": "Customer created successfully.",
+    "CREATE_FAILED": "Failed to create customer",
+    "UPDATED": "Customer updated successfully.",
+    "UPDATE_FAILED": "Failed to update customer",
+    "LOAD_FAILED": "Failed to load customers"
+  },
+  "DATEPICKER": {
+    "CALENDAR": "Calendar",
+    "OPEN_CALENDAR": "Open calendar",
+    "CLOSE_CALENDAR": "Close calendar",
+    "PREVIOUS_MONTH": "Previous month",
+    "NEXT_MONTH": "Next month",
+    "PREVIOUS_YEAR": "Previous year",
+    "NEXT_YEAR": "Next year",
+    "PREVIOUS_YEARS": "Previous 24 years",
+    "NEXT_YEARS": "Next 24 years",
+    "CHOOSE_DATE": "Choose date",
+    "CHOOSE_MONTH_YEAR": "Choose month and year",
+    "START_DATE": "Start date",
+    "END_DATE": "End date",
+    "COMPARISON_RANGE": "Comparison range",
+    "YEAR_RANGE_LABEL": "{{start}} to {{end}}"
+  },
+  "PAGINATOR": {
+    "ITEMS_PER_PAGE": "Items per page:",
+    "NEXT_PAGE": "Next page",
+    "PREVIOUS_PAGE": "Previous page",
+    "FIRST_PAGE": "First page",
+    "LAST_PAGE": "Last page",
+    "RANGE": "{{start}} – {{end}} of {{length}}",
+    "RANGE_EMPTY": "0 of {{length}}"
   },
   "COMMON": {
     "CANCEL": "Cancel",
+    "DATE_FORMAT_HINT": "dd/mm/yyyy",
     "SAVE": "Save",
+    "SAVING": "Saving…",
     "CREATE": "Create",
     "DELETE": "Delete",
     "EDIT": "Edit",
@@ -60,15 +120,50 @@
     "CLEAR": "Clear",
     "DETAILS": "Details",
     "CLOSE": "Close",
-    "NO": "No."
+    "NO": "No.",
+    "PRODUCT": "Product",
+    "QUANTITY": "Qty",
+    "PRICE": "Price",
+    "TOTAL": "Total",
+    "POINTS_SHORT": "pts"
   },
-  "GROUPS": {
-    "TITLE": "Product groups",
-    "ADD": "Add group",
-    "EDIT": "Edit group",
-    "EMPTY": "No groups found.",
-    "CATEGORY": "Category",
-    "CATEGORY_REQUIRED": "Category is required"
+  "CUSTOMER": {
+    "LOYALTY_CARD": "Loyalty card",
+    "QR_HINT": "Scan to link this customer to an order",
+    "AVAILABLE_POINTS": "Available points",
+    "MDL_VALUE": "MDL value",
+    "PROMOTIONS": "Promotions",
+    "RECEIPTS": "Recent receipts",
+    "RECEIPTS_EMPTY": "No receipts yet. Start shopping!",
+    "RECEIPT": "Receipt #{{id}}"
+  },
+  "POS": {
+    "SCAN": "Scan code or type phone",
+    "SCAN_PLACEHOLDER": "Scan, or type a code / phone…",
+    "SCAN_HINT": "Product code, customer QR or customer phone. Press Enter. F5 to checkout.",
+    "CART": "Cart ({{count}} items)",
+    "CART_EMPTY": "Cart is empty — scan a product to add",
+    "CUSTOMER": "Customer",
+    "CUSTOMER_HINT": "Scan the customer QR card or type their phone number to link",
+    "POINTS_BALANCE": "Points balance",
+    "USE_POINTS": "Use points",
+    "MAX_POINTS": "Max points for this purchase",
+    "SUBTOTAL": "Subtotal",
+    "POINTS_DISCOUNT": "Points discount ({{points}} pts)",
+    "TOTAL": "TOTAL",
+    "CHECKOUT": "CHECKOUT (F5)",
+    "PROCESSING": "Processing…",
+    "ORDER_COMPLETED": "Order completed",
+    "TOTAL_PAID": "Total paid",
+    "DISCOUNT": "Discount",
+    "EARNED": "Earned",
+    "CUSTOMER_BANNED": "Customer is banned",
+    "CUSTOMER_SCANNED": "Customer: {{email}} — {{points}} pts",
+    "CODE_NOT_RECOGNISED": "Code not recognised",
+    "CHECKOUT_SUCCESS": "Order completed — {{points}} pts earned",
+    "CHECKOUT_FAILED": "Checkout failed",
+    "PRICE_PROMPT_TITLE": "Missing price",
+    "PRICE_PROMPT_MESSAGE": "Product \"{{name}}\" has no price. Enter the selling price."
   },
   "CATEGORIES": {
     "TITLE": "Categories",
@@ -84,7 +179,16 @@
     "ADD": "Add gamma",
     "EDIT": "Edit gamma",
     "EMPTY": "No gammas found.",
-    "PLACEHOLDER_NAME": "Gamma name"
+    "PLACEHOLDER_NAME": "Gamma name",
+    "UPDATED": "Gamma \"{{name}}\" updated.",
+    "CREATED": "Gamma \"{{name}}\" created.",
+    "DELETED": "Gamma \"{{name}}\" deleted.",
+    "CREATE_FAILED": "Failed to create gamma",
+    "UPDATE_FAILED": "Failed to update gamma",
+    "DELETE_FAILED": "Failed to delete gamma",
+    "DELETE_TITLE": "Delete gamma",
+    "DELETE_MESSAGE": "Delete gamma \"{{name}}\"?",
+    "LOAD_FAILED": "Failed to load gammas"
   },
   "PRODUCTS": {
     "TITLE": "Products",
@@ -95,15 +199,15 @@
     "BARCODE": "Barcode",
     "MATRIX_BARCODE": "Matrix barcode",
     "QR_CODE": "QR code",
-    "GROUP": "Group",
     "GAMMA": "Gamma",
+    "CATEGORY": "Category",
     "ACTIONS": "Actions",
     "EMPTY": "No products found.",
     "EDIT": "Edit product",
     "NAME_REQUIRED": "Name is required",
     "PRICE_INVALID": "Price must be 0 or greater",
-    "NO_GROUP": "No group",
     "NO_GAMMA": "No gamma",
+    "NO_CATEGORY": "No category",
     "FILTER_NAME": "Filter by name",
     "ALL_GAMMAS": "All gammas",
     "ALL_CATEGORIES": "All categories",
@@ -121,7 +225,6 @@
     "DELETE_TITLE": "Delete product",
     "DELETE_MESSAGE": "Delete product \"{{name}}\"?",
     "LOAD_FAILED": "Failed to load products",
-    "GROUPS_LOAD_FAILED": "Failed to load product groups",
     "GAMMAS_LOAD_FAILED": "Failed to load gammas",
     "CATEGORIES_LOAD_FAILED": "Failed to load categories",
     "DUPLICATE_VALUE": "A product with the same unique value already exists.",
@@ -129,7 +232,8 @@
     "DUPLICATE_ITEM_CODE": "A product with this item code already exists.",
     "DUPLICATE_BARCODE": "A product with this barcode already exists.",
     "DUPLICATE_MATRIX_BARCODE": "A product with this matrix barcode already exists.",
-    "DUPLICATE_QR_CODE": "A product with this QR code already exists."
+    "DUPLICATE_QR_CODE": "A product with this QR code already exists.",
+    "NO_PRICE": "No price"
   },
   "USERS": {
     "TITLE": "Users",
@@ -179,6 +283,8 @@
     "ADD_ITEM": "Add item",
     "CUSTOMER": "Customer",
     "EDIT": "Edit order",
+    "VIEW": "View order",
+    "POINTS_EARNED": "Points earned",
     "USE_POINTS": "Use points",
     "STATUS_PENDING": "Pending",
     "STATUS_COMPLETED": "Completed",
@@ -223,5 +329,6 @@
   "Orders": "Orders",
   "Settings": "Settings",
   "Users": "Users",
-  "Workspace": "Workspace"
+  "Workspace": "Workspace",
+  "Customers": "Customers"
 }

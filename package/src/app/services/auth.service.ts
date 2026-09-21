@@ -4,6 +4,7 @@ import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { getRoleHomePath } from '../core/routing/app-feature.routes';
 import { ProductCreationPreferencesService } from './product-creation-preferences.service';
+import { CustomerDTO } from '../features/customers/customer.models';
 
 interface LoginResponse {
   token: string;
@@ -29,8 +30,8 @@ export class AuthService {
     private readonly productCreationPreferencesService: ProductCreationPreferencesService,
   ) {}
 
-  register(email: string, password: string, dateOfBirth: string): Observable<{ token: string }> {
-    return this.http.post<{ token: string }>(`${this.apiUrl}/register`, { email, password, dateOfBirth }).pipe(
+  register(dto: CustomerDTO): Observable<{ token: string }> {
+    return this.http.post<{ token: string }>(`${this.apiUrl}/register`, dto).pipe(
       tap((response) => localStorage.setItem(AuthService.TOKEN_KEY, response.token)),
     );
   }

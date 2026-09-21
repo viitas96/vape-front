@@ -14,6 +14,17 @@
       <input matInput formControlName="price" type="number" min="0" step="0.01" placeholder="0.00" />
       <mat-error>{{ 'PRODUCTS.PRICE_INVALID' | translate }}</mat-error>
     </mat-form-field>
+    <mat-checkbox class="m-b-16" formControlName="noPrice">{{ 'PRODUCTS.NO_PRICE' | translate }}</mat-checkbox>
+
+    <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.CATEGORY' | translate }}</mat-label>
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-select formControlName="categoryId" [placeholder]="'PRODUCTS.NO_CATEGORY' | translate">
+        <mat-option [value]="null">{{ 'PRODUCTS.NO_CATEGORY' | translate }}</mat-option>
+        @for (category of data.categories; track category.id) {
+          <mat-option [value]="category.id">{{ category.name }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
 
   </form>
 </mat-dialog-content>

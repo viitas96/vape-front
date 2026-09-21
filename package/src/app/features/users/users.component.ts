@@ -6,20 +6,22 @@ import { AdminService } from 'src/app/services/admin.service';
 import { ConfirmDialogData } from 'src/app/shared/dialogs/confirm-dialog.component';
 import { ConfirmDialogService } from 'src/app/shared/dialogs/confirm-dialog.service';
 import { PagedListPageState } from 'src/app/shared/page/page-state';
+import { TablePaginatorComponent } from 'src/app/shared/page/table-paginator.component';
 import { ChangePasswordDialogComponent } from './change-password-dialog.component';
 import { CreateUserDialogComponent } from './create-user-dialog.component';
 import { UserResponse } from './user.models';
+import { RolePipe } from 'src/app/pipe/role.pipe';
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [MaterialModule, TranslatePipe],
+  imports: [MaterialModule, TranslatePipe, RolePipe, TablePaginatorComponent],
   templateUrl: './users.component.html',
 })
 export class UsersComponent extends PagedListPageState implements OnInit {
   users: UserResponse[] = [];
   displayedColumns = ['id', 'email', 'roles', 'status', 'actions', 'expand'];
-  override readonly pageSizeOptions = [5, 10, 25];
+  override readonly pageSizeOptions = [5, 10, 25, 50];
 
   constructor(
     private readonly adminService: AdminService,

@@ -3,51 +3,40 @@
 
   <mat-card class="cardWithShadow m-b-24 customer-loyalty-card" style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%); color: white;">
     <mat-card-content class="p-32 text-center customer-loyalty-content">
-      <p class="f-s-12 f-w-400 m-b-8" style="opacity: 0.7; letter-spacing: 2px; text-transform: uppercase;">Loyalty Card</p>
+      <p class="f-s-12 f-w-400 m-b-8" style="opacity: 0.7; letter-spacing: 2px; text-transform: uppercase;">{{ 'CUSTOMER.LOYALTY_CARD' | translate }}</p>
       <p class="f-s-12 m-b-4 customer-email" style="opacity: 0.6;">{{ profile.email }}</p>
 
       <div class="m-y-20" style="display: inline-block;">
         <div class="customer-qr-frame" style="background: white; border-radius: 12px; padding: 16px; display: inline-block;">
           @if (qrDataUrl) {
-            <img class="customer-qr-image" [src]="qrDataUrl" alt="Loyalty QR" style="display: block; width: 180px; height: 180px;" />
+            <img class="customer-qr-image" [src]="qrDataUrl" [alt]="'CUSTOMER.LOYALTY_CARD' | translate" style="display: block; width: 180px; height: 180px;" />
           } @else {
             <div class="customer-qr-loader" style="width: 180px; height: 180px; display: flex; align-items: center; justify-content: center;">
               <mat-spinner diameter="40"></mat-spinner>
             </div>
           }
         </div>
-        <p style="font-size: 11px; opacity: 0.6; margin: 8px 0 0;">Scan to link this customer to an order</p>
+        <p style="font-size: 11px; opacity: 0.6; margin: 8px 0 0;">{{ 'CUSTOMER.QR_HINT' | translate }}</p>
       </div>
 
       <div class="d-flex justify-content-center gap-32 m-t-8 customer-points-summary">
         <div>
           <p class="f-s-32 f-w-700 m-b-0" style="line-height: 1;">{{ profile.pointsBalance }}</p>
-          <p class="f-s-12 m-t-4" style="opacity: 0.7;">Available points</p>
+          <p class="f-s-12 m-t-4" style="opacity: 0.7;">{{ 'CUSTOMER.AVAILABLE_POINTS' | translate }}</p>
         </div>
         <div class="customer-points-divider" style="width: 1px; background: rgba(255,255,255,0.2);"></div>
         <div>
           <p class="f-s-32 f-w-700 m-b-0" style="line-height: 1;">{{ pointsValueMdl.toFixed(2) }}</p>
-          <p class="f-s-12 m-t-4" style="opacity: 0.7;">MDL value</p>
+          <p class="f-s-12 m-t-4" style="opacity: 0.7;">{{ 'CUSTOMER.MDL_VALUE' | translate }}</p>
         </div>
       </div>
-    </mat-card-content>
-  </mat-card>
-
-  <mat-card class="cardWithShadow m-b-24">
-    <mat-card-content class="p-24">
-      <div class="d-flex align-items-center justify-content-between m-b-12">
-        <p class="f-s-14 f-w-600 m-b-0">Progress toward top souvenir</p>
-        <span class="f-s-14 f-w-600 text-primary">{{ souvenirProgressPercent }}%</span>
-      </div>
-      <mat-progress-bar mode="determinate" [value]="souvenirProgressPercent" color="primary"></mat-progress-bar>
-      <p class="f-s-12 text-muted m-t-8 m-b-0">Keep earning points to unlock a souvenir at 90% off!</p>
     </mat-card-content>
   </mat-card>
 
   @if (promotions.length > 0) {
     <mat-card class="cardWithShadow m-b-24">
       <mat-card-header>
-        <mat-card-title class="f-s-16">Promotions</mat-card-title>
+        <mat-card-title class="f-s-16">{{ 'CUSTOMER.PROMOTIONS' | translate }}</mat-card-title>
       </mat-card-header>
       <mat-card-content class="p-x-24 p-b-24">
         <div style="min-height: 80px;">
@@ -71,12 +60,12 @@
 
   <mat-card class="cardWithShadow">
     <mat-card-header>
-      <mat-card-title class="f-s-16">Recent Receipts</mat-card-title>
+      <mat-card-title class="f-s-16">{{ 'CUSTOMER.RECEIPTS' | translate }}</mat-card-title>
     </mat-card-header>
     <mat-card-content class="p-x-24 p-b-24">
       @if (orders.length === 0) {
         <div class="text-center p-24 text-muted">
-          No receipts yet. Start shopping!
+          {{ 'CUSTOMER.RECEIPTS_EMPTY' | translate }}
         </div>
       } @else {
         <mat-accordion>
@@ -84,11 +73,11 @@
             <mat-expansion-panel>
               <mat-expansion-panel-header>
                 <mat-panel-title class="f-s-14 f-w-600">
-                  Receipt #{{ order.id }}
+                  {{ 'CUSTOMER.RECEIPT' | translate:{ id: order.id } }}
                 </mat-panel-title>
                 <mat-panel-description>
                   {{ formatMdl(order.total) }} &nbsp;·&nbsp; {{ order.createdAt | date:'dd.MM.yyyy HH:mm' }} &nbsp;·&nbsp;
-                  <span [class]="order.status === 'COMPLETED' ? 'text-success' : 'text-muted'">{{ order.status }}</span>
+                  <span [class]="order.status === 'COMPLETED' ? 'text-success' : 'text-muted'">{{ 'ORDERS.STATUS_' + order.status | translate }}</span>
                 </mat-panel-description>
               </mat-expansion-panel-header>
 
@@ -96,10 +85,10 @@
                 <table class="w-100" style="border-collapse: collapse;">
                   <thead>
                     <tr style="border-bottom: 1px solid #eee;">
-                      <th class="f-s-12 f-w-600 p-b-8" style="text-align: left;">Product</th>
-                      <th class="f-s-12 f-w-600 p-b-8" style="text-align: right;">Qty</th>
-                      <th class="f-s-12 f-w-600 p-b-8" style="text-align: right;">Price</th>
-                      <th class="f-s-12 f-w-600 p-b-8" style="text-align: right;">Total</th>
+                      <th class="f-s-12 f-w-600 p-b-8" style="text-align: left;">{{ 'COMMON.PRODUCT' | translate }}</th>
+                      <th class="f-s-12 f-w-600 p-b-8" style="text-align: right;">{{ 'COMMON.QUANTITY' | translate }}</th>
+                      <th class="f-s-12 f-w-600 p-b-8" style="text-align: right;">{{ 'COMMON.PRICE' | translate }}</th>
+                      <th class="f-s-12 f-w-600 p-b-8" style="text-align: right;">{{ 'COMMON.TOTAL' | translate }}</th>
                     </tr>
                   </thead>
                   <tbody>

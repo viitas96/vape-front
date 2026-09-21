@@ -3,12 +3,20 @@
     "LOGOUT": "Deconectare"
   },
   "Management": "Administrare",
-  "Product Groups": "Grupuri de produse",
+  "Cash Register": "Casă",
   "Categories": "Categorii",
   "Gammas": "Game",
   "LANGUAGE": {
     "RO": "Română",
     "EN": "Engleză"
+  },
+  "ROLE": {
+    "ADMIN": "Administrator",
+    "DIRECTOR": "Director",
+    "SELLER": "Vânzător",
+    "ACCOUNTANT": "Contabil",
+    "OPERATOR": "Operator",
+    "CUSTOMER": "Client"
   },
   "THEME": {
     "LIGHT": "Tema luminoasă",
@@ -47,12 +55,64 @@
       "DATE_OF_BIRTH_REQUIRED": "Data nașterii este obligatorie",
       "CREATING": "Se creează contul...",
       "SUBMIT": "Creează contul",
-      "HAS_ACCOUNT": "Ai deja un cont?"
+      "HAS_ACCOUNT": "Ai deja un cont?",
+      "FAILED": "Crearea contului a eșuat"
     }
+  },
+  "CUSTOMERS": {
+    "TITLE": "Clienți",
+    "CREATE": "Adaugă client",
+    "EDIT": "Editează clientul",
+    "NAME": "Nume",
+    "FIRST_NAME": "Prenume",
+    "FIRST_NAME_PLACEHOLDER": "ex. Ion",
+    "FIRST_NAME_REQUIRED": "Prenumele este obligatoriu",
+    "LAST_NAME": "Nume de familie",
+    "LAST_NAME_PLACEHOLDER": "ex. Popescu",
+    "LAST_NAME_REQUIRED": "Numele de familie este obligatoriu",
+    "PHONE": "Telefon",
+    "PHONE_PLACEHOLDER": "ex. 069123456",
+    "PHONE_HINT": "Număr din Moldova, ex. 069123456",
+    "PHONE_INVALID": "Introdu un număr de telefon valid",
+    "POINTS": "Puncte",
+    "EMPTY": "Nu au fost găsiți clienți.",
+    "CREATED": "Clientul a fost creat cu succes.",
+    "CREATE_FAILED": "Crearea clientului a eșuat",
+    "UPDATED": "Clientul a fost actualizat cu succes.",
+    "UPDATE_FAILED": "Actualizarea clientului a eșuat",
+    "LOAD_FAILED": "Încărcarea clienților a eșuat"
+  },
+  "DATEPICKER": {
+    "CALENDAR": "Calendar",
+    "OPEN_CALENDAR": "Deschide calendarul",
+    "CLOSE_CALENDAR": "Închide calendarul",
+    "PREVIOUS_MONTH": "Luna anterioară",
+    "NEXT_MONTH": "Luna următoare",
+    "PREVIOUS_YEAR": "Anul anterior",
+    "NEXT_YEAR": "Anul următor",
+    "PREVIOUS_YEARS": "Precedenții 24 de ani",
+    "NEXT_YEARS": "Următorii 24 de ani",
+    "CHOOSE_DATE": "Alege data",
+    "CHOOSE_MONTH_YEAR": "Alege luna și anul",
+    "START_DATE": "Data de început",
+    "END_DATE": "Data de sfârșit",
+    "COMPARISON_RANGE": "Interval de comparație",
+    "YEAR_RANGE_LABEL": "{{start}} până la {{end}}"
+  },
+  "PAGINATOR": {
+    "ITEMS_PER_PAGE": "Rânduri pe pagină:",
+    "NEXT_PAGE": "Pagina următoare",
+    "PREVIOUS_PAGE": "Pagina anterioară",
+    "FIRST_PAGE": "Prima pagină",
+    "LAST_PAGE": "Ultima pagină",
+    "RANGE": "{{start}} – {{end}} din {{length}}",
+    "RANGE_EMPTY": "0 din {{length}}"
   },
   "COMMON": {
     "CANCEL": "Anulează",
+    "DATE_FORMAT_HINT": "zz/ll/aaaa",
     "SAVE": "Salvează",
+    "SAVING": "Se salvează…",
     "CREATE": "Creează",
     "DELETE": "Șterge",
     "EDIT": "Editează",
@@ -60,15 +120,50 @@
     "CLEAR": "Curăță",
     "DETAILS": "Detalii",
     "CLOSE": "Închide",
-    "NO": "Nr."
+    "NO": "Nr.",
+    "PRODUCT": "Produs",
+    "QUANTITY": "Cant.",
+    "PRICE": "Preț",
+    "TOTAL": "Total",
+    "POINTS_SHORT": "pct"
   },
-  "GROUPS": {
-    "TITLE": "Grupuri de produse",
-    "ADD": "Adaugă grup",
-    "EDIT": "Editează grupul",
-    "EMPTY": "Nu au fost găsite grupuri.",
-    "CATEGORY": "Categorie",
-    "CATEGORY_REQUIRED": "Categoria este obligatorie"
+  "CUSTOMER": {
+    "LOYALTY_CARD": "Card de fidelitate",
+    "QR_HINT": "Scanează pentru a lega clientul de o comandă",
+    "AVAILABLE_POINTS": "Puncte disponibile",
+    "MDL_VALUE": "Valoare MDL",
+    "PROMOTIONS": "Promoții",
+    "RECEIPTS": "Bonuri recente",
+    "RECEIPTS_EMPTY": "Încă nu ai bonuri. Hai la cumpărături!",
+    "RECEIPT": "Bon #{{id}}"
+  },
+  "POS": {
+    "SCAN": "Scanează codul sau tastează telefonul",
+    "SCAN_PLACEHOLDER": "Scanează sau tastează codul / telefonul…",
+    "SCAN_HINT": "Cod produs, QR client sau telefon client. Apasă Enter. F5 pentru finalizare.",
+    "CART": "Coș ({{count}} articole)",
+    "CART_EMPTY": "Coșul este gol — scanează un produs pentru a-l adăuga",
+    "CUSTOMER": "Client",
+    "CUSTOMER_HINT": "Scanează cardul QR al clientului sau tastează numărul de telefon pentru a-l lega",
+    "POINTS_BALANCE": "Sold puncte",
+    "USE_POINTS": "Folosește puncte",
+    "MAX_POINTS": "Puncte maxime pentru această achiziție",
+    "SUBTOTAL": "Subtotal",
+    "POINTS_DISCOUNT": "Reducere din puncte ({{points}} pct)",
+    "TOTAL": "TOTAL",
+    "CHECKOUT": "FINALIZEAZĂ (F5)",
+    "PROCESSING": "Se procesează…",
+    "ORDER_COMPLETED": "Comandă finalizată",
+    "TOTAL_PAID": "Total plătit",
+    "DISCOUNT": "Reducere",
+    "EARNED": "Acumulate",
+    "CUSTOMER_BANNED": "Clientul este blocat",
+    "CUSTOMER_SCANNED": "Client: {{email}} — {{points}} pct",
+    "CODE_NOT_RECOGNISED": "Cod nerecunoscut",
+    "CHECKOUT_SUCCESS": "Comandă finalizată — {{points}} pct acumulate",
+    "CHECKOUT_FAILED": "Finalizarea comenzii a eșuat",
+    "PRICE_PROMPT_TITLE": "Preț lipsă",
+    "PRICE_PROMPT_MESSAGE": "Produsul „{{name}}” nu are preț. Introdu prețul de vânzare."
   },
   "CATEGORIES": {
     "TITLE": "Categorii",
@@ -84,7 +179,16 @@
     "ADD": "Adaugă gamă",
     "EDIT": "Editează gama",
     "EMPTY": "Nu au fost găsite game.",
-    "PLACEHOLDER_NAME": "Denumire gamă"
+    "PLACEHOLDER_NAME": "Denumire gamă",
+    "UPDATED": "Gama „{{name}}” a fost actualizată.",
+    "CREATED": "Gama „{{name}}” a fost creată.",
+    "DELETED": "Gama „{{name}}” a fost ștearsă.",
+    "CREATE_FAILED": "Crearea gamei a eșuat",
+    "UPDATE_FAILED": "Actualizarea gamei a eșuat",
+    "DELETE_FAILED": "Ștergerea gamei a eșuat",
+    "DELETE_TITLE": "Șterge gama",
+    "DELETE_MESSAGE": "Ștergi gama „{{name}}”?",
+    "LOAD_FAILED": "Încărcarea gamelor a eșuat"
   },
   "PRODUCTS": {
     "TITLE": "Produse",
@@ -95,15 +199,15 @@
     "BARCODE": "Cod de bare",
     "MATRIX_BARCODE": "Cod de bare matricial",
     "QR_CODE": "Cod QR",
-    "GROUP": "Grup",
     "GAMMA": "Gamă",
+    "CATEGORY": "Categorie",
     "ACTIONS": "Acțiuni",
     "EMPTY": "Nu au fost găsite produse.",
     "EDIT": "Editează produsul",
     "NAME_REQUIRED": "Denumirea este obligatorie",
     "PRICE_INVALID": "Prețul trebuie să fie cel puțin 0",
-    "NO_GROUP": "Fără grup",
     "NO_GAMMA": "Fără gamă",
+    "NO_CATEGORY": "Fără categorie",
     "FILTER_NAME": "Filtrează după denumire",
     "ALL_GAMMAS": "Toate gamele",
     "ALL_CATEGORIES": "Toate categoriile",
@@ -121,7 +225,6 @@
     "DELETE_TITLE": "Șterge produsul",
     "DELETE_MESSAGE": "Ștergi produsul „{{name}}”?",
     "LOAD_FAILED": "Încărcarea produselor a eșuat",
-    "GROUPS_LOAD_FAILED": "Încărcarea grupurilor de produse a eșuat",
     "GAMMAS_LOAD_FAILED": "Încărcarea gamelor a eșuat",
     "CATEGORIES_LOAD_FAILED": "Încărcarea categoriilor a eșuat",
     "DUPLICATE_VALUE": "Există deja un produs cu aceeași valoare unică.",
@@ -129,7 +232,8 @@
     "DUPLICATE_ITEM_CODE": "Există deja un produs cu acest cod de articol.",
     "DUPLICATE_BARCODE": "Există deja un produs cu acest cod de bare.",
     "DUPLICATE_MATRIX_BARCODE": "Există deja un produs cu acest cod de bare matricial.",
-    "DUPLICATE_QR_CODE": "Există deja un produs cu acest cod QR."
+    "DUPLICATE_QR_CODE": "Există deja un produs cu acest cod QR.",
+    "NO_PRICE": "Fără preț"
   },
   "USERS": {
     "TITLE": "Utilizatori",
@@ -179,6 +283,8 @@
     "ADD_ITEM": "Adaugă articol",
     "CUSTOMER": "Client",
     "EDIT": "Editează comanda",
+    "VIEW": "Vezi comanda",
+    "POINTS_EARNED": "Puncte acumulate",
     "USE_POINTS": "Folosește puncte",
     "STATUS_PENDING": "În așteptare",
     "STATUS_COMPLETED": "Finalizată",
@@ -223,5 +329,6 @@
   "Orders": "Comenzi",
   "Settings": "Setări",
   "Users": "Utilizatori",
-  "Workspace": "Spațiu de lucru"
+  "Workspace": "Spațiu de lucru",
+  "Customers": "Clienți"
 }

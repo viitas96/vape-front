@@ -3,6 +3,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { MatDialogRef } from '@angular/material/dialog';
 import { MaterialModule } from 'src/app/material.module';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { RolePipe } from 'src/app/pipe/role.pipe';
 import { AdminService } from 'src/app/services/admin.service';
 import { getApiErrorMessage } from 'src/app/shared/http/api-error';
 import { RoleDTO } from './user.models';
@@ -10,7 +11,7 @@ import { RoleDTO } from './user.models';
 @Component({
   selector: 'app-create-user-dialog',
   standalone: true,
-  imports: [MaterialModule, ReactiveFormsModule, TranslatePipe],
+  imports: [MaterialModule, ReactiveFormsModule, TranslatePipe, RolePipe],
   template: `
     <h2 mat-dialog-title>{{ 'USERS.CREATE' | translate }}</h2>
 
@@ -33,7 +34,7 @@ import { RoleDTO } from './user.models';
         <mat-form-field appearance="outline" class="w-100">
           <mat-select formControlName="roles" multiple [placeholder]="'USERS.SELECT_ROLES' | translate">
             @for (role of roles; track role.id) {
-              <mat-option [value]="role.id">{{ role.name }}</mat-option>
+              <mat-option [value]="role.id">{{ role.name | appRole }}</mat-option>
             }
           </mat-select>
           <mat-error>{{ 'USERS.ROLES_REQUIRED' | translate }}</mat-error>

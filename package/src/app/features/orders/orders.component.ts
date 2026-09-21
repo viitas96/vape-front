@@ -12,12 +12,15 @@ import { ProductService } from 'src/app/services/product.service';
 import { Product } from '../products/product.models';
 import { ConfirmDialogService } from 'src/app/shared/dialogs/confirm-dialog.service';
 import { PagedListPageState } from 'src/app/shared/page/page-state';
+import { TablePaginatorComponent } from 'src/app/shared/page/table-paginator.component';
+import { AuthService } from 'src/app/services/auth.service';
 import { OrderDialogComponent, OrderDialogData } from './order-dialog.component';
+import { OrderViewDialogComponent, OrderViewDialogData } from './order-view-dialog.component';
 
 @Component({
   selector: 'app-orders',
   standalone: true,
-  imports: [MaterialModule, DatePipe, TranslatePipe],
+  imports: [MaterialModule, DatePipe, TranslatePipe, TablePaginatorComponent],
   templateUrl: './orders.component.html',
   styles: [`
     .mat-column-createdBy {
@@ -37,11 +40,16 @@ export class OrdersComponent extends PagedListPageState implements OnInit {
     private readonly orderService: OrderService,
     private readonly productService: ProductService,
     private readonly adminService: AdminService,
+    private readonly authService: AuthService,
     private readonly dialog: MatDialog,
     private readonly confirmDialog: ConfirmDialogService,
     private readonly translateService: TranslateService,
   ) {
     super();
+  }
+
+  get canManage(): boolean {
+    return this.authService.hasAnyRole(['ADMIN', 'SELLER']);
   }
 
   ngOnInit(): void {
@@ -51,6 +59,15 @@ export class OrdersComponent extends PagedListPageState implements OnInit {
 
   formatPrice(cents: number): string {
     return (cents / 100).toFixed(2);
+  }
+
+  openViewDialog(order: Order): void {
+    const data: OrderViewDialogData = {
+      order,
+      customerEmail: this.users.find((user) => user.uuid === order.customerId)?.email ?? null,
+    };
+
+    this.dialog.open(OrderViewDialogComponent, { width: '640px', maxWidth: 'calc(100vw - 48px)', data });
   }
 
   openDialog(order?: Order): void {

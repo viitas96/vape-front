@@ -9,7 +9,6 @@ import { Router } from '@angular/router';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { MaterialModule } from 'src/app/material.module';
 import { AuthService } from 'src/app/services/auth.service';
-import { LanguageService, SupportedLanguage } from 'src/app/services/language.service';
 import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
@@ -25,17 +24,8 @@ export class HeaderComponent {
 
   constructor(
     private readonly authService: AuthService,
-    private readonly languageService: LanguageService,
     private readonly router: Router,
   ) {}
-
-  get currentLanguage(): SupportedLanguage {
-    return this.languageService.currentLanguage;
-  }
-
-  setLanguage(language: SupportedLanguage): void {
-    this.languageService.setLanguage(language);
-  }
 
   logout(): void {
     this.authService.logout();

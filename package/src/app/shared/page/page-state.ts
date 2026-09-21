@@ -49,7 +49,7 @@ export abstract class ExpandableRowsPageState extends FeedbackPageState {
 
 export abstract class PagedListPageState extends ExpandableRowsPageState {
   totalElements = 0;
-  pageSize = 10;
+  pageSize = 50;
   pageIndex = 0;
   sortBy = 'id';
   sortDirection: SortDirection = 'asc';

@@ -142,7 +142,13 @@
 .admin-products-page {
     mat-header-row,
     mat-row {
-        min-width: 1120px;
+        min-width: 1000px;
+    }
+
+    // the row number only needs to fit short values, so the freed space goes to
+    // the name, category and gamma columns
+    .mat-column-id {
+        flex: 0 0 56px;
     }
 }
 
@@ -150,6 +156,23 @@
     mat-header-row,
     mat-row {
         min-width: 900px;
+    }
+
+    .mat-column-id {
+        flex: 0 0 64px;
+    }
+
+    .mat-column-status {
+        flex: 0 0 116px;
+    }
+
+    .mat-column-items,
+    .mat-column-pointsUsed {
+        flex: 0 0 88px;
+    }
+
+    .mat-column-actions {
+        flex: 0 0 152px;
     }
 }
 
@@ -283,12 +306,23 @@
         }
     }
 
+    .admin-customers-page {
+        .mat-column-id,
+        .mat-column-phone,
+        .mat-column-points {
+            display: none;
+        }
+
+        .mat-column-status {
+            flex: 0 0 88px;
+        }
+    }
+
     .admin-products-page {
         .mat-column-id,
         .mat-column-itemCode,
         .mat-column-barcode,
-        .mat-column-matrixBarcode,
-        .mat-column-qrCode,
+        .mat-column-category,
         .mat-column-gamma {
             display: none;
         }
@@ -391,13 +425,13 @@
         }
 
         .mat-mdc-paginator-page-size {
-            justify-content: center;
+            justify-content: flex-end;
             margin-right: 0;
             width: 100%;
         }
 
         .mat-mdc-paginator-range-actions {
-            justify-content: center;
+            justify-content: flex-end;
             width: 100%;
         }
 

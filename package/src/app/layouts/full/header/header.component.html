@@ -5,13 +5,5 @@
 
   <span class="flex-1-auto"></span>
 
-  <button mat-stroked-button [matMenuTriggerFor]="languageMenu">
-    {{ (currentLanguage === 'ro' ? 'LANGUAGE.RO' : 'LANGUAGE.EN') | translate }}
-  </button>
-  <mat-menu #languageMenu="matMenu">
-    <button mat-menu-item (click)="setLanguage('ro')">{{ 'LANGUAGE.RO' | translate }}</button>
-    <button mat-menu-item (click)="setLanguage('en')">{{ 'LANGUAGE.EN' | translate }}</button>
-  </mat-menu>
-
   <button mat-stroked-button (click)="logout()">{{ 'HEADER.LOGOUT' | translate }}</button>
 </mat-toolbar>

@@ -16,21 +16,20 @@
         <input matInput formControlName="price" type="number" min="0" step="0.01" placeholder="0.00" />
         <mat-error>{{ 'PRODUCTS.PRICE_INVALID' | translate }}</mat-error>
       </mat-form-field>
+      <mat-checkbox formControlName="noPrice">{{ 'PRODUCTS.NO_PRICE' | translate }}</mat-checkbox>
     </div>
 
-    <!-- Group selector removed from the UI; kept on the model/backend for future use.
     <div class="product-form-field">
-      <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.GROUP' | translate }}</mat-label>
+      <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.CATEGORY' | translate }}</mat-label>
       <mat-form-field appearance="outline" class="w-100">
-        <mat-select formControlName="groupId" [placeholder]="'PRODUCTS.NO_GROUP' | translate">
-          <mat-option [value]="null">{{ 'PRODUCTS.NO_GROUP' | translate }}</mat-option>
-          @for (g of data.groups; track g.id) {
-            <mat-option [value]="g.id">{{ g.name }}</mat-option>
+        <mat-select formControlName="categoryId" [placeholder]="'PRODUCTS.NO_CATEGORY' | translate">
+          <mat-option [value]="null">{{ 'PRODUCTS.NO_CATEGORY' | translate }}</mat-option>
+          @for (category of data.categories; track category.id) {
+            <mat-option [value]="category.id">{{ category.name }}</mat-option>
           }
         </mat-select>
       </mat-form-field>
     </div>
-    -->
 
     <div class="product-form-field">
       <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.GAMMA' | translate }}</mat-label>

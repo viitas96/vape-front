@@ -7,5 +7,5 @@ export interface AppSettings {
 
 export const defaults: AppSettings = {
   sidenavOpened: false,
-  sidenavCollapsed: false,
+  sidenavCollapsed: true,
 };

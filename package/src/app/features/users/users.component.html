@@ -30,7 +30,7 @@
 
         <ng-container matColumnDef="roles">
           <mat-header-cell *matHeaderCellDef>{{ 'USERS.ROLES' | translate }}</mat-header-cell>
-          <mat-cell *matCellDef="let u">{{ u.roles.join(', ') }}</mat-cell>
+          <mat-cell *matCellDef="let u">{{ u.roles | appRole }}</mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="status">
@@ -75,7 +75,7 @@
                 </div>
                 <div class="admin-table-detail-field">
                   <dt>{{ 'USERS.ROLES' | translate }}</dt>
-                  <dd>{{ u.roles.join(', ') }}</dd>
+                  <dd>{{ u.roles | appRole }}</dd>
                 </div>
               </dl>
               <div class="admin-table-detail-actions">
@@ -102,14 +102,13 @@
 
       </mat-table>
 
-      <mat-paginator
+      <app-table-paginator
         [length]="totalElements"
         [pageSize]="pageSize"
         [pageIndex]="pageIndex"
         [pageSizeOptions]="pageSizeOptions"
-        (page)="onPageChange($event)"
-        showFirstLastButtons>
-      </mat-paginator>
+        (page)="onPageChange($event)">
+      </app-table-paginator>
 
     </mat-card-content>
   </mat-card>

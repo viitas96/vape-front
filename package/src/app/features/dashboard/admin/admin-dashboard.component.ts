@@ -5,11 +5,12 @@ import { AdminService } from 'src/app/services/admin.service';
 import { getApiErrorMessage } from 'src/app/shared/http/api-error';
 import { RoleDTO } from '../../users/user.models';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { RolePipe } from 'src/app/pipe/role.pipe';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [MaterialModule, ReactiveFormsModule, TranslatePipe],
+  imports: [MaterialModule, ReactiveFormsModule, TranslatePipe, RolePipe],
   templateUrl: './admin-dashboard.component.html',
 })
 export class AdminDashboardComponent implements OnInit {

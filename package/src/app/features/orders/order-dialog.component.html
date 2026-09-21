@@ -57,22 +57,17 @@
                         [compareWith]="compareProducts" (selectionChange)="onProductSelected(i)">
               @for (category of productTree; track category.name) {
                 <mat-option disabled>{{ category.name }}</mat-option>
-                @for (group of category.groups; track group.name) {
+                @for (gamma of category.gammas; track gamma.name) {
                   <mat-option disabled>
-                    <span style="padding-left: 16px">{{ group.name }}</span>
+                    <span style="padding-left: 16px">{{ gamma.name }}</span>
                   </mat-option>
-                  @for (gamma of group.gammas; track gamma.name) {
-                    <mat-option disabled>
-                      <span style="padding-left: 32px">{{ gamma.name }}</span>
+                  @for (p of gamma.products; track p.id) {
+                    <mat-option [value]="p">
+                      <span style="padding-left: 32px">{{ p.name }}</span>
+                      @if (p.barcode || p.itemCode) {
+                        <span style="opacity: 0.6; font-size: 12px"> · {{ p.barcode || p.itemCode }}</span>
+                      }
                     </mat-option>
-                    @for (p of gamma.products; track p.id) {
-                      <mat-option [value]="p">
-                        <span style="padding-left: 48px">{{ p.name }}</span>
-                        @if (p.barcode || p.itemCode) {
-                          <span style="opacity: 0.6; font-size: 12px"> В· {{ p.barcode || p.itemCode }}</span>
-                        }
-                      </mat-option>
-                    }
                   }
                 }
               }

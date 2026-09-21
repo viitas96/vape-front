@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { ProductGroupCategory, ProductGroupCategoryDTO } from '../features/product-groups/product-group.models';
+import { ProductGroupCategory, ProductGroupCategoryDTO } from '../features/product-group-categories/product-group-category.models';
 
 @Injectable({ providedIn: 'root' })
 export class ProductGroupCategoryService {

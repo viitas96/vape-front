@@ -5,6 +5,9 @@ export interface CustomerScan {
   id: number;
   uuid: string;
   email: string;
+  firstName: string | null;
+  lastName: string | null;
+  phone: string | null;
   roles: string[];
   banned: boolean;
   dateOfBirth: string | null;
