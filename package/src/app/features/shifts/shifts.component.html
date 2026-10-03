@@ -1,0 +1,102 @@
+<div class="p-24">
+  <mat-card class="cardWithShadow admin-data-card admin-shifts-page">
+    <mat-card-content class="p-32 admin-data-content">
+
+      <div class="d-flex align-items-center justify-content-between m-b-24 admin-page-header">
+        <h2 class="f-s-20 f-w-700">{{ 'SHIFTS.TITLE' | translate }}</h2>
+      </div>
+
+      @if (errorMessage) {
+        <p class="text-danger f-s-14 m-b-16">{{ errorMessage }}</p>
+      }
+
+      <mat-table [dataSource]="shifts">
+
+        <ng-container matColumnDef="id">
+          <mat-header-cell *matHeaderCellDef>ID</mat-header-cell>
+          <mat-cell *matCellDef="let s">{{ s.id }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <mat-header-cell *matHeaderCellDef>{{ 'SHIFTS.STATUS' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let s">
+            {{ (s.status === 'OPEN' ? 'SHIFTS.OPEN_STATUS' : 'SHIFTS.CLOSED_STATUS') | translate }}
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="openedBy">
+          <mat-header-cell *matHeaderCellDef>{{ 'SHIFTS.OPENED_BY' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let s">{{ s.openedBy }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="openedAt">
+          <mat-header-cell *matHeaderCellDef>{{ 'SHIFTS.OPENED' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let s">{{ s.openedAt | date:'short' }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="closedAt">
+          <mat-header-cell *matHeaderCellDef>{{ 'SHIFTS.CLOSED' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let s">{{ s.closedAt ? (s.closedAt | date:'short') : '—' }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="duration">
+          <mat-header-cell *matHeaderCellDef>{{ 'SHIFTS.DURATION' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let s">{{ formatDuration(s.durationMinutes) }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="startingCash">
+          <mat-header-cell *matHeaderCellDef>{{ 'SHIFTS.STARTING_CASH' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let s">{{ format(s.startingCash) }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="expectedCash">
+          <mat-header-cell *matHeaderCellDef>{{ 'SHIFTS.EXPECTED_CASH' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let s">{{ hasCashFigures(s) ? format(s.expectedCash) : '—' }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="actualCash">
+          <mat-header-cell *matHeaderCellDef>{{ 'SHIFTS.ACTUAL_CASH' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let s">{{ hasCashFigures(s) ? format(s.actualCash) : '—' }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="difference">
+          <mat-header-cell *matHeaderCellDef>{{ 'SHIFTS.DIFFERENCE' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let s">
+            @if (hasCashFigures(s)) {
+              <strong [class.text-success]="isBalanced(s)" [class.text-danger]="!isBalanced(s)">
+                {{ format(s.cashDifference) }}
+              </strong>
+            } @else {
+              <span>—</span>
+            }
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.ACTIONS' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let s">
+            <button mat-icon-button (click)="openReport(s)" [title]="'SHIFTS.VIEW_REPORT' | translate">
+              <mat-icon>receipt_long</mat-icon>
+            </button>
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+      </mat-table>
+
+      @if (shifts.length === 0) {
+        <p class="f-s-14 m-t-16">{{ 'SHIFTS.EMPTY' | translate }}</p>
+      }
+
+      <app-table-paginator
+        [length]="totalElements"
+        [pageSize]="pageSize"
+        [pageIndex]="pageIndex"
+        [pageSizeOptions]="pageSizeOptions"
+        (page)="onPageChange($event)">
+      </app-table-paginator>
+
+    </mat-card-content>
+  </mat-card>
+</div>

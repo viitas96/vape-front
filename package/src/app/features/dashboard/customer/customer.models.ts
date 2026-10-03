@@ -13,6 +13,8 @@ export interface MyProfile {
   banned: boolean;
   dateOfBirth: string | null;
   pointsBalance: number;
+  drinkCount: number;
+  freeDrinksAvailable: number;
 }
 
 export interface MyOrder {

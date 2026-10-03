@@ -1,0 +1,122 @@
+<h2 mat-dialog-title>{{ 'POS.PICKER_TITLE' | translate }}</h2>
+
+<mat-dialog-content>
+
+  <div class="p-t-8">
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>{{ 'POS.PICKER_SEARCH' | translate }}</mat-label>
+      <input matInput [(ngModel)]="search" autocomplete="off" autofocus />
+    </mat-form-field>
+
+    <div class="d-flex align-items-center gap-16 m-b-16">
+      <span class="f-s-13">{{ 'POS.PICKER_GROUP_BY' | translate }}</span>
+      <mat-button-toggle-group [(ngModel)]="groupBy" (ngModelChange)="onGroupByChange()">
+        <mat-button-toggle value="CATEGORY">{{ 'PRODUCTS.CATEGORY' | translate }}</mat-button-toggle>
+        <mat-button-toggle value="GAMMA">{{ 'PRODUCTS.GAMMA' | translate }}</mat-button-toggle>
+        <mat-button-toggle value="BRAND">{{ 'PRODUCTS.BRAND' | translate }}</mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+  </div>
+
+  @if (errorMessage) {
+    <p class="text-danger f-s-14">{{ errorMessage | translate }}</p>
+  }
+
+  <div style="display:grid;grid-template-columns:1fr 260px;gap:16px;min-height:360px">
+
+    <div style="overflow:auto;max-height:420px;border:1px solid rgba(0,0,0,0.12);border-radius:4px">
+      @if (loading) {
+        <p class="f-s-13 p-16">{{ 'POS.PICKER_LOADING' | translate }}</p>
+      }
+
+      @for (group of groups; track group.key) {
+        <div
+          (click)="toggleGroup(group)"
+          style="display:flex;align-items:center;gap:4px;padding:8px 12px;cursor:pointer;background:rgba(0,0,0,0.04);font-weight:600;font-size:13px"
+        >
+          <mat-icon style="font-size:18px;width:18px;height:18px">
+            {{ isCollapsed(group) ? 'chevron_right' : 'expand_more' }}
+          </mat-icon>
+          @if (group.key === otherGroupKey) {
+            <span>{{ 'POS.PICKER_OTHER' | translate }}</span>
+          } @else {
+            <span>{{ group.label }}</span>
+          }
+          <span style="margin-left:auto;opacity:0.6;font-weight:400">{{ group.products.length }}</span>
+        </div>
+
+        @if (!isCollapsed(group)) {
+          @for (product of group.products; track product.id) {
+            <div
+              (click)="select(product)"
+              style="display:flex;align-items:center;gap:8px;padding:6px 12px 6px 32px;cursor:pointer;font-size:13px"
+              [style.background]="isHighlighted(product) ? 'rgba(0,0,0,0.08)' : 'transparent'"
+            >
+              <span style="flex:1">{{ product.name }}</span>
+              @if (product.price === null || product.price === undefined) {
+                <span style="color:#e53935;font-size:11px">{{ 'POS.PICKER_NO_PRICE' | translate }}</span>
+              } @else {
+                <span style="color:#555">{{ format(product.price) }}</span>
+              }
+            </div>
+          }
+        }
+      }
+
+      @if (!loading && groups.length === 0) {
+        <p class="f-s-13 p-16">{{ 'POS.PICKER_EMPTY' | translate }}</p>
+      }
+    </div>
+
+    <div>
+      @if (!selected) {
+        <p class="f-s-13">{{ 'POS.PICKER_SELECT_HINT' | translate }}</p>
+      }
+
+      @if (selected) {
+        <div class="f-s-14 f-w-700 m-b-12">{{ selected.name }}</div>
+
+        <div class="d-flex align-items-center gap-8 m-b-16">
+          <button mat-icon-button (click)="changeQuantity(-1)">
+            <mat-icon>remove</mat-icon>
+          </button>
+          <span class="f-s-16 f-w-700" style="min-width:32px;text-align:center">{{ quantity }}</span>
+          <button mat-icon-button (click)="changeQuantity(1)">
+            <mat-icon>add</mat-icon>
+          </button>
+        </div>
+
+        @if (hasOwnPrice) {
+          <div class="d-flex justify-content-between f-s-13 m-b-16">
+            <span>{{ 'PRODUCTS.PRICE' | translate }}</span>
+            <strong>{{ format(selected.price) }}</strong>
+          </div>
+        } @else {
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>{{ 'PRODUCTS.PRICE' | translate }}</mat-label>
+            <input matInput [(ngModel)]="priceMdl" type="number" min="0" step="0.01" placeholder="0.00" />
+            <span matTextSuffix>MDL</span>
+            @if (suggestedPriceMdl !== null) {
+              <mat-hint>{{ 'POS.PICKER_GAMMA_PRICE' | translate }}</mat-hint>
+            }
+          </mat-form-field>
+        }
+
+        <button mat-flat-button color="primary" class="w-100" [disabled]="!canAdd" (click)="add()">
+          <mat-icon>add_shopping_cart</mat-icon>
+          {{ 'POS.PICKER_ADD' | translate }}
+        </button>
+      }
+    </div>
+
+  </div>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <span class="f-s-13" style="margin-right:auto">
+    {{ 'POS.PICKER_ADDED' | translate:{ count: addedCount } }}
+  </span>
+  <button mat-stroked-button mat-dialog-close>{{ 'COMMON.CANCEL' | translate }}</button>
+  <button mat-flat-button color="primary" (click)="done()">{{ 'COMMON.DONE' | translate }}</button>
+</mat-dialog-actions>

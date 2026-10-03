@@ -57,6 +57,13 @@ export const APP_FEATURE_ROUTE_DEFINITIONS: readonly AppFeatureRouteDefinition[]
     loadComponent: () => import('../../features/product-gammas/product-gammas.component').then((m) => m.ProductGammasComponent),
   },
   {
+    path: 'brands',
+    title: 'Brands',
+    roles: ['ADMIN', 'OPERATOR'],
+    sidebar: { label: 'Brands', iconName: 'bookmark', bgcolor: 'primary' },
+    loadComponent: () => import('../../features/brands/brands.component').then((m) => m.BrandsComponent),
+  },
+  {
     path: 'products',
     title: 'Products',
     roles: ['ADMIN', 'OPERATOR', 'SELLER'],
@@ -90,6 +97,13 @@ export const APP_FEATURE_ROUTE_DEFINITIONS: readonly AppFeatureRouteDefinition[]
     roles: ['ADMIN'],
     sidebar: { label: 'Users', iconName: 'users', bgcolor: 'primary' },
     loadComponent: () => import('../../features/users/users.component').then((m) => m.UsersComponent),
+  },
+  {
+    path: 'shifts',
+    title: 'Shifts',
+    roles: ['ADMIN', 'ACCOUNTANT'],
+    sidebar: { label: 'Shifts', iconName: 'report-money', bgcolor: 'warning' },
+    loadComponent: () => import('../../features/shifts/shifts.component').then((m) => m.ShiftsComponent),
   },
   {
     path: 'settings',

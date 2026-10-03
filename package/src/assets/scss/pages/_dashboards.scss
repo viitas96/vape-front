@@ -185,9 +185,24 @@
     }
 }
 
+.admin-shifts-page {
+    mat-header-row,
+    mat-row {
+        min-width: 1100px;
+    }
+
+    .mat-column-id {
+        flex: 0 0 56px;
+    }
+
+    .mat-column-actions {
+        flex: 0 0 88px;
+    }
+}
+
 // Widen the boxed page layout for the admin management tables so they have more
 // breathing room on smaller/15" monitors, instead of being capped at $boxedWidth.
-.pageWrapper.maxWidth:has(.admin-products-page, .admin-product-groups-page, .admin-product-categories-page, .admin-product-gammas-page) {
+.pageWrapper.maxWidth:has(.admin-products-page, .admin-product-groups-page, .admin-product-categories-page, .admin-product-gammas-page, .admin-shifts-page) {
     max-width: 90%;
 }
 

@@ -12,11 +12,13 @@
 
     <div class="product-form-field">
       <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.PRICE' | translate }}</mat-label>
-      <mat-form-field appearance="outline" class="w-100">
-        <input matInput formControlName="price" type="number" min="0" step="0.01" placeholder="0.00" />
-        <mat-error>{{ 'PRODUCTS.PRICE_INVALID' | translate }}</mat-error>
-      </mat-form-field>
-      <mat-checkbox formControlName="noPrice">{{ 'PRODUCTS.NO_PRICE' | translate }}</mat-checkbox>
+      <div class="product-price-row">
+        <mat-form-field appearance="outline" class="product-price-input">
+          <input matInput formControlName="price" type="number" min="0" max="9999" step="0.01" placeholder="0.00" />
+          <mat-error>{{ 'PRODUCTS.PRICE_INVALID' | translate }}</mat-error>
+        </mat-form-field>
+        <mat-checkbox formControlName="noPrice">{{ 'PRODUCTS.NO_PRICE' | translate }}</mat-checkbox>
+      </div>
     </div>
 
     <div class="product-form-field">
@@ -44,6 +46,18 @@
     </div>
 
     <div class="product-form-field">
+      <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.BRAND' | translate }}</mat-label>
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-select formControlName="brandId" [placeholder]="'PRODUCTS.NO_BRAND' | translate">
+          <mat-option [value]="null">{{ 'PRODUCTS.NO_BRAND' | translate }}</mat-option>
+          @for (brand of data.brands; track brand.id) {
+            <mat-option [value]="brand.id">{{ brand.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="product-form-field">
       <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.ITEM_CODE' | translate }}</mat-label>
       <mat-form-field appearance="outline" class="w-100">
         <input matInput formControlName="itemCode" [placeholder]="'PRODUCTS.PLACEHOLDER_ITEM_CODE' | translate" />
@@ -57,18 +71,40 @@
       </mat-form-field>
     </div>
 
-    <div class="product-form-field">
-      <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.MATRIX_BARCODE' | translate }}</mat-label>
-      <mat-form-field appearance="outline" class="w-100">
-        <input matInput formControlName="matrixBarcode" [placeholder]="'PRODUCTS.PLACEHOLDER_MATRIX_BARCODE' | translate" />
-      </mat-form-field>
+    <div class="product-form-field product-form-inline">
+      <mat-checkbox formControlName="drinkStampEligible">
+        {{ 'PRODUCTS.DRINK_STAMP_ELIGIBLE' | translate }}
+      </mat-checkbox>
+      <mat-icon
+        class="product-info-icon"
+        tabindex="0"
+        [matTooltip]="'PRODUCTS.DRINK_STAMP_ELIGIBLE_HINT' | translate"
+        matTooltipPosition="above"
+      >info_outline</mat-icon>
     </div>
 
-    <div class="product-form-field">
-      <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.QR_CODE' | translate }}</mat-label>
-      <mat-form-field appearance="outline" class="w-100">
-        <input matInput formControlName="qrCode" [placeholder]="'PRODUCTS.PLACEHOLDER_QR_CODE' | translate" />
-      </mat-form-field>
+    <div class="product-form-advanced">
+      <mat-expansion-panel class="shadow-none">
+        <mat-expansion-panel-header>
+          <mat-panel-title class="f-s-14 f-w-600">{{ 'PRODUCTS.ADVANCED_CODES' | translate }}</mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div class="product-form-advanced-grid">
+          <div class="product-form-field">
+            <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.MATRIX_BARCODE' | translate }}</mat-label>
+            <mat-form-field appearance="outline" class="w-100">
+              <input matInput formControlName="matrixBarcode" [placeholder]="'PRODUCTS.PLACEHOLDER_MATRIX_BARCODE' | translate" />
+            </mat-form-field>
+          </div>
+
+          <div class="product-form-field">
+            <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.QR_CODE' | translate }}</mat-label>
+            <mat-form-field appearance="outline" class="w-100">
+              <input matInput formControlName="qrCode" [placeholder]="'PRODUCTS.PLACEHOLDER_QR_CODE' | translate" />
+            </mat-form-field>
+          </div>
+        </div>
+      </mat-expansion-panel>
     </div>
   </form>
 </mat-dialog-content>

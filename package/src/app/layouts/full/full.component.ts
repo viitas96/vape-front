@@ -89,6 +89,19 @@ export class FullComponent implements OnInit, OnDestroy {
     this.router.navigate(['/authentication/login']);
   }
 
+  get isImpersonating(): boolean {
+    return this.authService.isImpersonating();
+  }
+
+  get impersonatedEmail(): string {
+    return this.authService.getImpersonatedEmail() ?? '';
+  }
+
+  stopImpersonating(): void {
+    this.authService.stopImpersonation();
+    window.location.assign(this.authService.getRedirectPath());
+  }
+
   toggleCollapsed(): void {
     this.clearHoverCloseTimer();
     this.isSidenavHovered = false;

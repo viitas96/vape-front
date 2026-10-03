@@ -5,6 +5,9 @@ import { MaterialModule } from 'src/app/material.module';
 import { AdminService } from 'src/app/services/admin.service';
 import { ConfirmDialogData } from 'src/app/shared/dialogs/confirm-dialog.component';
 import { ConfirmDialogService } from 'src/app/shared/dialogs/confirm-dialog.service';
+import { ImpersonationService } from 'src/app/services/impersonation.service';
+import { AuthService } from 'src/app/services/auth.service';
+import { getApiErrorMessage } from 'src/app/shared/http/api-error';
 import { PagedListPageState } from 'src/app/shared/page/page-state';
 import { TablePaginatorComponent } from 'src/app/shared/page/table-paginator.component';
 import { UserResponse } from '../users/user.models';
@@ -26,9 +29,27 @@ export class CustomersComponent extends PagedListPageState implements OnInit {
     private readonly adminService: AdminService,
     private readonly dialog: MatDialog,
     private readonly confirmDialog: ConfirmDialogService,
+    private readonly impersonationService: ImpersonationService,
+    private readonly authService: AuthService,
     private readonly translateService: TranslateService,
   ) {
     super();
+  }
+
+  get canImpersonate(): boolean {
+    return this.impersonationService.enabled && this.authService.hasAnyRole(['ADMIN']);
+  }
+
+  impersonate(customer: UserResponse): void {
+    this.clearMessages();
+    this.impersonationService.impersonate(customer.uuid).subscribe({
+      next: () => {
+        window.location.assign(this.authService.getRedirectPath());
+      },
+      error: (error) => {
+        this.setError(getApiErrorMessage(error, this.translateService.instant('IMPERSONATION.FAILED')));
+      },
+    });
   }
 
   ngOnInit(): void {

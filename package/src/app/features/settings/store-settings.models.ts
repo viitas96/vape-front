@@ -4,6 +4,8 @@ export interface StoreSettings {
   spendRate: number;
   goodsPointsCapPercent: number;
   souvenirSplitPercent: number;
+  shiftManagementEnabled: boolean;
+  freeDrinkThreshold: number;
 }
 
 export type StoreSettingsUpdate = Omit<StoreSettings, 'id'>;

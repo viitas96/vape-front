@@ -62,6 +62,12 @@
                     [title]="(c.banned ? 'USERS.UNBAN' : 'USERS.BAN') | translate">
               <mat-icon>{{ c.banned ? 'lock_open' : 'block' }}</mat-icon>
             </button>
+            @if (canImpersonate && !c.banned) {
+              <button mat-icon-button color="accent" (click)="impersonate(c)"
+                      [title]="'IMPERSONATION.LOGIN_AS' | translate">
+                <mat-icon>switch_account</mat-icon>
+              </button>
+            }
           </mat-cell>
         </ng-container>
 

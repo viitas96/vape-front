@@ -1,0 +1,71 @@
+<div class="p-24">
+  <mat-card class="cardWithShadow admin-data-card">
+    <mat-card-content class="p-32 admin-data-content">
+
+      <div class="d-flex align-items-center justify-content-between m-b-24 admin-page-header">
+        <h2 class="f-s-20 f-w-700">{{ 'BRANDS.TITLE' | translate }}</h2>
+        <button mat-flat-button color="primary" (click)="openDialog()">
+          <mat-icon>add</mat-icon> {{ 'BRANDS.ADD' | translate }}
+        </button>
+      </div>
+
+      @if (successMessage) {
+        <p class="text-success f-s-14 m-b-16">{{ successMessage }}</p>
+      }
+      @if (errorMessage) {
+        <p class="text-danger f-s-14 m-b-16">{{ errorMessage }}</p>
+      }
+
+      <mat-table [dataSource]="brands" matSort [matSortActive]="sortBy" [matSortDirection]="sortDirection" (matSortChange)="onSortChange($event)">
+
+        <ng-container matColumnDef="id">
+          <mat-header-cell *matHeaderCellDef>{{ 'COMMON.NO' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let brand; let i = dataIndex">{{ rowNumber(i) }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+          <mat-header-cell *matHeaderCellDef mat-sort-header="name">{{ 'PRODUCTS.NAME' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let brand">{{ brand.name }}</mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="active">
+          <mat-header-cell *matHeaderCellDef mat-sort-header="active">{{ 'BRANDS.ACTIVE' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let brand">
+            @if (brand.active) {
+              <span class="text-success">{{ 'BRANDS.STATUS_ACTIVE' | translate }}</span>
+            } @else {
+              <span class="text-danger">{{ 'BRANDS.STATUS_INACTIVE' | translate }}</span>
+            }
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.ACTIONS' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let brand">
+            <button mat-icon-button color="primary" (click)="openDialog(brand)" [title]="'COMMON.EDIT' | translate">
+              <mat-icon>edit</mat-icon>
+            </button>
+            @if (brand.active) {
+              <button mat-icon-button color="warn" (click)="deactivate(brand)" [title]="'BRANDS.DEACTIVATE' | translate">
+                <mat-icon>block</mat-icon>
+              </button>
+            } @else {
+              <button mat-icon-button color="primary" (click)="reactivate(brand)" [title]="'BRANDS.REACTIVATE' | translate">
+                <mat-icon>restore</mat-icon>
+              </button>
+            }
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell p-16" [attr.colspan]="displayedColumns.length">{{ 'BRANDS.EMPTY' | translate }}</td>
+        </tr>
+
+      </mat-table>
+
+    </mat-card-content>
+  </mat-card>
+</div>

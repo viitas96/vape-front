@@ -16,6 +16,8 @@ import { TablePaginatorComponent } from 'src/app/shared/page/table-paginator.com
 import { ProductDialogComponent, ProductDialogData } from './product-dialog.component';
 import { ProductGroupCategory } from '../product-group-categories/product-group-category.models';
 import { ProductGamma } from '../product-gammas/product-gamma.models';
+import { Brand } from '../brands/brand.models';
+import { BrandService } from 'src/app/services/brand.service';
 import { Product } from './product.models';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
@@ -30,6 +32,7 @@ export class ProductsComponent extends PagedListPageState implements OnInit {
   products: Product[] = [];
   gammas: ProductGamma[] = [];
   categories: ProductGroupCategory[] = [];
+  brands: Brand[] = [];
   nameFilter = '';
   gammaIdFilter: number | null = null;
   categoryIdFilter: number | null = null;
@@ -40,6 +43,7 @@ export class ProductsComponent extends PagedListPageState implements OnInit {
     private readonly productService: ProductService,
     private readonly productGammaService: ProductGammaService,
     private readonly productGroupCategoryService: ProductGroupCategoryService,
+    private readonly brandService: BrandService,
     private readonly productCreationPreferencesService: ProductCreationPreferencesService,
     private readonly productPageSizePreferencesService: ProductPageSizePreferencesService,
     private readonly dialog: MatDialog,
@@ -55,6 +59,7 @@ export class ProductsComponent extends PagedListPageState implements OnInit {
     this.loadPage();
     this.loadGammas();
     this.loadCategories();
+    this.loadBrands();
   }
 
   formatPrice(cents: number | null): string {
@@ -89,6 +94,7 @@ export class ProductsComponent extends PagedListPageState implements OnInit {
       product: product ?? null,
       categories: this.categories,
       gammas: this.gammas,
+      brands: this.brands,
       initialCategoryId,
       initialGammaId,
     };
@@ -185,6 +191,17 @@ export class ProductsComponent extends PagedListPageState implements OnInit {
       },
       error: () => {
         this.setError(this.translateService.instant('PRODUCTS.GAMMAS_LOAD_FAILED'));
+      },
+    });
+  }
+
+  private loadBrands(): void {
+    this.brandService.getActive().subscribe({
+      next: (brands) => {
+        this.brands = brands;
+      },
+      error: () => {
+        this.setError(this.translateService.instant('BRANDS.LOAD_FAILED'));
       },
     });
   }

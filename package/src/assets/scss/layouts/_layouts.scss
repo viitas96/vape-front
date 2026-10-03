@@ -1,2 +1,13 @@
 @use "sidebar";
 @use "header";
+.impersonation-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 10px 16px;
+  border: 1px solid #ffb74d;
+  border-radius: 8px;
+  background: #fff3e0;
+  color: #e65100;
+}

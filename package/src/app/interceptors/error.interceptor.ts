@@ -27,6 +27,14 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => error);
       }
 
+      // An impersonation token has no refresh token, so a 401 means it expired:
+      // drop back to the admin session instead of logging everything out.
+      if (auth.isImpersonating()) {
+        auth.stopImpersonation();
+        window.location.assign(auth.getRedirectPath());
+        return throwError(() => error);
+      }
+
       if (isRefreshing) {
         return refreshTokenSubject.pipe(
           filter((token) => token !== null),

@@ -13,3 +13,50 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+.product-price-row {
+  display: flex;
+  gap: 16px;
+}
+
+.product-price-input {
+  flex: 0 0 160px;
+}
+
+.product-price-row mat-checkbox {
+  display: inline-flex;
+  align-items: center;
+  height: var(--mat-form-field-container-height, 56px);
+}
+
+.product-form-inline {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.product-info-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  cursor: help;
+  opacity: 0.6;
+}
+
+.product-form-advanced {
+  grid-column: 1 / -1;
+  min-width: 0;
+  margin-top: 8px;
+}
+
+.product-form-advanced-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 24px;
+}
+
+@media (max-width: 768px) {
+  .product-form-advanced-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

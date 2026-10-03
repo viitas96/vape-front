@@ -38,6 +38,15 @@
     </button>
     }
     <main class="pageWrapper maxWidth">
+      @if (isImpersonating) {
+        <div class="impersonation-banner">
+          <i-tabler name="eye" class="icon-18 d-flex"></i-tabler>
+          <span class="f-s-14 f-w-600">{{ 'IMPERSONATION.BANNER' | translate:{ email: impersonatedEmail } }}</span>
+          <button mat-flat-button color="warn" class="m-l-auto" (click)="stopImpersonating()">
+            {{ 'IMPERSONATION.EXIT' | translate }}
+          </button>
+        </div>
+      }
       <div>
         <router-outlet></router-outlet>
       </div>

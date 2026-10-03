@@ -9,6 +9,7 @@ export interface ProductFilters {
   name?: string;
   gammaId?: number | null;
   categoryId?: number | null;
+  brandId?: number | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -36,6 +37,10 @@ export class ProductService {
 
     if (filters.categoryId) {
       params['categoryId'] = filters.categoryId;
+    }
+
+    if (filters.brandId) {
+      params['brandId'] = filters.brandId;
     }
 
     return this.http.get<PageResponse<Product>>(this.API_URL, {

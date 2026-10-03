@@ -23,6 +23,7 @@ export class CustomerDashboardComponent implements OnInit {
   settings: StoreSettings | null = null;
   qrDataUrl = '';
   promoIndex = 0;
+  loadFailed = false;
 
   constructor(
     private readonly meService: MeService,
@@ -36,12 +37,17 @@ export class CustomerDashboardComponent implements OnInit {
       orders: this.meService.getOrders(0, 5),
       promotions: this.promotionService.getActive(),
       settings: this.settingsService.get(),
-    }).subscribe(({ profile, orders, promotions, settings }) => {
-      this.profile = profile;
-      this.orders = orders.content;
-      this.promotions = promotions;
-      this.settings = settings;
-      this.generateQrCode(profile.uuid);
+    }).subscribe({
+      next: ({ profile, orders, promotions, settings }) => {
+        this.profile = profile;
+        this.orders = orders.content;
+        this.promotions = promotions;
+        this.settings = settings;
+        this.generateQrCode(profile.uuid);
+      },
+      error: () => {
+        this.loadFailed = true;
+      },
     });
   }
 
@@ -51,6 +57,10 @@ export class CustomerDashboardComponent implements OnInit {
     }
 
     return Math.floor((this.profile.pointsBalance * 100) / this.settings.spendRate) / 100;
+  }
+
+  get freeDrinkThreshold(): number {
+    return this.settings?.freeDrinkThreshold ?? 6;
   }
 
   prevPromo(): void {

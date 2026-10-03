@@ -5,12 +5,14 @@ import { MaterialModule } from 'src/app/material.module';
 import { Product, ProductDTO } from './product.models';
 import { ProductGroupCategory } from '../product-group-categories/product-group-category.models';
 import { ProductGamma } from '../product-gammas/product-gamma.models';
+import { Brand } from '../brands/brand.models';
 import { TranslatePipe } from '@ngx-translate/core';
 
 export interface ProductDialogData {
   product: Product | null;
   categories: ProductGroupCategory[];
   gammas: ProductGamma[];
+  brands: Brand[];
   initialCategoryId?: number | null;
   initialGammaId?: number | null;
 }
@@ -33,6 +35,8 @@ export class ProductDialogComponent {
     qrCode: new FormControl(''),
     categoryId: new FormControl<number | null>(null),
     gammaId: new FormControl<number | null>(null),
+    brandId: new FormControl<number | null>(null),
+    drinkStampEligible: new FormControl<boolean>(false, { nonNullable: true }),
   });
 
   constructor(
@@ -52,6 +56,8 @@ export class ProductDialogComponent {
         qrCode: data.product.qrCode ?? '',
         categoryId: data.product.category?.id ?? null,
         gammaId: data.product.gamma?.id ?? null,
+        brandId: data.product.brand?.id ?? null,
+        drinkStampEligible: data.product.drinkStampEligible ?? false,
       });
       return;
     }
@@ -81,6 +87,8 @@ export class ProductDialogComponent {
       qrCode: this.f.qrCode.value || undefined,
       categoryId: this.f.categoryId.value ?? undefined,
       gammaId: this.f.gammaId.value ?? undefined,
+      brandId: this.f.brandId.value ?? undefined,
+      drinkStampEligible: this.f.drinkStampEligible.value,
     });
   }
 

@@ -12,6 +12,8 @@ export interface CustomerScan {
   banned: boolean;
   dateOfBirth: string | null;
   pointsBalance: number;
+  drinkCount: number;
+  freeDrinksAvailable: number;
 }
 
 export interface ScanResult {
@@ -22,6 +24,9 @@ export interface ScanResult {
 export interface PosCheckoutDTO {
   customerId?: string;
   usePoints?: boolean;
+  cashAmount?: number;
+  cardAmount?: number;
+  freeDrinksRedeemed?: number;
   items: OrderItemDTO[];
 }
 

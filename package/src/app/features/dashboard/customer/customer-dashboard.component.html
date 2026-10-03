@@ -29,6 +29,20 @@
           <p class="f-s-32 f-w-700 m-b-0" style="line-height: 1;">{{ pointsValueMdl.toFixed(2) }}</p>
           <p class="f-s-12 m-t-4" style="opacity: 0.7;">{{ 'CUSTOMER.MDL_VALUE' | translate }}</p>
         </div>
+        <div class="customer-points-divider" style="width: 1px; background: rgba(255,255,255,0.2);"></div>
+        <div>
+          <p class="f-s-32 f-w-700 m-b-0" style="line-height: 1;">
+            {{ profile.drinkCount }}<span class="f-s-16" style="opacity: 0.7;">/{{ freeDrinkThreshold }}</span>
+          </p>
+          <p class="f-s-12 m-t-4" style="opacity: 0.7;">{{ 'CUSTOMER.DRINK_PROGRESS' | translate }}</p>
+        </div>
+        @if (profile.freeDrinksAvailable > 0) {
+          <div class="customer-points-divider" style="width: 1px; background: rgba(255,255,255,0.2);"></div>
+          <div>
+            <p class="f-s-32 f-w-700 m-b-0" style="line-height: 1;">{{ profile.freeDrinksAvailable }}</p>
+            <p class="f-s-12 m-t-4" style="opacity: 0.7;">{{ 'CUSTOMER.FREE_DRINKS' | translate }}</p>
+          </div>
+        }
       </div>
     </mat-card-content>
   </mat-card>
@@ -111,4 +125,8 @@
   </mat-card>
 
 </div>
+} @else if (loadFailed) {
+  <div class="m-24">
+    <p class="text-danger f-s-14">{{ 'CUSTOMER.LOAD_FAILED' | translate }}</p>
+  </div>
 }
