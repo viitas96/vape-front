@@ -16,6 +16,7 @@ import { TablePaginatorComponent } from 'src/app/shared/page/table-paginator.com
 import { AuthService } from 'src/app/services/auth.service';
 import { OrderDialogComponent, OrderDialogData } from './order-dialog.component';
 import { OrderViewDialogComponent, OrderViewDialogData } from './order-view-dialog.component';
+import { RefundFlowService } from './refund-flow.service';
 
 @Component({
   selector: 'app-orders',
@@ -26,6 +27,15 @@ import { OrderViewDialogComponent, OrderViewDialogData } from './order-view-dial
     .mat-column-createdBy {
       flex: 2.5;
       min-width: 200px;
+    }
+
+    .refund-badge {
+      margin-left: 6px;
+      padding: 1px 6px;
+      border-radius: 8px;
+      font-size: 11px;
+      color: var(--mat-sys-error);
+      border: 1px solid var(--mat-sys-error);
     }
   `],
 })
@@ -44,6 +54,7 @@ export class OrdersComponent extends PagedListPageState implements OnInit {
     private readonly dialog: MatDialog,
     private readonly confirmDialog: ConfirmDialogService,
     private readonly translateService: TranslateService,
+    private readonly refundFlow: RefundFlowService,
   ) {
     super();
   }
@@ -97,6 +108,27 @@ export class OrdersComponent extends PagedListPageState implements OnInit {
           this.setError(error.error?.message ?? this.translateService.instant(order ? 'ORDERS.UPDATE_FAILED' : 'ORDERS.CREATE_FAILED'));
         },
       });
+    });
+  }
+
+  canRefund(order: Order): boolean {
+    return this.canManage && this.refundFlow.canRefund(order);
+  }
+
+  canEdit(order: Order): boolean {
+    return this.canManage && (order.refundStatus ?? 'NONE') === 'NONE';
+  }
+
+  openRefundDialog(order: Order): void {
+    this.clearMessages();
+    this.refundFlow.refund(order).subscribe({
+      next: (id) => {
+        this.setSuccess(this.translateService.instant('REFUNDS.CREATED', { id }));
+        this.loadPage();
+      },
+      error: (error) => {
+        this.setError(error.error?.message ?? this.translateService.instant('REFUNDS.CREATE_FAILED'));
+      },
     });
   }
 

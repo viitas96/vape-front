@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Order, OrderDTO } from '../features/orders/order.models';
+import { Order, OrderDTO, Refund, RefundDTO } from '../features/orders/order.models';
 import { PageResponse } from '../shared/models/page-response.model';
 
 @Injectable({ providedIn: 'root' })
@@ -11,10 +11,21 @@ export class OrderService {
 
   constructor(private http: HttpClient) {}
 
-  getAll(page = 0, size = 10, sortBy = 'id', sortDirection = 'desc'): Observable<PageResponse<Order>> {
-    return this.http.get<PageResponse<Order>>(this.API_URL, {
-      params: { page, size, sortBy, sortDirection },
-    });
+  getAll(page = 0, size = 10, sortBy = 'id', sortDirection = 'desc', shiftId?: number | null): Observable<PageResponse<Order>> {
+    let params = new HttpParams().set('page', page).set('size', size).set('sortBy', sortBy).set('sortDirection', sortDirection);
+    if (shiftId !== null && shiftId !== undefined) {
+      params = params.set('shiftId', shiftId);
+    }
+
+    return this.http.get<PageResponse<Order>>(this.API_URL, { params });
+  }
+
+  getRefunds(id: number): Observable<Refund[]> {
+    return this.http.get<Refund[]>(`${this.API_URL}/${id}/refunds`);
+  }
+
+  refund(id: number, dto: RefundDTO): Observable<void> {
+    return this.http.post<void>(`${this.API_URL}/${id}/refunds`, dto);
   }
 
   getById(id: number): Observable<Order> {

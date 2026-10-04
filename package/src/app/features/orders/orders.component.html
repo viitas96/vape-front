@@ -27,7 +27,12 @@
 
         <ng-container matColumnDef="status">
           <mat-header-cell *matHeaderCellDef mat-sort-header="status">{{ 'ORDERS.STATUS' | translate }}</mat-header-cell>
-          <mat-cell *matCellDef="let o">{{ 'ORDERS.STATUS_' + o.status | translate }}</mat-cell>
+          <mat-cell *matCellDef="let o">
+            <span>{{ 'ORDERS.STATUS_' + o.status | translate }}</span>
+            @if (o.refundStatus && o.refundStatus !== 'NONE') {
+              <span class="refund-badge">{{ 'REFUNDS.STATUS_' + o.refundStatus | translate }}</span>
+            }
+          </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="items">
@@ -66,7 +71,12 @@
             <button mat-icon-button (click)="openViewDialog(o)" [title]="'ORDERS.VIEW' | translate">
               <mat-icon>visibility</mat-icon>
             </button>
-            @if (canManage) {
+            @if (canRefund(o)) {
+              <button mat-icon-button (click)="openRefundDialog(o)" [title]="'REFUNDS.ACTION' | translate">
+                <mat-icon>undo</mat-icon>
+              </button>
+            }
+            @if (canEdit(o)) {
               <button mat-icon-button color="primary" (click)="openDialog(o)" [title]="'COMMON.EDIT' | translate">
                 <mat-icon>edit</mat-icon>
               </button>
@@ -112,7 +122,12 @@
                 <button mat-stroked-button type="button" (click)="openViewDialog(o)">
                   <mat-icon>visibility</mat-icon> {{ 'ORDERS.VIEW' | translate }}
                 </button>
-                @if (canManage) {
+                @if (canRefund(o)) {
+                  <button mat-stroked-button type="button" (click)="openRefundDialog(o)">
+                    <mat-icon>undo</mat-icon> {{ 'REFUNDS.ACTION' | translate }}
+                  </button>
+                }
+                @if (canEdit(o)) {
                   <button mat-stroked-button color="primary" type="button" (click)="openDialog(o)">
                     <mat-icon>edit</mat-icon> {{ 'COMMON.EDIT' | translate }}
                   </button>

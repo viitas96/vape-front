@@ -76,6 +76,12 @@ export interface ShiftReportDialogData {
         <div class="d-flex justify-content-between f-s-13">
           <span>{{ 'SHIFTS.FREE_DRINKS' | translate }}</span><strong>{{ report.freeDrinksRedeemed }}</strong>
         </div>
+        <div class="d-flex justify-content-between f-s-13">
+          <span>{{ 'SHIFTS.REFUNDS_COUNT' | translate }}</span><strong>{{ report.refundsCount ?? 0 }}</strong>
+        </div>
+        <div class="d-flex justify-content-between f-s-13">
+          <span>{{ 'SHIFTS.CARD_REFUNDS' | translate }}</span><strong>{{ format(report.cardRefunds ?? 0) }}</strong>
+        </div>
 
         <mat-divider class="m-y-12"></mat-divider>
 
@@ -86,6 +92,9 @@ export interface ShiftReportDialogData {
         </div>
         <div class="d-flex justify-content-between f-s-13">
           <span>{{ 'SHIFTS.CASH_PAYMENTS' | translate }}</span><strong>{{ format(report.cashPayments) }}</strong>
+        </div>
+        <div class="d-flex justify-content-between f-s-13">
+          <span>{{ 'SHIFTS.CASH_REFUNDS' | translate }}</span><strong>−{{ format(report.cashRefunds ?? 0) }}</strong>
         </div>
         <div class="d-flex justify-content-between f-s-13">
           <span>{{ 'SHIFTS.PAID_IN' | translate }}</span><strong>{{ format(report.paidIn) }}</strong>

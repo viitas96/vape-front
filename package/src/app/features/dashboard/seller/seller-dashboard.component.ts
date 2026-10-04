@@ -20,6 +20,7 @@ import { PaymentDialogComponent, PaymentDialogData, PaymentDialogResult } from '
 import { formatMdl } from 'src/app/shared/money/money.util';
 import { getApiErrorMessage } from 'src/app/shared/http/api-error';
 import { PickedProduct, ProductPickerDialogComponent } from './product-picker-dialog.component';
+import { ReceiptsDialogComponent, ReceiptsDialogData } from './receipts-dialog.component';
 
 interface CartItem {
   product: Product;
@@ -339,6 +340,13 @@ export class SellerDashboardComponent implements OnInit {
           error: (error) => this.notifyError(error, 'SHIFTS.CLOSE_FAILED'),
         });
       });
+  }
+
+  openReceipts(): void {
+    const data: ReceiptsDialogData = { shiftId: this.currentShift?.id ?? null };
+    this.dialog.open(ReceiptsDialogComponent, { width: '640px', maxWidth: 'calc(100vw - 48px)', data })
+      .afterClosed()
+      .subscribe(() => this.focusBarcode());
   }
 
   openProductPicker(): void {

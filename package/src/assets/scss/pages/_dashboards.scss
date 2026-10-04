@@ -155,7 +155,7 @@
 .admin-orders-page {
     mat-header-row,
     mat-row {
-        min-width: 900px;
+        min-width: 1100px;
     }
 
     .mat-column-id {
@@ -163,7 +163,9 @@
     }
 
     .mat-column-status {
-        flex: 0 0 116px;
+        flex: 0 0 210px;
+        flex-wrap: wrap;
+        row-gap: 4px;
     }
 
     .mat-column-items,
@@ -172,7 +174,12 @@
     }
 
     .mat-column-actions {
-        flex: 0 0 152px;
+        flex: 0 0 230px;
+        flex-wrap: nowrap;
+
+        .mat-mdc-icon-button {
+            flex-shrink: 0;
+        }
     }
 }
 
@@ -202,7 +209,7 @@
 
 // Widen the boxed page layout for the admin management tables so they have more
 // breathing room on smaller/15" monitors, instead of being capped at $boxedWidth.
-.pageWrapper.maxWidth:has(.admin-products-page, .admin-product-groups-page, .admin-product-categories-page, .admin-product-gammas-page, .admin-shifts-page) {
+.pageWrapper.maxWidth:has(.admin-products-page, .admin-product-groups-page, .admin-product-categories-page, .admin-product-gammas-page, .admin-shifts-page, .admin-orders-page) {
     max-width: 90%;
 }
 
