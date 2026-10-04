@@ -6,6 +6,8 @@ export interface StoreSettings {
   souvenirSplitPercent: number;
   shiftManagementEnabled: boolean;
   freeDrinkThreshold: number;
+  defaultVatRate: number;
+  inventoryTrackingEnabled: boolean;
 }
 
 export type StoreSettingsUpdate = Omit<StoreSettings, 'id'>;

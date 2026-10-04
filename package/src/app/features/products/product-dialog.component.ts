@@ -29,6 +29,9 @@ export class ProductDialogComponent {
     name: new FormControl('', [Validators.required]),
     noPrice: new FormControl<boolean>(false, { nonNullable: true }),
     price: new FormControl<number | null>(null, [Validators.required, Validators.min(0)]),
+    costPrice: new FormControl<number | null>(null, [Validators.min(0)]),
+    vatRate: new FormControl<number | null>(null, [Validators.min(0), Validators.max(100)]),
+    stock: new FormControl<number | null>(null, [Validators.min(0)]),
     itemCode: new FormControl(''),
     barcode: new FormControl(''),
     matrixBarcode: new FormControl(''),
@@ -50,6 +53,9 @@ export class ProductDialogComponent {
         name: data.product.name,
         noPrice: data.product.price === null || data.product.price === undefined,
         price: this.toMajorUnits(data.product.price),
+        costPrice: this.toMajorUnits(data.product.costPrice),
+        vatRate: data.product.vatRate ?? null,
+        stock: data.product.stock ?? null,
         itemCode: data.product.itemCode ?? '',
         barcode: data.product.barcode ?? '',
         matrixBarcode: data.product.matrixBarcode ?? '',
@@ -81,6 +87,9 @@ export class ProductDialogComponent {
     this.dialogRef.close({
       name: this.f.name.value!,
       price: this.resolvePrice(),
+      costPrice: this.toMinorUnits(this.f.costPrice.value),
+      vatRate: this.f.vatRate.value ?? undefined,
+      stock: this.f.stock.value ?? undefined,
       itemCode: this.f.itemCode.value || undefined,
       barcode: this.f.barcode.value || undefined,
       matrixBarcode: this.f.matrixBarcode.value || undefined,
@@ -137,6 +146,14 @@ export class ProductDialogComponent {
     const price = this.f.price.value;
 
     return price !== null && price !== undefined;
+  }
+
+  private toMinorUnits(amount: number | null): number | undefined {
+    if (amount === null || amount === undefined) {
+      return undefined;
+    }
+
+    return Math.round(amount * 100);
   }
 
   private toMajorUnits(price: number | null | undefined): number | null {

@@ -4,11 +4,57 @@
 
       <div class="d-flex align-items-center justify-content-between m-b-24 admin-page-header">
         <h2 class="f-s-20 f-w-700">{{ 'ORDERS.TITLE' | translate }}</h2>
-        @if (canManage) {
-          <button mat-flat-button color="primary" (click)="openDialog()">
-            <mat-icon>add</mat-icon> {{ 'ORDERS.ADD' | translate }}
-          </button>
-        }
+        <div class="d-flex align-items-center" style="gap: 8px;">
+          @if (canExport) {
+            <button mat-stroked-button type="button" [disabled]="exporting" (click)="export()">
+              <mat-icon>download</mat-icon> {{ 'ORDERS.EXPORT' | translate }}
+            </button>
+          }
+          @if (canManage) {
+            <button mat-flat-button color="primary" (click)="openDialog()">
+              <mat-icon>add</mat-icon> {{ 'ORDERS.ADD' | translate }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="m-b-16">
+        <app-date-range-filter class="d-block m-b-8" [from]="filter.from" [to]="filter.to" [clearable]="true"
+          (rangeChange)="onRangeChange($event)"></app-date-range-filter>
+
+        <div class="d-flex align-items-center flex-wrap" style="gap: 8px;">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>{{ 'ORDERS.STATUS' | translate }}</mat-label>
+            <mat-select [(ngModel)]="filter.status" (selectionChange)="applyFilters()">
+              <mat-option value="">{{ 'ORDERS.FILTER_ANY' | translate }}</mat-option>
+              @for (status of statuses; track status) {
+                <mat-option [value]="status">{{ 'ORDERS.STATUS_' + status | translate }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>{{ 'PAYMENT.METHOD' | translate }}</mat-label>
+            <mat-select [(ngModel)]="filter.paymentMethod" (selectionChange)="applyFilters()">
+              <mat-option value="">{{ 'ORDERS.FILTER_ANY' | translate }}</mat-option>
+              @for (method of paymentMethods; track method) {
+                <mat-option [value]="method">{{ 'PAYMENT.' + method | translate }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>{{ 'ORDERS.CREATED_BY' | translate }}</mat-label>
+            <input matInput [(ngModel)]="filter.createdBy" (keyup.enter)="applyFilters()" (blur)="applyFilters()" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" style="max-width: 140px;">
+            <mat-label>{{ 'ORDERS.SHIFT' | translate }}</mat-label>
+            <input matInput type="number" [(ngModel)]="filter.shiftId" (keyup.enter)="applyFilters()" (blur)="applyFilters()" />
+          </mat-form-field>
+
+          <button mat-button type="button" (click)="resetFilters()">{{ 'ORDERS.RESET_FILTERS' | translate }}</button>
+        </div>
       </div>
 
       @if (successMessage) {
@@ -66,6 +112,11 @@
             <button mat-icon-button (click)="openViewDialog(o)" [title]="'ORDERS.VIEW' | translate">
               <mat-icon>visibility</mat-icon>
             </button>
+            @if (canRefund(o)) {
+              <button mat-icon-button (click)="openRefundDialog(o)" [title]="'REFUNDS.ACTION' | translate">
+                <mat-icon>undo</mat-icon>
+              </button>
+            }
             @if (canManage) {
               <button mat-icon-button color="primary" (click)="openDialog(o)" [title]="'COMMON.EDIT' | translate">
                 <mat-icon>edit</mat-icon>
@@ -112,6 +163,11 @@
                 <button mat-stroked-button type="button" (click)="openViewDialog(o)">
                   <mat-icon>visibility</mat-icon> {{ 'ORDERS.VIEW' | translate }}
                 </button>
+                @if (canRefund(o)) {
+                  <button mat-stroked-button type="button" (click)="openRefundDialog(o)">
+                    <mat-icon>undo</mat-icon> {{ 'REFUNDS.ACTION' | translate }}
+                  </button>
+                }
                 @if (canManage) {
                   <button mat-stroked-button color="primary" type="button" (click)="openDialog(o)">
                     <mat-icon>edit</mat-icon> {{ 'COMMON.EDIT' | translate }}

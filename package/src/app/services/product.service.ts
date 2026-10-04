@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Product, ProductDTO } from '../features/products/product.models';
+import { Product, ProductDTO, StockMovement } from '../features/products/product.models';
 import { PageResponse } from '../shared/models/page-response.model';
 
 export interface ProductFilters {
@@ -50,6 +50,12 @@ export class ProductService {
 
   getById(id: number): Observable<Product> {
     return this.http.get<Product>(`${this.API_URL}/${id}`);
+  }
+
+  getStockMovements(id: number, page = 0, size = 20): Observable<PageResponse<StockMovement>> {
+    return this.http.get<PageResponse<StockMovement>>(`${this.API_URL}/${id}/stock-movements`, {
+      params: { page, size },
+    });
   }
 
   create(dto: ProductDTO): Observable<Product> {

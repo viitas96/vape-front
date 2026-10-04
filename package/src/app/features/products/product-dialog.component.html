@@ -22,6 +22,31 @@
     </div>
 
     <div class="product-form-field">
+      <div class="product-price-row">
+        <div>
+          <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.COST_PRICE' | translate }}</mat-label>
+          <mat-form-field appearance="outline" class="product-price-input">
+            <input matInput formControlName="costPrice" type="number" min="0" step="0.01" placeholder="0.00" />
+          </mat-form-field>
+        </div>
+        <div>
+          <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.VAT_RATE' | translate }}</mat-label>
+          <mat-form-field appearance="outline" class="product-price-input">
+            <input matInput formControlName="vatRate" type="number" min="0" max="100" step="1"
+                   [placeholder]="'PRODUCTS.VAT_RATE_DEFAULT' | translate" />
+            <mat-error>{{ 'PRODUCTS.VAT_RATE_INVALID' | translate }}</mat-error>
+          </mat-form-field>
+        </div>
+        <div>
+          <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.STOCK' | translate }}</mat-label>
+          <mat-form-field appearance="outline" class="product-price-input">
+            <input matInput formControlName="stock" type="number" min="0" step="1" placeholder="0" />
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+
+    <div class="product-form-field">
       <mat-label class="f-s-14 f-w-600 m-b-12 d-block">{{ 'PRODUCTS.CATEGORY' | translate }}</mat-label>
       <mat-form-field appearance="outline" class="w-100">
         <mat-select formControlName="categoryId" [placeholder]="'PRODUCTS.NO_CATEGORY' | translate">

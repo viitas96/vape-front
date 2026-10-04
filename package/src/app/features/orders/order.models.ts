@@ -9,6 +9,41 @@ export interface OrderItem {
   unitPrice: number;
   quantity: number;
   lineTotal: number;
+  discount?: number;
+  netLineTotal?: number;
+  vatRate?: number;
+}
+
+export interface RefundItem {
+  id: number;
+  orderItemId: number;
+  productId: number;
+  productName: string;
+  quantity: number;
+  amount: number;
+  discount: number;
+}
+
+export interface Refund {
+  id: number;
+  orderId: number;
+  shiftId: number | null;
+  total: number;
+  cashAmount: number;
+  cardAmount: number;
+  pointsReturned: number;
+  pointsRevoked: number;
+  reason: string | null;
+  items: RefundItem[];
+  createdBy: string;
+  createdAt: string;
+}
+
+export interface RefundDTO {
+  items: { orderItemId: number; quantity: number }[];
+  cashAmount?: number;
+  cardAmount?: number;
+  reason?: string;
 }
 
 export interface Order {
@@ -29,6 +64,15 @@ export interface Order {
   createdAt: string;
   lastModifiedBy?: string;
   lastModifiedAt?: string;
+}
+
+export interface OrderFilter {
+  from?: string;
+  to?: string;
+  createdBy?: string;
+  paymentMethod?: PaymentMethod | '';
+  shiftId?: number | null;
+  status?: OrderStatus | '';
 }
 
 export interface OrderItemDTO {

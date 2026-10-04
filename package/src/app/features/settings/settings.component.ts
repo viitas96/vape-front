@@ -23,6 +23,8 @@ export class SettingsComponent extends FeedbackPageState implements OnInit {
     souvenirSplitPercent: new FormControl<number>(90, [Validators.required, Validators.min(1), Validators.max(100)]),
     shiftManagementEnabled: new FormControl<boolean>(true, [Validators.required]),
     freeDrinkThreshold: new FormControl<number>(6, [Validators.required, Validators.min(1)]),
+    defaultVatRate: new FormControl<number>(0, [Validators.required, Validators.min(0), Validators.max(100)]),
+    inventoryTrackingEnabled: new FormControl<boolean>(false, [Validators.required]),
   });
 
   constructor(
@@ -56,7 +58,16 @@ export class SettingsComponent extends FeedbackPageState implements OnInit {
 
     this.loading = true;
     this.clearMessages();
-    const { earnRatePercent, spendRate, goodsPointsCapPercent, souvenirSplitPercent, shiftManagementEnabled, freeDrinkThreshold } = this.form.value;
+    const {
+      earnRatePercent,
+      spendRate,
+      goodsPointsCapPercent,
+      souvenirSplitPercent,
+      shiftManagementEnabled,
+      freeDrinkThreshold,
+      defaultVatRate,
+      inventoryTrackingEnabled,
+    } = this.form.value;
 
     this.settingsService.update({
       earnRatePercent: earnRatePercent!,
@@ -65,6 +76,8 @@ export class SettingsComponent extends FeedbackPageState implements OnInit {
       souvenirSplitPercent: souvenirSplitPercent!,
       shiftManagementEnabled: shiftManagementEnabled!,
       freeDrinkThreshold: freeDrinkThreshold!,
+      defaultVatRate: defaultVatRate!,
+      inventoryTrackingEnabled: inventoryTrackingEnabled!,
     }).subscribe({
       next: () => {
         this.loading = false;

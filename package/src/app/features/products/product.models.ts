@@ -7,6 +7,8 @@ export interface Product {
   name: string;
   price: number | null;
   stock?: number;
+  costPrice?: number | null;
+  vatRate?: number | null;
   drinkStampEligible?: boolean;
   itemCode?: string;
   barcode?: string;
@@ -20,6 +22,9 @@ export interface Product {
 export interface ProductDTO {
   name: string;
   price?: number;
+  costPrice?: number;
+  vatRate?: number;
+  stock?: number;
   itemCode?: string;
   barcode?: string;
   matrixBarcode?: string;
@@ -28,4 +33,19 @@ export interface ProductDTO {
   gammaId?: number;
   brandId?: number;
   drinkStampEligible?: boolean;
+}
+
+export type StockMovementType = 'SALE' | 'SALE_REVERSAL' | 'REFUND' | 'ADJUSTMENT';
+
+export interface StockMovement {
+  id: number;
+  productId: number;
+  type: StockMovementType;
+  quantity: number;
+  stockAfter: number;
+  orderId: number | null;
+  refundId: number | null;
+  comment: string | null;
+  createdBy: string;
+  createdAt: string;
 }

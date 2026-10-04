@@ -61,6 +61,25 @@
           <mat-error>{{ 'SETTINGS.MIN_ERROR' | translate }}</mat-error>
         </mat-form-field>
 
+        <mat-divider class="m-b-24"></mat-divider>
+
+        <mat-label class="f-s-14 f-w-600 m-b-8 d-block">
+          {{ 'SETTINGS.DEFAULT_VAT_RATE' | translate }}</mat-label>
+        <mat-form-field appearance="outline" class="w-100 m-b-24">
+          <input matInput type="number" formControlName="defaultVatRate" min="0" max="100" />
+          <mat-hint>{{ 'SETTINGS.DEFAULT_VAT_RATE_HINT' | translate }}</mat-hint>
+          <mat-error>{{ 'SETTINGS.VAT_RANGE_ERROR' | translate }}</mat-error>
+        </mat-form-field>
+
+        <mat-label class="f-s-14 f-w-600 m-b-8 d-block">
+          {{ 'SETTINGS.INVENTORY_TRACKING' | translate }}</mat-label>
+        <div class="m-b-24">
+          <mat-slide-toggle formControlName="inventoryTrackingEnabled">
+            {{ 'SETTINGS.INVENTORY_TRACKING_LABEL' | translate }}
+          </mat-slide-toggle>
+          <p class="mat-body-2 text-muted m-t-8 m-b-0">{{ 'SETTINGS.INVENTORY_TRACKING_HINT' | translate }}</p>
+        </div>
+
         @if (successMessage) {
           <p class="text-success f-s-14 m-b-12">{{ successMessage }}</p>
         }

@@ -57,6 +57,34 @@
     <span class="f-s-14 f-w-600">{{ 'COMMON.TOTAL' | translate }}</span>
     <span class="f-s-18 f-w-700">{{ formatPrice(order.total) }}</span>
   </div>
+
+  @if (refunds.length) {
+    <p class="f-s-14 f-w-600 m-t-24 m-b-8">{{ 'REFUNDS.LIST_TITLE' | translate }}</p>
+    @for (refund of refunds; track refund.id) {
+      <div class="m-b-12 f-s-13">
+        <div class="d-flex justify-content-between">
+          <span>#{{ refund.id }} · {{ refund.createdAt | date:'dd.MM.yyyy HH:mm' }} · {{ refund.createdBy }}</span>
+          <strong>−{{ formatPrice(refund.total) }}</strong>
+        </div>
+        <div class="text-muted">
+          @for (item of refund.items; track item.id) {
+            <span>{{ item.productName }} × {{ item.quantity }}; </span>
+          }
+          {{ 'PAYMENT.CASH' | translate }} {{ formatPrice(refund.cashAmount) }} · {{ 'PAYMENT.CARD' | translate }} {{ formatPrice(refund.cardAmount) }}
+          @if (refund.pointsReturned || refund.pointsRevoked) {
+            · {{ 'REFUNDS.POINTS_SUMMARY' | translate: { returned: refund.pointsReturned, revoked: refund.pointsRevoked } }}
+          }
+          @if (refund.reason) {
+            · {{ refund.reason }}
+          }
+        </div>
+      </div>
+    }
+    <div class="d-flex align-items-center justify-content-between">
+      <span class="f-s-14 f-w-600">{{ 'REFUNDS.NET_AFTER' | translate }}</span>
+      <span class="f-s-16 f-w-700">{{ formatPrice(order.total - refundedTotal) }}</span>
+    </div>
+  }
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">

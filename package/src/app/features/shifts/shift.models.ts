@@ -46,6 +46,9 @@ export interface ShiftReport {
   paidIn: number;
   paidOut: number;
   freeDrinksRedeemed: number;
+  refundsCount?: number | null;
+  cashRefunds?: number | null;
+  cardRefunds?: number | null;
   expectedCash?: number | null;
   actualCash?: number | null;
   difference?: number | null;

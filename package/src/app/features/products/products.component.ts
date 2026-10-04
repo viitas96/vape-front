@@ -14,6 +14,8 @@ import { getApiErrorMessage, isDuplicateValueError } from 'src/app/shared/http/a
 import { PagedListPageState } from 'src/app/shared/page/page-state';
 import { TablePaginatorComponent } from 'src/app/shared/page/table-paginator.component';
 import { ProductDialogComponent, ProductDialogData } from './product-dialog.component';
+import { StockHistoryDialogComponent, StockHistoryDialogData } from './stock-history-dialog.component';
+import { AuthService } from 'src/app/services/auth.service';
 import { ProductGroupCategory } from '../product-group-categories/product-group-category.models';
 import { ProductGamma } from '../product-gammas/product-gamma.models';
 import { Brand } from '../brands/brand.models';
@@ -50,8 +52,18 @@ export class ProductsComponent extends PagedListPageState implements OnInit {
     private readonly confirmDialog: ConfirmDialogService,
     private readonly snackBar: MatSnackBar,
     private readonly translateService: TranslateService,
+    private readonly authService: AuthService,
   ) {
     super();
+  }
+
+  get canViewStockHistory(): boolean {
+    return this.authService.hasAnyRole(['ADMIN', 'OPERATOR', 'ACCOUNTANT']);
+  }
+
+  openStockHistory(product: Product): void {
+    const data: StockHistoryDialogData = { productId: product.id, productName: product.name };
+    this.dialog.open(StockHistoryDialogComponent, { width: '860px', maxWidth: 'calc(100vw - 48px)', data });
   }
 
   ngOnInit(): void {

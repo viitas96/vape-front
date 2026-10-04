@@ -1,9 +1,10 @@
 import { DatePipe } from '@angular/common';
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MaterialModule } from 'src/app/material.module';
-import { Order } from './order.models';
+import { OrderService } from 'src/app/services/order.service';
+import { Order, Refund } from './order.models';
 
 export interface OrderViewDialogData {
   order: Order;
@@ -39,8 +40,24 @@ export interface OrderViewDialogData {
     }
   `],
 })
-export class OrderViewDialogComponent {
-  constructor(@Inject(MAT_DIALOG_DATA) public data: OrderViewDialogData) {}
+export class OrderViewDialogComponent implements OnInit {
+  refunds: Refund[] = [];
+
+  constructor(
+    @Inject(MAT_DIALOG_DATA) public data: OrderViewDialogData,
+    private readonly orderService: OrderService,
+  ) {}
+
+  ngOnInit(): void {
+    this.orderService.getRefunds(this.order.id).subscribe({
+      next: (refunds) => (this.refunds = refunds),
+      error: () => (this.refunds = []),
+    });
+  }
+
+  get refundedTotal(): number {
+    return this.refunds.reduce((sum, refund) => sum + refund.total, 0);
+  }
 
   get order(): Order {
     return this.data.order;

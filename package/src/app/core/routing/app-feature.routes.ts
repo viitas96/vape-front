@@ -18,7 +18,7 @@ export interface AppFeatureRouteDefinition {
 export const APP_ROLE_HOME_PATHS: ReadonlyArray<readonly [AppRole, string]> = [
   ['ADMIN', '/products'],
   ['SELLER', '/orders'],
-  ['ACCOUNTANT', '/accountant'],
+  ['ACCOUNTANT', '/reports'],
   ['OPERATOR', '/products'],
   ['CUSTOMER', '/customer'],
 ] as const;
@@ -29,12 +29,6 @@ export const APP_FEATURE_ROUTE_DEFINITIONS: readonly AppFeatureRouteDefinition[]
     title: 'Admin Dashboard',
     roles: ['ADMIN'],
     loadComponent: () => import('../../features/dashboard/admin/admin-dashboard.component').then((m) => m.AdminDashboardComponent),
-  },
-  {
-    path: 'accountant',
-    title: 'Accountant Dashboard',
-    roles: ['ACCOUNTANT'],
-    loadComponent: () => import('../../features/dashboard/accountant/accountant-dashboard.component').then((m) => m.AccountantDashboardComponent),
   },
   {
     path: 'customer',
@@ -104,6 +98,13 @@ export const APP_FEATURE_ROUTE_DEFINITIONS: readonly AppFeatureRouteDefinition[]
     roles: ['ADMIN', 'ACCOUNTANT'],
     sidebar: { label: 'Shifts', iconName: 'report-money', bgcolor: 'warning' },
     loadComponent: () => import('../../features/shifts/shifts.component').then((m) => m.ShiftsComponent),
+  },
+  {
+    path: 'reports',
+    title: 'Reports',
+    roles: ['ADMIN', 'ACCOUNTANT'],
+    sidebar: { label: 'Reports', iconName: 'chart-bar', bgcolor: 'success' },
+    loadComponent: () => import('../../features/reports/reports.component').then((m) => m.ReportsComponent),
   },
   {
     path: 'settings',

@@ -99,6 +99,11 @@
         <ng-container matColumnDef="actions">
           <mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.ACTIONS' | translate }}</mat-header-cell>
           <mat-cell *matCellDef="let p">
+            @if (canViewStockHistory) {
+              <button mat-icon-button (click)="openStockHistory(p)" [title]="'PRODUCTS.STOCK_HISTORY' | translate">
+                <mat-icon>history</mat-icon>
+              </button>
+            }
             <button mat-icon-button color="primary" (click)="openDialog(p)" [title]="'COMMON.EDIT' | translate">
               <mat-icon>edit</mat-icon>
             </button>
