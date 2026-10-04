@@ -4,6 +4,7 @@
   },
   "Management": "Administrare",
   "Cash Register": "Casă",
+  "Shift & Cash": "Tură și bani",
   "Categories": "Categorii",
   "Gammas": "Game",
   "LANGUAGE": {
@@ -144,6 +145,7 @@
   "POS": {
     "PICKER_OPEN": "Nu găseşti codul de bare?",
     "PICKER_TITLE": "Alege un produs",
+    "PICKER_LIST": "Listă produse",
     "PICKER_SEARCH": "Caută după nume",
     "PICKER_GROUP_BY": "Grupează după",
     "PICKER_OTHER": "Altele",
@@ -191,6 +193,18 @@
     "QUANTITY": "Cantitate",
     "QUANTITY_HINT": "Doar cifre · Enter adaugă în bon",
     "CLEAR_RECEIPT": "Curăță",
+    "HOLD": "Pune în așteptare",
+    "HOLD_SUCCESS": "Bonul a fost pus în așteptare",
+    "HOLD_NOTHING": "Nu e nimic de pus în așteptare",
+    "HELD": "În așteptare ({{count}})",
+    "HELD_TITLE": "Bonuri în așteptare",
+    "HELD_EMPTY": "Nu sunt bonuri în așteptare",
+    "HELD_RESUME": "Reia",
+    "HELD_RESUMED": "Bonul a fost reluat",
+    "HELD_NO_CUSTOMER": "Fără client",
+    "HELD_ITEMS": "{{count}} produs(e)",
+    "HELD_DELETE_TITLE": "Ștergi bonul din așteptare?",
+    "HELD_DELETE_MESSAGE": "Bonul în așteptare al lui {{label}} va fi șters.",
     "CLEAR_CONFIRM_TITLE": "Curăță bonul",
     "CLEAR_CONFIRM_MESSAGE": "Elimini toate produsele și clientul din acest bon?",
     "PRINT_RECEIPT": "Imprimă",
@@ -198,7 +212,7 @@
     "PRINT_LAST_RECEIPT": "Imprimă bonul",
     "PRINT_SLIP": "Imprimă bon",
     "HOTKEYS": "Taste rapide",
-    "HOTKEYS_HELP": "F1 scanare · F2 căutare · F4 puncte · F5 plată · F9 imprimare · Ctrl+Del curăță · ↑↓ alege linia · +/− cant. · Del șterge linia · Esc înapoi"
+    "HOTKEYS_HELP": "F1 scanare · F2 căutare · F3 listă produse · F4 puncte · F5 plată · F8 așteptare · Shift+F8 bonuri în așteptare · F9 imprimare · Ctrl+Del curăță · ↑↓ alege linia · +/− cant. · Del șterge linia · Esc înapoi"
   },
   "PRINT": {
     "STORE_NAME": "MISTER VAPE",

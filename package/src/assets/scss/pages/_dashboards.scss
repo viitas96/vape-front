@@ -213,6 +213,16 @@
     max-width: 90%;
 }
 
+.pageWrapper.maxWidth:has(.seller-pos-page) {
+    max-width: 100%;
+}
+
+@media (min-width: 769px) {
+    .pageWrapper.maxWidth:has(.seller-pos-page) {
+        padding: 16px;
+    }
+}
+
 .customer-email {
     overflow-wrap: anywhere;
 }

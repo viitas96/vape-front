@@ -4,6 +4,7 @@
   },
   "Management": "Management",
   "Cash Register": "POS",
+  "Shift & Cash": "Shift & cash",
   "Categories": "Categories",
   "Gammas": "Gammas",
   "LANGUAGE": {
@@ -144,6 +145,7 @@
   "POS": {
     "PICKER_OPEN": "Can't find the barcode?",
     "PICKER_TITLE": "Choose a product",
+    "PICKER_LIST": "Product list",
     "PICKER_SEARCH": "Search by name",
     "PICKER_GROUP_BY": "Group by",
     "PICKER_OTHER": "Other",
@@ -191,6 +193,18 @@
     "QUANTITY": "Quantity",
     "QUANTITY_HINT": "Digits only · Enter adds to the receipt",
     "CLEAR_RECEIPT": "Clear",
+    "HOLD": "Hold",
+    "HOLD_SUCCESS": "Receipt put on hold",
+    "HOLD_NOTHING": "Nothing to put on hold",
+    "HELD": "On hold ({{count}})",
+    "HELD_TITLE": "Receipts on hold",
+    "HELD_EMPTY": "No receipts on hold",
+    "HELD_RESUME": "Resume",
+    "HELD_RESUMED": "Receipt resumed",
+    "HELD_NO_CUSTOMER": "No client",
+    "HELD_ITEMS": "{{count}} item(s)",
+    "HELD_DELETE_TITLE": "Delete the held receipt?",
+    "HELD_DELETE_MESSAGE": "The held receipt of {{label}} will be deleted.",
     "CLEAR_CONFIRM_TITLE": "Clear receipt",
     "CLEAR_CONFIRM_MESSAGE": "Remove all products and the customer from this receipt?",
     "PRINT_RECEIPT": "Print",
@@ -198,7 +212,7 @@
     "PRINT_LAST_RECEIPT": "Print receipt",
     "PRINT_SLIP": "Print slip",
     "HOTKEYS": "Hotkeys",
-    "HOTKEYS_HELP": "F1 scan · F2 search · F4 points · F5 pay · F9 print · Ctrl+Del clear · ↑↓ select line · +/− qty · Del remove line · Esc back"
+    "HOTKEYS_HELP": "F1 scan · F2 search · F3 product list · F4 points · F5 pay · F8 hold · Shift+F8 on hold · F9 print · Ctrl+Del clear · ↑↓ select line · +/− qty · Del remove line · Esc back"
   },
   "PRINT": {
     "STORE_NAME": "MISTER VAPE",

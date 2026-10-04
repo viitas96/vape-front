@@ -1,3 +1,4 @@
+import { EventEmitter } from '@angular/core';
 import { OrderItemDTO, Order } from '../../orders/order.models';
 import { Product } from '../../products/product.models';
 
@@ -31,3 +32,28 @@ export interface PosCheckoutDTO {
 }
 
 export type PosCheckoutResponse = Order;
+
+export interface CartItem {
+  product: Product;
+  unitPrice: number;
+  quantity: number;
+  free: boolean;
+}
+
+export interface HeldReceipt {
+  id: string;
+  heldAt: string;
+  customer: CustomerScan | null;
+  usePoints: boolean;
+  items: CartItem[];
+}
+
+export interface PickedProduct {
+  product: Product;
+  quantity: number;
+  unitPrice: number;
+}
+
+export interface ProductPickerDialog {
+  productAdded: EventEmitter<PickedProduct>;
+}

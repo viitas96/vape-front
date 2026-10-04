@@ -7,7 +7,10 @@ export interface ConfirmDialogData {
   message: string;
   confirmLabel?: string;
   confirmColor?: 'primary' | 'warn' | 'accent';
+  focusConfirm?: boolean;
 }
+
+export const CONFIRM_BUTTON_CLASS = 'confirm-dialog-confirm';
 
 @Component({
   selector: 'app-confirm-dialog',
@@ -22,7 +25,7 @@ export interface ConfirmDialogData {
 
     <mat-dialog-actions align="end">
       <button mat-stroked-button mat-dialog-close>Cancel</button>
-      <button mat-flat-button [color]="data.confirmColor || 'primary'" [mat-dialog-close]="true">
+      <button mat-flat-button class="confirm-dialog-confirm" [color]="data.confirmColor || 'primary'" [mat-dialog-close]="true">
         {{ data.confirmLabel || 'Confirm' }}
       </button>
     </mat-dialog-actions>

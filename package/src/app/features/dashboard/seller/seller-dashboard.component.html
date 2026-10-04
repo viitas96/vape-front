@@ -1,9 +1,20 @@
-<div class="pos">
+<div class="seller-pos-page">
 
-  <!-- Left: scan + product block -->
+  <!-- Left: scan + client + product tiles -->
   <section class="pos-left">
 
-    <mat-card class="cardWithShadow">
+    @if (shiftRequired) {
+      <div class="pos-notice pos-shift-required">
+        <span class="pos-shift-closed">{{ 'SHIFTS.NO_OPEN_SHIFT' | translate }}</span>
+        <span class="pos-muted">{{ 'SHIFTS.NO_OPEN_SHIFT_HINT' | translate }}</span>
+        <a mat-flat-button color="primary" class="pos-notice-action" routerLink="/seller-shift">
+          <mat-icon>lock_open</mat-icon>
+          {{ 'SHIFTS.OPEN' | translate }}
+        </a>
+      </div>
+    }
+
+    <mat-card class="cardWithShadow pos-scan-card">
       <mat-card-content class="pos-scan">
         <mat-form-field appearance="outline" class="pos-scan-field" subscriptSizing="dynamic">
           <mat-label>{{ 'POS.SCAN' | translate }} (F1)</mat-label>
@@ -18,178 +29,162 @@
           />
         </mat-form-field>
 
-        <button mat-stroked-button type="button" class="pos-scan-button" (click)="openReceipts()">
-          <mat-icon>receipt_long</mat-icon>
-          {{ 'REFUNDS.RECEIPTS' | translate }}
+        <button mat-stroked-button type="button" class="pos-scan-button" (click)="openProductList()">
+          <mat-icon>list</mat-icon>
+          {{ 'POS.PICKER_LIST' | translate }} (F3)
         </button>
       </mat-card-content>
       <div class="pos-hotkeys">{{ 'POS.HOTKEYS_HELP' | translate }}</div>
     </mat-card>
 
-    <mat-card class="cardWithShadow pos-products-card">
-      <mat-card-content class="pos-products">
-        <app-product-grid (productPicked)="onProductPicked($event)" />
-      </mat-card-content>
-    </mat-card>
+    <div class="pos-products-split">
 
-  </section>
+      <!-- Client -->
+      <mat-card class="cardWithShadow pos-client-card" [class.pos-client-attached]="customer">
+        <mat-card-content class="pos-client">
+          <div class="f-s-16 f-w-600 pos-client-heading">{{ 'POS.CUSTOMER' | translate }}</div>
 
-  <!-- Right: shift + receipt + customer + totals -->
-  <section class="pos-right">
-
-    @if (shiftManagementEnabled) {
-      <mat-card class="cardWithShadow">
-        <mat-card-content class="pos-panel">
-          @if (!currentShift) {
-            <div class="pos-shift-closed">{{ 'SHIFTS.NO_OPEN_SHIFT' | translate }}</div>
-            <div class="pos-muted m-b-12">{{ 'SHIFTS.NO_OPEN_SHIFT_HINT' | translate }}</div>
-            <button mat-flat-button color="primary" class="w-100" (click)="openShift()">
-              <mat-icon>lock_open</mat-icon>
-              {{ 'SHIFTS.OPEN' | translate }}
-            </button>
+          @if (!customer) {
+            <div class="pos-muted">{{ 'POS.CUSTOMER_HINT' | translate }}</div>
           } @else {
             <div class="pos-row">
-              <div>
-                <div class="f-w-600">{{ 'SHIFTS.SHIFT' | translate }} #{{ currentShift.id }}</div>
-                <div class="pos-muted">
-                  {{ currentShift.openedBy }} · {{ formatDuration(currentShift.durationMinutes) }} ·
-                  {{ 'SHIFTS.STARTING_CASH' | translate }} {{ formatMdl(currentShift.startingCash) }}
-                </div>
+              <div class="pos-client-contacts">
+                <div class="f-w-600">{{ customerName || customer.email }}</div>
+                @if (customerName) {
+                  <div class="pos-muted">{{ customer.email }}</div>
+                }
+                @if (customer.phone) {
+                  <div class="pos-muted">{{ customer.phone }}</div>
+                }
               </div>
-              <mat-chip-set>
-                <mat-chip color="primary" highlighted>{{ 'SHIFTS.OPEN_STATUS' | translate }}</mat-chip>
-              </mat-chip-set>
+              <span class="pos-row-end">
+                <mat-chip-set>
+                  <mat-chip color="accent" highlighted>18+</mat-chip>
+                </mat-chip-set>
+                <button mat-icon-button type="button" (click)="clearCustomer()">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </span>
             </div>
 
-            <div class="pos-actions m-t-8">
-              <button mat-stroked-button (click)="openCashMovement()">
-                <mat-icon>account_balance_wallet</mat-icon>
-                {{ 'SHIFTS.CASH_MANAGEMENT' | translate }}
-              </button>
-              <button mat-stroked-button color="warn" (click)="closeShift()">
-                <mat-icon>lock</mat-icon>
-                {{ 'SHIFTS.CLOSE' | translate }}
-              </button>
+            <mat-divider class="pos-client-divider"></mat-divider>
+
+            <div class="pos-row">
+              <span>{{ 'POS.POINTS_BALANCE' | translate }}</span>
+              <strong>{{ customer.pointsBalance }} {{ 'COMMON.POINTS_SHORT' | translate }}</strong>
             </div>
+            <div class="pos-row pos-row-wrap">
+              <mat-checkbox [(ngModel)]="usePoints">{{ 'POS.USE_POINTS' | translate }} (F4)</mat-checkbox>
+              <span class="pos-muted">{{ maxPointsHint }}</span>
+            </div>
+
+            <mat-divider class="pos-client-divider"></mat-divider>
+
+            <div class="pos-row">
+              <span>{{ 'POS.DRINK_PROGRESS' | translate }}</span>
+              <strong>{{ customer.drinkCount }} / {{ freeDrinkThreshold }}</strong>
+            </div>
+            @if (customer.freeDrinksAvailable > 0) {
+              <div class="pos-free-drinks">
+                <mat-icon>redeem</mat-icon>
+                {{ 'POS.FREE_DRINKS_AVAILABLE' | translate:{ count: customer.freeDrinksAvailable } }}
+              </div>
+            }
           }
         </mat-card-content>
       </mat-card>
-    }
 
-    <!-- Receipt -->
-    <mat-card class="cardWithShadow pos-cart-card">
-      <div class="pos-cart-header">
-        <span class="f-s-16 f-w-600">{{ 'POS.CART' | translate:{ count: cart.length } }}</span>
-        <span class="pos-actions">
-          <button mat-stroked-button color="warn" type="button" [disabled]="cart.length === 0 && !customer" (click)="clearReceipt()">
-            <mat-icon>delete_sweep</mat-icon>
-            {{ 'POS.CLEAR_RECEIPT' | translate }} (Ctrl+Del)
-          </button>
-          <button mat-stroked-button type="button" [disabled]="!hasSomethingToPrint" (click)="printReceipt()">
-            <mat-icon>print</mat-icon>
-            {{ 'POS.PRINT_RECEIPT' | translate }} (F9)
-          </button>
-        </span>
-      </div>
+      <!-- Products -->
+      <mat-card class="cardWithShadow pos-products-card">
+        <mat-card-content class="pos-products">
+          <app-product-grid (productPicked)="onProductPicked($event)" />
+        </mat-card-content>
+      </mat-card>
 
-      <div class="pos-cart-lines">
-        @if (cart.length === 0) {
-          <div class="pos-cart-empty">{{ 'POS.CART_EMPTY' | translate }}</div>
+    </div>
+
+  </section>
+
+  <!-- Right: receipt + totals + pay, full height -->
+  <mat-card class="cardWithShadow pos-cart-card">
+    <div class="pos-cart-header">
+      <span class="f-s-16 f-w-600">{{ 'POS.CART' | translate:{ count: cart.length } }}</span>
+      <span class="pos-actions">
+        <button mat-stroked-button type="button" [disabled]="!hasReceiptContent" (click)="holdReceipt()">
+          <mat-icon>pause_circle</mat-icon>
+          {{ 'POS.HOLD' | translate }} (F8)
+        </button>
+        @if (heldCount > 0) {
+          <button mat-flat-button color="accent" type="button" (click)="openHeldReceipts()">
+            <mat-icon>pending_actions</mat-icon>
+            {{ 'POS.HELD' | translate:{ count: heldCount } }}
+          </button>
         }
+        <button mat-stroked-button color="warn" type="button" [disabled]="!hasReceiptContent" (click)="clearReceipt()">
+          <mat-icon>delete_sweep</mat-icon>
+          {{ 'POS.CLEAR_RECEIPT' | translate }} (Ctrl+Del)
+        </button>
+        <button mat-stroked-button type="button" [disabled]="!hasSomethingToPrint" (click)="printReceipt()">
+          <mat-icon>print</mat-icon>
+          {{ 'POS.PRINT_RECEIPT' | translate }} (F9)
+        </button>
+      </span>
+    </div>
 
-        @for (item of cart; track $index) {
-          <div class="pos-cart-line" [class.pos-cart-line-selected]="isSelected(item)" (click)="selectLine(item)">
-            <span class="pos-cart-name">
+    <div class="pos-cart-row pos-cart-columns">
+      <span>{{ 'COMMON.NO' | translate }}</span>
+      <span>{{ 'COMMON.PRODUCT' | translate }}</span>
+      <span class="pos-cart-center">{{ 'COMMON.QUANTITY' | translate }}</span>
+      <span class="pos-cart-number">{{ 'COMMON.TOTAL' | translate }}</span>
+      <span></span>
+    </div>
+
+    <div class="pos-cart-lines">
+      @if (cart.length === 0) {
+        <div class="pos-cart-empty">{{ 'POS.CART_EMPTY' | translate }}</div>
+      }
+
+      @for (item of cart; track $index; let index = $index) {
+        <div class="pos-cart-row pos-cart-line" [class.pos-cart-line-selected]="isSelected(item)" (click)="selectLine(item)">
+          <span class="pos-cart-index">{{ index + 1 }}</span>
+
+          <span class="pos-cart-name">
+            <span>
               {{ item.product.name }}
               @if (item.free) {
                 <span class="pos-free"> · {{ 'POS.FREE' | translate }}</span>
               }
-              <span class="pos-cart-unit">{{ formatMdl(item.unitPrice) }}</span>
             </span>
-
+            <span class="pos-cart-meta">{{ lineDetails(item) }}</span>
             @if (canApplyFreeDrink(item)) {
-              <button mat-icon-button color="primary" type="button" (click)="applyFreeDrink(item); $event.stopPropagation()"
-                [title]="'POS.APPLY_FREE_DRINK' | translate">
+              <button mat-button color="primary" type="button" class="pos-free-drink-button" (click)="applyFreeDrink(item); $event.stopPropagation()">
                 <mat-icon>redeem</mat-icon>
+                {{ 'POS.APPLY_FREE_DRINK' | translate }}
               </button>
             }
+          </span>
 
-            <span class="pos-qty">
-              <button mat-icon-button type="button" (click)="changeQty(item, -1); $event.stopPropagation()">
-                <mat-icon>remove</mat-icon>
-              </button>
-              <span class="pos-qty-value">{{ item.quantity }}</span>
-              <button mat-icon-button type="button" (click)="changeQty(item, 1); $event.stopPropagation()">
-                <mat-icon>add</mat-icon>
-              </button>
-            </span>
-
-            <span class="pos-cart-total">{{ formatMdl(item.unitPrice * item.quantity) }}</span>
-
-            <button mat-icon-button color="warn" type="button" (click)="removeLine(item); $event.stopPropagation()">
-              <mat-icon>delete_outline</mat-icon>
+          <span class="pos-qty">
+            <button mat-icon-button type="button" (click)="changeQty(item, -1); $event.stopPropagation()">
+              <mat-icon>remove</mat-icon>
             </button>
-          </div>
-        }
-      </div>
-    </mat-card>
+            <span class="pos-qty-value">{{ item.quantity }}</span>
+            <button mat-icon-button type="button" (click)="changeQty(item, 1); $event.stopPropagation()">
+              <mat-icon>add</mat-icon>
+            </button>
+          </span>
 
-    <!-- Customer -->
-    <mat-card class="cardWithShadow">
-      <mat-card-content class="pos-panel">
-        <div class="f-w-600 m-b-8">{{ 'POS.CUSTOMER' | translate }}</div>
+          <span class="pos-cart-total">{{ formatMdl(item.unitPrice * item.quantity) }}</span>
 
-        @if (!customer) {
-          <div class="pos-muted">{{ 'POS.CUSTOMER_HINT' | translate }}</div>
-        } @else {
-          <div class="pos-row">
-            <div>
-              <div class="f-w-600">{{ customerName || customer.email }}</div>
-              @if (customerName) {
-                <div class="pos-muted">{{ customer.email }}</div>
-              }
-              @if (customer.phone) {
-                <div class="pos-muted">{{ customer.phone }}</div>
-              }
-            </div>
-            <span class="pos-row-end">
-              <mat-chip-set>
-                <mat-chip color="accent" highlighted>18+</mat-chip>
-              </mat-chip-set>
-              <button mat-icon-button type="button" (click)="clearCustomer()">
-                <mat-icon>close</mat-icon>
-              </button>
-            </span>
-          </div>
+          <button mat-icon-button color="warn" type="button" (click)="removeLine(item); $event.stopPropagation()">
+            <mat-icon>delete_outline</mat-icon>
+          </button>
+        </div>
+      }
+    </div>
 
-          <div class="pos-row m-t-8">
-            <span>{{ 'POS.POINTS_BALANCE' | translate }}</span>
-            <strong>{{ customer.pointsBalance }} {{ 'COMMON.POINTS_SHORT' | translate }}</strong>
-          </div>
-          <div class="pos-row">
-            <span>{{ 'POS.DRINK_PROGRESS' | translate }}</span>
-            <strong>{{ customer.drinkCount }} / {{ freeDrinkThreshold }}</strong>
-          </div>
-
-          @if (customer.freeDrinksAvailable > 0) {
-            <div class="pos-free-drinks">
-              {{ 'POS.FREE_DRINKS_AVAILABLE' | translate:{ count: customer.freeDrinksAvailable } }}
-            </div>
-          }
-
-          <div class="pos-row m-t-8">
-            <mat-checkbox [(ngModel)]="usePoints">{{ 'POS.USE_POINTS' | translate }} (F4)</mat-checkbox>
-            <span class="pos-muted">
-              {{ 'POS.MAX_POINTS' | translate }}: {{ maxPointsForPurchase }} (≈ {{ formatMdl((maxPointsForPurchase * 100) / spendRate) }})
-            </span>
-          </div>
-        }
-      </mat-card-content>
-    </mat-card>
-
-    <!-- Totals + checkout -->
-    <mat-card class="cardWithShadow">
-      <mat-card-content class="pos-panel">
+    <div class="pos-cart-footer">
+      <div class="pos-totals">
         <div class="pos-row">
           <span>{{ 'POS.SUBTOTAL' | translate }}</span>
           <span>{{ formatMdl(grossTotal) }}</span>
@@ -200,39 +195,19 @@
             <span>− {{ formatMdl(discountCents) }}</span>
           </div>
         }
-        <mat-divider class="m-y-8"></mat-divider>
         <div class="pos-row pos-total">
           <span>{{ 'POS.TOTAL' | translate }}</span>
           <span>{{ formatMdl(netTotal) }}</span>
         </div>
-      </mat-card-content>
-    </mat-card>
+      </div>
 
-    <button
-      mat-raised-button
-      color="primary"
-      class="pos-checkout"
-      [disabled]="!canCheckout"
-      (click)="checkout()"
-    >
-      <mat-icon>point_of_sale</mat-icon>
-      {{ (loading ? 'POS.PROCESSING' : 'POS.CHECKOUT') | translate }}
-    </button>
-
-    @if (lastOrder) {
-      <mat-card class="cardWithShadow pos-last-order">
-        <mat-card-content class="pos-panel">
-          <div class="pos-row">
-            <span class="f-w-600">{{ 'POS.ORDER_COMPLETED' | translate }} · #{{ lastOrder.id }}</span>
-            <button mat-stroked-button type="button" (click)="printReceipt()" [disabled]="cart.length > 0">
-              <mat-icon>print</mat-icon>
-              {{ 'POS.PRINT_LAST_RECEIPT' | translate }}
-            </button>
-          </div>
+      @if (lastOrder) {
+        <div class="pos-notice">
+          <span class="f-w-600">{{ 'POS.ORDER_COMPLETED' | translate }} · #{{ lastOrder.id }}</span>
           @if (lastChangeCents > 0) {
-            <div class="pos-change">{{ 'PAYMENT.CHANGE' | translate }}: {{ formatMdl(lastChangeCents) }}</div>
+            <span class="pos-change">{{ 'PAYMENT.CHANGE' | translate }}: {{ formatMdl(lastChangeCents) }}</span>
           }
-          <div class="pos-muted">
+          <span class="pos-muted">
             {{ 'POS.TOTAL_PAID' | translate }}: {{ formatMdl(lastOrder.total) }}
             @if (lastOrder.discount) {
               · {{ 'POS.DISCOUNT' | translate }}: {{ formatMdl(lastOrder.discount) }}
@@ -240,31 +215,25 @@
             @if (lastOrder.pointsEarned) {
               · {{ 'POS.EARNED' | translate }}: {{ lastOrder.pointsEarned }} {{ 'COMMON.POINTS_SHORT' | translate }}
             }
-          </div>
-        </mat-card-content>
-      </mat-card>
-    }
+          </span>
+          <button mat-stroked-button type="button" class="pos-notice-action" (click)="printReceipt()" [disabled]="cart.length > 0">
+            <mat-icon>print</mat-icon>
+            {{ 'POS.PRINT_LAST_RECEIPT' | translate }}
+          </button>
+        </div>
+      }
 
-    @if (closedShift) {
-      <mat-card class="cardWithShadow pos-closed-shift">
-        <mat-card-content class="pos-panel">
-          <div class="pos-row">
-            <span class="f-w-600">{{ 'SHIFTS.CLOSED_SUCCESS' | translate }} — {{ 'SHIFTS.SHIFT' | translate }} #{{ closedShift.id }}</span>
-            <button mat-stroked-button type="button" (click)="printShiftReport(closedShift.id)">
-              <mat-icon>print</mat-icon>
-              {{ 'POS.PRINT_SLIP' | translate }}
-            </button>
-          </div>
-          <div class="pos-muted">
-            {{ 'SHIFTS.EXPECTED_CASH' | translate }}: {{ formatMdl(closedShift.expectedCash ?? 0) }}
-            · {{ 'SHIFTS.ACTUAL_CASH' | translate }}: {{ formatMdl(closedShift.actualCash ?? 0) }}
-          </div>
-          <div class="f-w-700" [class.pos-ok]="(closedShift.cashDifference ?? 0) === 0" [class.pos-bad]="(closedShift.cashDifference ?? 0) !== 0">
-            {{ 'SHIFTS.DIFFERENCE' | translate }}: {{ formatMdl(closedShift.cashDifference ?? 0) }}
-          </div>
-        </mat-card-content>
-      </mat-card>
-    }
+      <button
+        mat-raised-button
+        color="primary"
+        class="pos-checkout"
+        [disabled]="!canCheckout"
+        (click)="checkout()"
+      >
+        <mat-icon>point_of_sale</mat-icon>
+        {{ (loading ? 'POS.PROCESSING' : 'POS.CHECKOUT') | translate }}
+      </button>
+    </div>
+  </mat-card>
 
-  </section>
 </div>

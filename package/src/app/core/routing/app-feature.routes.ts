@@ -85,6 +85,13 @@ export const APP_FEATURE_ROUTE_DEFINITIONS: readonly AppFeatureRouteDefinition[]
     loadComponent: () => import('../../features/dashboard/seller/seller-dashboard.component').then((m) => m.SellerDashboardComponent),
   },
   {
+    path: 'seller-shift',
+    title: 'Shift & Cash',
+    roles: ['SELLER'],
+    sidebar: { label: 'Shift & Cash', iconName: 'report-money', bgcolor: 'primary' },
+    loadComponent: () => import('../../features/dashboard/seller/seller-shift.component').then((m) => m.SellerShiftComponent),
+  },
+  {
     path: 'customers',
     title: 'Customers',
     roles: ['ADMIN', 'SELLER'],

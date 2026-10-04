@@ -1,27 +1,27 @@
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
-import { catchError, forkJoin, map, of } from 'rxjs';
+import { RouterLink } from '@angular/router';
 import { MaterialModule } from 'src/app/material.module';
 import { Order } from '../../orders/order.models';
 import { PosService } from 'src/app/services/pos.service';
-import { CustomerScan, PosCheckoutDTO } from './pos.models';
+import { CartItem, CustomerScan, PickedProduct, PosCheckoutDTO, ProductPickerDialog } from './pos.models';
+import { HeldReceiptsService } from './held-receipts.service';
+import { HeldReceiptsDialogComponent } from './held-receipts-dialog.component';
 import { Product } from '../../products/product.models';
 import { StoreSettingsService } from 'src/app/services/store-settings.service';
 import { ShiftService } from 'src/app/services/shift.service';
-import { CashMovement, CashMovementDTO, Shift } from 'src/app/features/shifts/shift.models';
-import { ShiftOpenDialogComponent, ShiftOpenDialogData } from './shift-open-dialog.component';
-import { ShiftCloseDialogComponent } from './shift-close-dialog.component';
-import { CashMovementDialogComponent } from './cash-movement-dialog.component';
+import { Shift } from 'src/app/features/shifts/shift.models';
 import { PaymentDialogComponent, PaymentDialogData, PaymentDialogResult } from './payment-dialog.component';
 import { formatMdl } from 'src/app/shared/money/money.util';
 import { getApiErrorMessage } from 'src/app/shared/http/api-error';
-import { ReceiptsDialogComponent, ReceiptsDialogData } from './receipts-dialog.component';
 import { ProductGridComponent } from './product-grid.component';
-import { QuantityPromptDialogComponent, QuantityPromptDialogData, QuantityPromptResult } from './quantity-prompt-dialog.component';
+import { CoreService } from 'src/app/services/core.service';
+import { ProductListDialogComponent } from './product-list-dialog.component';
+import { QuantityPromptService } from './quantity-prompt.service';
 import { ConfirmDialogService } from 'src/app/shared/dialogs/confirm-dialog.service';
 import { PosPrintService } from 'src/app/shared/print/pos-print.service';
 
@@ -30,17 +30,10 @@ const SELECTION_STEPS: Record<string, number> = {
   ArrowDown: 1,
 };
 
-interface CartItem {
-  product: Product;
-  unitPrice: number;
-  quantity: number;
-  free: boolean;
-}
-
 @Component({
   selector: 'app-seller-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, MaterialModule, MatSnackBarModule, TranslatePipe, ProductGridComponent],
+  imports: [CommonModule, FormsModule, MaterialModule, MatSnackBarModule, TranslatePipe, RouterLink, ProductGridComponent],
   templateUrl: './seller-dashboard.component.html',
   styleUrls: ['./seller-dashboard.component.scss'],
 })
@@ -62,7 +55,6 @@ export class SellerDashboardComponent implements OnInit {
   freeDrinkThreshold = 6;
   shiftManagementEnabled = true;
   currentShift: Shift | null = null;
-  closedShift: Shift | null = null;
 
   constructor(
     private readonly posService: PosService,
@@ -73,9 +65,14 @@ export class SellerDashboardComponent implements OnInit {
     private readonly dialog: MatDialog,
     private readonly confirmDialog: ConfirmDialogService,
     private readonly posPrint: PosPrintService,
+    private readonly quantityPrompt: QuantityPromptService,
+    private readonly coreService: CoreService,
+    private readonly heldReceipts: HeldReceiptsService,
   ) {}
 
   ngOnInit(): void {
+    this.coreService.setOptions({ sidenavCollapsed: true });
+
     this.settingsService.get().subscribe((settings) => {
       this.spendRate = settings.spendRate;
       this.goodsPointsCapPercent = settings.goodsPointsCapPercent;
@@ -106,6 +103,11 @@ export class SellerDashboardComponent implements OnInit {
     }
 
     return [this.customer.firstName, this.customer.lastName].filter(Boolean).join(' ');
+  }
+
+  get maxPointsHint(): string {
+    const maxDiscount = formatMdl((this.maxPointsForPurchase * 100) / this.spendRate);
+    return `${this.translateService.instant('POS.MAX_POINTS')}: ${this.maxPointsForPurchase} (≈ ${maxDiscount})`;
   }
 
   get grossTotal(): number {
@@ -170,8 +172,23 @@ export class SellerDashboardComponent implements OnInit {
     return this.cart.length > 0 && !this.loading && !this.shiftRequired;
   }
 
+  get hasReceiptContent(): boolean {
+    return this.cart.length > 0 || this.customer !== null;
+  }
+
+  get heldCount(): number {
+    return this.heldReceipts.count;
+  }
+
   get hasSomethingToPrint(): boolean {
     return this.cart.length > 0 || this.lastOrder !== null;
+  }
+
+  lineDetails(item: CartItem): string {
+    const product = item.product;
+    return [formatMdl(item.unitPrice), product.brand?.name, product.category?.name, product.gamma?.name, product.barcode]
+      .filter(Boolean)
+      .join(' · ');
   }
 
   canApplyFreeDrink(item: CartItem): boolean {
@@ -245,10 +262,6 @@ export class SellerDashboardComponent implements OnInit {
     });
   }
 
-  onProductPicked(product: Product): void {
-    this.askQuantity(product, () => this.productGrid?.focusSearch());
-  }
-
   selectLine(item: CartItem): void {
     this.selectedLine = item;
   }
@@ -290,15 +303,16 @@ export class SellerDashboardComponent implements OnInit {
   }
 
   clearReceipt(): void {
-    if (this.cart.length === 0 && !this.customer) {
+    if (!this.hasReceiptContent) {
       return;
     }
 
     this.confirmDialog.confirm({
       title: this.translateService.instant('POS.CLEAR_CONFIRM_TITLE'),
       message: this.translateService.instant('POS.CLEAR_CONFIRM_MESSAGE'),
-      confirmLabel: this.translateService.instant('POS.CLEAR_RECEIPT'),
+      confirmLabel: `${this.translateService.instant('POS.CLEAR_RECEIPT')} (Enter)`,
       confirmColor: 'warn',
+      focusConfirm: true,
     }).subscribe((confirmed) => {
       if (confirmed) {
         this.resetReceipt();
@@ -337,13 +351,6 @@ export class SellerDashboardComponent implements OnInit {
     return formatMdl(cents);
   }
 
-  formatDuration(minutes: number): string {
-    return this.translateService.instant('SHIFTS.DURATION_VALUE', {
-      hours: Math.floor(minutes / 60),
-      minutes: minutes % 60,
-    });
-  }
-
   checkout(): void {
     if (!this.canCheckout) {
       return;
@@ -367,92 +374,61 @@ export class SellerDashboardComponent implements OnInit {
       });
   }
 
-  openShift(): void {
-    this.shiftService.getLastClosed().pipe(
-      map((shift) => shift?.actualCash ?? null),
-      catchError(() => of(null)),
-    ).subscribe((suggestedStartingCash) => {
-      const data: ShiftOpenDialogData = { suggestedStartingCash };
-      this.dialog.open(ShiftOpenDialogComponent, { width: '360px', data })
-        .afterClosed()
-        .subscribe((startingCash?: number) => {
-          if (startingCash === undefined) {
-            this.focusBarcode();
-            return;
-          }
-
-          this.shiftService.open({ startingCash }).subscribe({
-            next: () => {
-              this.closedShift = null;
-              this.notify('SHIFTS.OPENED_SUCCESS');
-              this.loadCurrentShift();
-              this.focusBarcode();
-            },
-            error: (error) => this.notifyError(error, 'SHIFTS.OPEN_FAILED'),
-          });
-        });
+  onProductPicked(product: Product): void {
+    this.quantityPrompt.ask(product).subscribe({
+      next: (picked) => this.addToCart(picked.product, picked.quantity, picked.unitPrice),
+      complete: () => setTimeout(() => this.productGrid?.focusSearch()),
     });
   }
 
-  closeShift(): void {
-    const shift = this.currentShift;
-    if (!shift) {
+  openProductList(): void {
+    const dialogRef = this.dialog.open(ProductListDialogComponent, { width: '720px', maxWidth: 'calc(100vw - 48px)' });
+    this.addPickedProducts(dialogRef);
+  }
+
+  holdReceipt(): void {
+    if (!this.hasReceiptContent) {
+      this.notify('POS.HOLD_NOTHING');
       return;
     }
 
-    this.dialog.open(ShiftCloseDialogComponent, { width: '360px' })
+    this.parkCurrentReceipt();
+    this.notify('POS.HOLD_SUCCESS');
+    this.focusBarcode();
+  }
+
+  openHeldReceipts(): void {
+    this.dialog.open(HeldReceiptsDialogComponent, { width: '560px', maxWidth: 'calc(100vw - 48px)' })
       .afterClosed()
-      .subscribe((actualCash?: number) => {
-        if (actualCash === undefined) {
-          this.focusBarcode();
-          return;
+      .subscribe((id?: string) => {
+        if (id) {
+          this.resumeReceipt(id);
         }
 
-        this.shiftService.close({ actualCash }).subscribe({
-          next: () => {
-            this.currentShift = null;
-            this.notify('SHIFTS.CLOSED_SUCCESS');
-            this.loadClosedShift(shift.id);
-            this.printShiftReport(shift.id);
-            this.focusBarcode();
-          },
-          error: (error) => this.notifyError(error, 'SHIFTS.CLOSE_FAILED'),
-        });
+        this.focusBarcode();
       });
   }
 
-  printShiftReport(shiftId: number): void {
-    this.shiftService.getReport(shiftId).subscribe({
-      next: (report) => this.posPrint.printShiftReport(report),
-      error: (error) => this.notifyError(error, 'SHIFTS.LOAD_FAILED'),
-    });
+  private resumeReceipt(id: string): void {
+    const receipt = this.heldReceipts.take(id);
+    if (!receipt) {
+      return;
+    }
+
+    if (this.hasReceiptContent) {
+      this.parkCurrentReceipt();
+    }
+
+    this.cart = receipt.items;
+    this.customer = receipt.customer;
+    this.usePoints = receipt.usePoints;
+    this.selectedLine = null;
+    this.notify('POS.HELD_RESUMED');
   }
 
-  openReceipts(): void {
-    const data: ReceiptsDialogData = { shiftId: this.currentShift?.id ?? null };
-    this.dialog.open(ReceiptsDialogComponent, { width: '680px', maxWidth: 'calc(100vw - 48px)', data })
-      .afterClosed()
-      .subscribe(() => this.focusBarcode());
-  }
-
-  openCashMovement(): void {
-    this.dialog.open(CashMovementDialogComponent, { width: '400px' })
-      .afterClosed()
-      .subscribe((dto?: CashMovementDTO) => {
-        if (!dto) {
-          this.focusBarcode();
-          return;
-        }
-
-        this.shiftService.recordCashMovement(dto).subscribe({
-          next: () => {
-            this.notify('SHIFTS.MOVEMENT_RECORDED');
-            this.printCashMovement(dto);
-            this.focusBarcode();
-          },
-          error: (error) => this.notifyError(error, 'SHIFTS.MOVEMENT_FAILED'),
-        });
-      });
+  private parkCurrentReceipt(): void {
+    this.heldReceipts.hold({ customer: this.customer, usePoints: this.usePoints, items: this.cart });
+    this.resetReceipt();
   }
 
   private handleHotkey(event: KeyboardEvent): boolean {
@@ -461,11 +437,18 @@ export class SellerDashboardComponent implements OnInit {
       return true;
     }
 
+    if (event.shiftKey && event.key === 'F8') {
+      this.openHeldReceipts();
+      return true;
+    }
+
     const actions: Record<string, () => void> = {
       F1: () => this.focusBarcode(),
       F2: () => this.productGrid?.focusSearch(),
+      F3: () => this.openProductList(),
       F4: () => this.togglePoints(),
       F5: () => this.checkout(),
+      F8: () => this.holdReceipt(),
       F9: () => this.printReceipt(),
     };
     const action = actions[event.key];
@@ -538,7 +521,7 @@ export class SellerDashboardComponent implements OnInit {
     }
 
     if (product.price === null || product.price === undefined) {
-      this.askQuantity(product, () => this.focusBarcode());
+      this.askQuantity(product);
       return;
     }
 
@@ -546,17 +529,21 @@ export class SellerDashboardComponent implements OnInit {
     this.focusBarcode();
   }
 
-  private askQuantity(product: Product, afterClose: () => void): void {
-    const data: QuantityPromptDialogData = { product };
-    this.dialog.open(QuantityPromptDialogComponent, { width: '380px', data })
-      .afterClosed()
-      .subscribe((result?: QuantityPromptResult) => {
-        if (result) {
-          this.addToCart(product, result.quantity, result.unitPrice);
-        }
+  private askQuantity(product: Product): void {
+    this.quantityPrompt.ask(product).subscribe({
+      next: (picked) => this.addToCart(picked.product, picked.quantity, picked.unitPrice),
+      complete: () => setTimeout(() => this.focusBarcode()),
+    });
+  }
 
-        setTimeout(afterClose);
-      });
+  private addPickedProducts(dialogRef: MatDialogRef<ProductPickerDialog>): void {
+    const subscription = dialogRef.componentInstance.productAdded
+      .subscribe((picked: PickedProduct) => this.addToCart(picked.product, picked.quantity, picked.unitPrice));
+
+    dialogRef.afterClosed().subscribe(() => {
+      subscription.unsubscribe();
+      setTimeout(() => this.focusBarcode());
+    });
   }
 
   private addToCart(product: Product, quantity: number, unitPrice: number): void {
@@ -577,31 +564,6 @@ export class SellerDashboardComponent implements OnInit {
     this.selectedLine = null;
     this.customer = null;
     this.usePoints = false;
-  }
-
-  private printCashMovement(dto: CashMovementDTO): void {
-    const shiftId = this.currentShift?.id;
-    if (shiftId === undefined) {
-      return;
-    }
-
-    forkJoin({
-      movements: this.shiftService.getCashMovements(shiftId).pipe(catchError(() => of([] as CashMovement[]))),
-      drawerAmount: this.shiftService.getCurrentReport().pipe(
-        map((report) => report.expectedCash ?? null),
-        catchError(() => of(null)),
-      ),
-    }).subscribe(({ movements, drawerAmount }) => {
-      const latest = movements.at(-1);
-      this.posPrint.printCashMovement({
-        type: dto.type,
-        amount: dto.amount,
-        comment: dto.comment,
-        drawerAmount,
-        author: latest?.createdBy ?? '',
-        createdAt: new Date(latest?.createdAt ?? Date.now()),
-      });
-    });
   }
 
   private submitCheckout(payment: PaymentDialogResult): void {
@@ -645,14 +607,6 @@ export class SellerDashboardComponent implements OnInit {
       },
       error: () => {
         this.currentShift = null;
-      },
-    });
-  }
-
-  private loadClosedShift(id: number): void {
-    this.shiftService.getById(id).subscribe({
-      next: (shift) => {
-        this.closedShift = shift;
       },
     });
   }

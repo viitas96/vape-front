@@ -1,0 +1,120 @@
+<div class="seller-shift">
+
+  <div class="seller-shift-header">
+    <h2 class="seller-shift-title">{{ 'Shift & Cash' | translate }}</h2>
+    <button mat-flat-button color="primary" class="seller-shift-big-button" (click)="openReceipts()">
+      <mat-icon>receipt_long</mat-icon>
+      {{ 'REFUNDS.RECEIPTS' | translate }}
+    </button>
+  </div>
+
+  @if (loading) {
+    <mat-progress-bar mode="indeterminate" />
+  } @else if (!currentShift) {
+    <mat-card class="cardWithShadow">
+      <mat-card-content class="seller-shift-closed">
+        <mat-icon class="seller-shift-closed-icon">lock</mat-icon>
+        <div class="seller-shift-closed-title">{{ 'SHIFTS.NO_OPEN_SHIFT' | translate }}</div>
+        <div class="seller-shift-muted">{{ 'SHIFTS.NO_OPEN_SHIFT_HINT' | translate }}</div>
+        <button mat-flat-button color="primary" class="seller-shift-big-button" (click)="openShift()">
+          <mat-icon>lock_open</mat-icon>
+          {{ 'SHIFTS.OPEN' | translate }}
+        </button>
+      </mat-card-content>
+    </mat-card>
+  } @else {
+    <mat-card class="cardWithShadow">
+      <mat-card-content>
+        <div class="seller-shift-header">
+          <div>
+            <div class="seller-shift-name">
+              <span class="seller-shift-dot"></span>
+              {{ 'SHIFTS.SHIFT' | translate }} #{{ currentShift.id }} · {{ 'SHIFTS.OPEN_STATUS' | translate }}
+            </div>
+            <div class="seller-shift-muted">
+              {{ 'SHIFTS.OPENED_BY' | translate }}: {{ currentShift.openedBy }} · {{ currentShift.openedAt | date:'short' }}
+              · {{ formatDuration(currentShift.durationMinutes) }}
+            </div>
+          </div>
+        </div>
+
+        <div class="seller-shift-stats">
+          <div class="seller-shift-stat">
+            <span>{{ 'SHIFTS.STARTING_CASH' | translate }}</span>
+            <strong>{{ formatMdl(currentShift.startingCash) }}</strong>
+          </div>
+          @if (report) {
+            <div class="seller-shift-stat">
+              <span>{{ 'SHIFTS.RECEIPTS' | translate }}</span>
+              <strong>{{ report.receiptsCount }}</strong>
+            </div>
+            <div class="seller-shift-stat">
+              <span>{{ 'SHIFTS.NET_SALES' | translate }}</span>
+              <strong>{{ formatMdl(report.netSales) }}</strong>
+            </div>
+            <div class="seller-shift-stat">
+              <span>{{ 'SHIFTS.CASH_PAYMENTS' | translate }}</span>
+              <strong>{{ formatMdl(report.cashPayments) }}</strong>
+            </div>
+            <div class="seller-shift-stat">
+              <span>{{ 'SHIFTS.CARD_PAYMENTS' | translate }}</span>
+              <strong>{{ formatMdl(report.cardPayments) }}</strong>
+            </div>
+            <div class="seller-shift-stat">
+              <span>{{ 'SHIFTS.PAID_IN' | translate }} / {{ 'SHIFTS.PAID_OUT' | translate }}</span>
+              <strong>{{ formatMdl(report.paidIn) }} / {{ formatMdl(report.paidOut) }}</strong>
+            </div>
+            <div class="seller-shift-stat seller-shift-stat-main">
+              <span>{{ 'SHIFTS.EXPECTED_CASH' | translate }}</span>
+              <strong>{{ formatMdl(report.expectedCash) }}</strong>
+            </div>
+          }
+        </div>
+
+        <div class="seller-shift-actions">
+          <button mat-flat-button color="primary" class="seller-shift-big-button" (click)="openCashMovement()">
+            <mat-icon>account_balance_wallet</mat-icon>
+            {{ 'SHIFTS.CASH_MANAGEMENT' | translate }}
+          </button>
+          <button mat-stroked-button class="seller-shift-big-button" (click)="openReport()">
+            <mat-icon>summarize</mat-icon>
+            {{ 'SHIFTS.VIEW_REPORT' | translate }}
+          </button>
+          <button mat-stroked-button color="warn" class="seller-shift-big-button" (click)="closeShift()">
+            <mat-icon>lock</mat-icon>
+            {{ 'SHIFTS.CLOSE' | translate }}
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+
+  @if (closedShift) {
+    <mat-card class="cardWithShadow">
+      <mat-card-content>
+        <div class="seller-shift-header">
+          <div class="seller-shift-name">{{ 'SHIFTS.CLOSED_SUCCESS' | translate }} — {{ 'SHIFTS.SHIFT' | translate }} #{{ closedShift.id }}</div>
+          <button mat-stroked-button type="button" (click)="printShiftReport(closedShift.id)">
+            <mat-icon>print</mat-icon>
+            {{ 'POS.PRINT_SLIP' | translate }}
+          </button>
+        </div>
+        <div class="seller-shift-stats">
+          <div class="seller-shift-stat">
+            <span>{{ 'SHIFTS.EXPECTED_CASH' | translate }}</span>
+            <strong>{{ formatMdl(closedShift.expectedCash) }}</strong>
+          </div>
+          <div class="seller-shift-stat">
+            <span>{{ 'SHIFTS.ACTUAL_CASH' | translate }}</span>
+            <strong>{{ formatMdl(closedShift.actualCash) }}</strong>
+          </div>
+          <div class="seller-shift-stat" [class.seller-shift-ok]="(closedShift.cashDifference ?? 0) === 0" [class.seller-shift-bad]="(closedShift.cashDifference ?? 0) !== 0">
+            <span>{{ 'SHIFTS.DIFFERENCE' | translate }}</span>
+            <strong>{{ formatMdl(closedShift.cashDifference) }}</strong>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  }
+
+</div>

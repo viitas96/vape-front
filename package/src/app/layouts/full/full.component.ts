@@ -37,12 +37,15 @@ export class FullComponent implements OnInit, OnDestroy {
   @ViewChild('content', { static: true }) content!: MatSidenavContent;
 
   navItems: NavItem[] = [];
-  options = this.settings.getOptions();
   isSidenavHovered = false;
 
   private readonly subscriptions = new Subscription();
   private isMobileScreen = false;
   private hoverCloseTimer?: number;
+
+  get options() {
+    return this.settings.getOptions();
+  }
 
   get isOver(): boolean {
     return this.isMobileScreen;
