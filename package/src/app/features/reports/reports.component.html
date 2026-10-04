@@ -1,0 +1,291 @@
+<div class="p-24">
+  <mat-card class="cardWithShadow admin-data-card">
+    <mat-card-content class="p-32 admin-data-content">
+
+      <div class="d-flex align-items-center justify-content-between m-b-16 admin-page-header">
+        <h2 class="f-s-20 f-w-700">{{ 'REPORTS.TITLE' | translate }}</h2>
+        <button mat-flat-button color="primary" type="button" [disabled]="exporting" (click)="export('summary')">
+          <mat-icon>download</mat-icon> {{ 'REPORTS.EXPORT_SUMMARY' | translate }}
+        </button>
+      </div>
+
+      <app-date-range-filter class="d-block m-b-16" [from]="period.from" [to]="period.to"
+        (rangeChange)="onRangeChange($event)"></app-date-range-filter>
+
+      @if (errorMessage) {
+        <p class="text-danger f-s-14 m-b-16">{{ errorMessage }}</p>
+      }
+
+      @if (summary && summary.itemsWithoutCost > 0) {
+        <p class="f-s-13 m-b-16 report-warning">
+          {{ 'REPORTS.ITEMS_WITHOUT_COST' | translate: { count: summary.itemsWithoutCost } }}
+        </p>
+      }
+
+      <div class="report-tiles m-b-24">
+        @for (tile of tiles; track tile.label) {
+          <div class="report-tile">
+            <div class="f-s-13 text-muted">{{ tile.label }}</div>
+            <div class="f-s-18 f-w-700">{{ tile.value }}</div>
+          </div>
+        }
+      </div>
+
+      @if (chart) {
+        <h3 class="f-s-16 f-w-600 m-b-8">{{ 'REPORTS.DAILY_NET_REVENUE' | translate }}</h3>
+        <apx-chart class="d-block m-b-24" [series]="chart.series" [chart]="chart.chart" [colors]="chart.colors"
+          [plotOptions]="chart.plotOptions" [dataLabels]="chart.dataLabels" [grid]="chart.grid"
+          [legend]="chart.legend" [xaxis]="chart.xaxis" [yaxis]="chart.yaxis" [tooltip]="chart.tooltip"></apx-chart>
+      }
+
+      <div class="report-one-c m-b-24">
+        <h3 class="f-s-16 f-w-600 m-b-8">{{ 'REPORTS.ONE_C_TITLE' | translate }}</h3>
+        <div class="d-flex align-items-center flex-wrap" style="gap: 8px;">
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>{{ 'REPORTS.ONE_C_MONTH' | translate }}</mat-label>
+            <input matInput type="month" [(ngModel)]="oneCMonth" />
+          </mat-form-field>
+          <mat-form-field appearance="outline" subscriptSizing="dynamic">
+            <mat-label>{{ 'REPORTS.ONE_C_TYPE' | translate }}</mat-label>
+            <mat-select [(ngModel)]="oneCType">
+              @for (type of oneCTypes; track type) {
+                <mat-option [value]="type">{{ 'REPORTS.ONE_C_' + type | translate }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <button mat-stroked-button type="button" [disabled]="exporting || !oneCMonth" (click)="exportForOneC()">
+            <mat-icon>download</mat-icon> {{ 'REPORTS.ONE_C_EXPORT' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <mat-tab-group (selectedIndexChange)="onTabChange($event)">
+        <mat-tab [label]="'REPORTS.TAB_ITEMS' | translate">
+          <div class="d-flex justify-content-end m-y-16">
+            <button mat-stroked-button type="button" [disabled]="exporting" (click)="export('items')">
+              <mat-icon>download</mat-icon> {{ 'REPORTS.EXPORT' | translate }}
+            </button>
+          </div>
+          <div class="report-table">
+            <mat-table [dataSource]="itemSales">
+              <ng-container matColumnDef="productName">
+                <mat-header-cell *matHeaderCellDef>{{ 'COMMON.PRODUCT' | translate }}</mat-header-cell>
+                <mat-cell *matCellDef="let row">{{ row.productName || '-' }}</mat-cell>
+              </ng-container>
+              <ng-container matColumnDef="categoryName">
+                <mat-header-cell *matHeaderCellDef>{{ 'REPORTS.CATEGORY' | translate }}</mat-header-cell>
+                <mat-cell *matCellDef="let row">{{ row.categoryName || ('REPORTS.UNCATEGORIZED' | translate) }}</mat-cell>
+              </ng-container>
+              <ng-container matColumnDef="quantity">
+                <mat-header-cell *matHeaderCellDef>{{ 'COMMON.QUANTITY' | translate }}</mat-header-cell>
+                <mat-cell *matCellDef="let row">{{ row.quantity }}</mat-cell>
+              </ng-container>
+              <ng-container matColumnDef="quantityRefunded">
+                <mat-header-cell *matHeaderCellDef>{{ 'REPORTS.QUANTITY_REFUNDED' | translate }}</mat-header-cell>
+                <mat-cell *matCellDef="let row">{{ row.quantityRefunded }}</mat-cell>
+              </ng-container>
+              @for (column of ['netSales', 'refunds', 'netRevenue', 'costOfGoods', 'grossProfit']; track column) {
+                <ng-container [matColumnDef]="column">
+                  <mat-header-cell *matHeaderCellDef>{{ 'REPORTS.COLUMN_' + column | translate }}</mat-header-cell>
+                  <mat-cell *matCellDef="let row">{{ format(row[column]) }}</mat-cell>
+                </ng-container>
+              }
+              <mat-header-row *matHeaderRowDef="itemColumns"></mat-header-row>
+              <mat-row *matRowDef="let row; columns: itemColumns"></mat-row>
+              <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell p-16">{{ 'REPORTS.EMPTY' | translate }}</td>
+              </tr>
+            </mat-table>
+          </div>
+        </mat-tab>
+
+        <mat-tab [label]="'REPORTS.TAB_CATEGORIES' | translate">
+          <div class="d-flex justify-content-end m-y-16">
+            <button mat-stroked-button type="button" [disabled]="exporting" (click)="export('categories')">
+              <mat-icon>download</mat-icon> {{ 'REPORTS.EXPORT' | translate }}
+            </button>
+          </div>
+          <div class="report-table">
+            <mat-table [dataSource]="categorySales">
+              <ng-container matColumnDef="categoryName">
+                <mat-header-cell *matHeaderCellDef>{{ 'REPORTS.CATEGORY' | translate }}</mat-header-cell>
+                <mat-cell *matCellDef="let row">{{ row.categoryName || ('REPORTS.UNCATEGORIZED' | translate) }}</mat-cell>
+              </ng-container>
+              <ng-container matColumnDef="quantity">
+                <mat-header-cell *matHeaderCellDef>{{ 'COMMON.QUANTITY' | translate }}</mat-header-cell>
+                <mat-cell *matCellDef="let row">{{ row.quantity }}</mat-cell>
+              </ng-container>
+              <ng-container matColumnDef="quantityRefunded">
+                <mat-header-cell *matHeaderCellDef>{{ 'REPORTS.QUANTITY_REFUNDED' | translate }}</mat-header-cell>
+                <mat-cell *matCellDef="let row">{{ row.quantityRefunded }}</mat-cell>
+              </ng-container>
+              @for (column of ['netRevenue', 'costOfGoods', 'grossProfit']; track column) {
+                <ng-container [matColumnDef]="column">
+                  <mat-header-cell *matHeaderCellDef>{{ 'REPORTS.COLUMN_' + column | translate }}</mat-header-cell>
+                  <mat-cell *matCellDef="let row">{{ format(row[column]) }}</mat-cell>
+                </ng-container>
+              }
+              <ng-container matColumnDef="sharePercent">
+                <mat-header-cell *matHeaderCellDef>{{ 'REPORTS.SHARE' | translate }}</mat-header-cell>
+                <mat-cell *matCellDef="let row">{{ row.sharePercent }}%</mat-cell>
+              </ng-container>
+              <mat-header-row *matHeaderRowDef="categoryColumns"></mat-header-row>
+              <mat-row *matRowDef="let row; columns: categoryColumns"></mat-row>
+              <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell p-16">{{ 'REPORTS.EMPTY' | translate }}</td>
+              </tr>
+            </mat-table>
+          </div>
+        </mat-tab>
+
+        <mat-tab [label]="'REPORTS.TAB_EMPLOYEES' | translate">
+          <div class="d-flex justify-content-end m-y-16">
+            <button mat-stroked-button type="button" [disabled]="exporting" (click)="export('employees')">
+              <mat-icon>download</mat-icon> {{ 'REPORTS.EXPORT' | translate }}
+            </button>
+          </div>
+          <div class="report-table">
+            <mat-table [dataSource]="employeeSales">
+              <ng-container matColumnDef="seller">
+                <mat-header-cell *matHeaderCellDef>{{ 'REPORTS.SELLER' | translate }}</mat-header-cell>
+                <mat-cell *matCellDef="let row">{{ row.name || row.seller }}</mat-cell>
+              </ng-container>
+              <ng-container matColumnDef="receiptsCount">
+                <mat-header-cell *matHeaderCellDef>{{ 'REPORTS.RECEIPTS' | translate }}</mat-header-cell>
+                <mat-cell *matCellDef="let row">{{ row.receiptsCount }}</mat-cell>
+              </ng-container>
+              <ng-container matColumnDef="shiftsCount">
+                <mat-header-cell *matHeaderCellDef>{{ 'REPORTS.SHIFTS' | translate }}</mat-header-cell>
+                <mat-cell *matCellDef="let row">{{ row.shiftsCount }}</mat-cell>
+              </ng-container>
+              @for (column of ['grossSales', 'pointsDiscount', 'netSales', 'averageReceipt']; track column) {
+                <ng-container [matColumnDef]="column">
+                  <mat-header-cell *matHeaderCellDef>{{ 'REPORTS.COLUMN_' + column | translate }}</mat-header-cell>
+                  <mat-cell *matCellDef="let row">{{ format(row[column]) }}</mat-cell>
+                </ng-container>
+              }
+              <mat-header-row *matHeaderRowDef="employeeColumns"></mat-header-row>
+              <mat-row *matRowDef="let row; columns: employeeColumns"></mat-row>
+              <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell p-16">{{ 'REPORTS.EMPTY' | translate }}</td>
+              </tr>
+            </mat-table>
+          </div>
+        </mat-tab>
+
+        <mat-tab [label]="'REPORTS.TAB_PAYMENT_TYPES' | translate">
+          <div class="d-flex justify-content-end m-y-16">
+            <button mat-stroked-button type="button" [disabled]="exporting" (click)="export('payment-types')">
+              <mat-icon>download</mat-icon> {{ 'REPORTS.EXPORT' | translate }}
+            </button>
+          </div>
+          <div class="report-table">
+            <mat-table [dataSource]="paymentTypeSales">
+              <ng-container matColumnDef="type">
+                <mat-header-cell *matHeaderCellDef>{{ 'REPORTS.PAYMENT_TYPE' | translate }}</mat-header-cell>
+                <mat-cell *matCellDef="let row">{{ 'REPORTS.PAYMENT_' + row.type | translate }}</mat-cell>
+              </ng-container>
+              <ng-container matColumnDef="receiptsCount">
+                <mat-header-cell *matHeaderCellDef>{{ 'REPORTS.RECEIPTS' | translate }}</mat-header-cell>
+                <mat-cell *matCellDef="let row">{{ row.receiptsCount }}</mat-cell>
+              </ng-container>
+              @for (column of ['amount', 'refunded', 'netAmount']; track column) {
+                <ng-container [matColumnDef]="column">
+                  <mat-header-cell *matHeaderCellDef>{{ 'REPORTS.COLUMN_' + column | translate }}</mat-header-cell>
+                  <mat-cell *matCellDef="let row">{{ format(row[column]) }}</mat-cell>
+                </ng-container>
+              }
+              <ng-container matColumnDef="sharePercent">
+                <mat-header-cell *matHeaderCellDef>{{ 'REPORTS.SHARE' | translate }}</mat-header-cell>
+                <mat-cell *matCellDef="let row">{{ row.sharePercent }}%</mat-cell>
+              </ng-container>
+              <mat-header-row *matHeaderRowDef="paymentTypeColumns"></mat-header-row>
+              <mat-row *matRowDef="let row; columns: paymentTypeColumns"></mat-row>
+              <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell p-16">{{ 'REPORTS.EMPTY' | translate }}</td>
+              </tr>
+            </mat-table>
+          </div>
+        </mat-tab>
+
+        <mat-tab [label]="'REPORTS.TAB_TAXES' | translate">
+          <div class="d-flex justify-content-end m-y-16">
+            <button mat-stroked-button type="button" [disabled]="exporting" (click)="export('taxes')">
+              <mat-icon>download</mat-icon> {{ 'REPORTS.EXPORT' | translate }}
+            </button>
+          </div>
+          <div class="report-table">
+            <mat-table [dataSource]="taxes">
+              <ng-container matColumnDef="vatRate">
+                <mat-header-cell *matHeaderCellDef>{{ 'REPORTS.VAT_RATE' | translate }}</mat-header-cell>
+                <mat-cell *matCellDef="let row">{{ row.vatRate }}%</mat-cell>
+              </ng-container>
+              @for (column of ['netSales', 'refunds', 'taxableAmount', 'vatAmount', 'amountWithoutVat']; track column) {
+                <ng-container [matColumnDef]="column">
+                  <mat-header-cell *matHeaderCellDef>{{ 'REPORTS.COLUMN_' + column | translate }}</mat-header-cell>
+                  <mat-cell *matCellDef="let row">{{ format(row[column]) }}</mat-cell>
+                </ng-container>
+              }
+              <mat-header-row *matHeaderRowDef="taxColumns"></mat-header-row>
+              <mat-row *matRowDef="let row; columns: taxColumns"></mat-row>
+              <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell p-16">{{ 'REPORTS.EMPTY' | translate }}</td>
+              </tr>
+            </mat-table>
+          </div>
+        </mat-tab>
+
+        <mat-tab [label]="'REPORTS.TAB_INVENTORY' | translate">
+          <div class="d-flex align-items-center justify-content-between m-y-16 flex-wrap" style="gap: 8px;">
+            @if (inventory) {
+              <span class="f-s-13">
+                {{ 'REPORTS.INVENTORY_TOTALS' | translate: {
+                  units: inventory.totalUnits,
+                  cost: format(inventory.costValue),
+                  retail: format(inventory.retailValue),
+                  profit: format(inventory.potentialProfit)
+                } }}
+              </span>
+            }
+            <button mat-stroked-button type="button" [disabled]="exporting" (click)="export('inventory')">
+              <mat-icon>download</mat-icon> {{ 'REPORTS.EXPORT' | translate }}
+            </button>
+          </div>
+          @if (inventory && inventory.productsWithoutCost > 0) {
+            <p class="f-s-13 m-b-16 report-warning">
+              {{ 'REPORTS.PRODUCTS_WITHOUT_COST' | translate: { count: inventory.productsWithoutCost } }}
+            </p>
+          }
+          <div class="report-table">
+            <mat-table [dataSource]="inventory?.items ?? []">
+              <ng-container matColumnDef="productName">
+                <mat-header-cell *matHeaderCellDef>{{ 'COMMON.PRODUCT' | translate }}</mat-header-cell>
+                <mat-cell *matCellDef="let row">{{ row.productName }}</mat-cell>
+              </ng-container>
+              <ng-container matColumnDef="categoryName">
+                <mat-header-cell *matHeaderCellDef>{{ 'REPORTS.CATEGORY' | translate }}</mat-header-cell>
+                <mat-cell *matCellDef="let row">{{ row.categoryName || ('REPORTS.UNCATEGORIZED' | translate) }}</mat-cell>
+              </ng-container>
+              <ng-container matColumnDef="stock">
+                <mat-header-cell *matHeaderCellDef>{{ 'PRODUCTS.STOCK' | translate }}</mat-header-cell>
+                <mat-cell *matCellDef="let row" [class.text-danger]="row.stock < 0">{{ row.stock }}</mat-cell>
+              </ng-container>
+              @for (column of ['costPrice', 'price', 'costValue', 'retailValue', 'potentialProfit']; track column) {
+                <ng-container [matColumnDef]="column">
+                  <mat-header-cell *matHeaderCellDef>{{ 'REPORTS.COLUMN_' + column | translate }}</mat-header-cell>
+                  <mat-cell *matCellDef="let row">{{ format(row[column]) }}</mat-cell>
+                </ng-container>
+              }
+              <mat-header-row *matHeaderRowDef="inventoryColumns"></mat-header-row>
+              <mat-row *matRowDef="let row; columns: inventoryColumns"></mat-row>
+              <tr class="mat-row" *matNoDataRow>
+                <td class="mat-cell p-16">{{ 'REPORTS.INVENTORY_EMPTY' | translate }}</td>
+              </tr>
+            </mat-table>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+
+    </mat-card-content>
+  </mat-card>
+</div>
