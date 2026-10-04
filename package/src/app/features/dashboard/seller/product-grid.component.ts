@@ -1,21 +1,14 @@
-import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, OnInit, Output, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatDialogRef } from '@angular/material/dialog';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MaterialModule } from 'src/app/material.module';
 import { Product } from 'src/app/features/products/product.models';
 import { CategoryIconComponent } from 'src/app/features/product-group-categories/category-icon.component';
 import { ProductGroupCategory } from 'src/app/features/product-group-categories/product-group-category.models';
 import { ProductService } from 'src/app/services/product.service';
-import { formatMdl, toCents, toMdl } from 'src/app/shared/money/money.util';
+import { formatMdl } from 'src/app/shared/money/money.util';
 
 export type PickerGroupBy = 'CATEGORY' | 'GAMMA' | 'BRAND' | 'BRAND_CATEGORY_GAMMA';
-
-export interface PickedProduct {
-  product: Product;
-  unitPrice: number;
-  quantity: number;
-}
 
 type PickerDimension = 'CATEGORY' | 'GAMMA' | 'BRAND';
 
@@ -29,7 +22,7 @@ interface PickerGroup {
 const OTHER_GROUP_KEY = '__OTHER__';
 const PRODUCT_KEY_PREFIX = 'product-';
 const CATALOG_PAGE_SIZE = 1000;
-const NAVIGATION_KEYS = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Enter', 'Backspace'];
+const NAVIGATION_KEYS = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Enter', 'Backspace', 'Escape'];
 
 const GROUP_BY_LEVELS: Record<PickerGroupBy, PickerDimension[]> = {
   CATEGORY: ['CATEGORY'],
@@ -44,15 +37,25 @@ const ROOT_LABELS: Record<PickerDimension, string> = {
   BRAND: 'POS.PICKER_ALL_BRANDS',
 };
 
+const GROUP_BY_LABELS: Record<PickerGroupBy, string> = {
+  CATEGORY: 'PRODUCTS.CATEGORY',
+  GAMMA: 'PRODUCTS.GAMMA',
+  BRAND: 'PRODUCTS.BRAND',
+  BRAND_CATEGORY_GAMMA: 'POS.PICKER_BRAND_CATEGORY_GAMMA',
+};
+
 @Component({
-  selector: 'app-product-picker-dialog',
+  selector: 'app-product-grid',
   standalone: true,
   imports: [MaterialModule, FormsModule, TranslatePipe, CategoryIconComponent],
-  templateUrl: './product-picker-dialog.component.html',
-  styleUrls: ['./product-picker-dialog.component.scss'],
+  templateUrl: './product-grid.component.html',
+  styleUrls: ['./product-grid.component.scss'],
 })
-export class ProductPickerDialogComponent implements OnInit {
+export class ProductGridComponent implements OnInit {
   @ViewChild('tileGrid') tileGrid?: ElementRef<HTMLElement>;
+  @ViewChild('searchInput') searchInput?: ElementRef<HTMLInputElement>;
+
+  @Output() readonly productPicked = new EventEmitter<Product>();
 
   products: Product[] = [];
   groupBy: PickerGroupBy = 'CATEGORY';
@@ -60,20 +63,12 @@ export class ProductPickerDialogComponent implements OnInit {
   search = '';
   loading = true;
   errorMessage = '';
-
-  selected: Product | null = null;
-  quantity = 1;
-  priceMdl: number | null = null;
-
-  picked: PickedProduct[] = [];
   highlightedKey: string | null = null;
 
   readonly otherGroupKey = OTHER_GROUP_KEY;
+  readonly groupByOptions = Object.keys(GROUP_BY_LEVELS) as PickerGroupBy[];
 
-  constructor(
-    private readonly productService: ProductService,
-    private readonly dialogRef: MatDialogRef<ProductPickerDialogComponent, PickedProduct[]>,
-  ) {}
+  constructor(private readonly productService: ProductService) {}
 
   ngOnInit(): void {
     this.productService.getAll(0, CATALOG_PAGE_SIZE, 'name', 'asc').subscribe({
@@ -148,41 +143,29 @@ export class ProductPickerDialogComponent implements OnInit {
     return ROOT_LABELS[this.levels[0]];
   }
 
-  get addedCount(): number {
-    return this.picked.reduce((sum, pick) => sum + pick.quantity, 0);
+  groupByLabel(option: PickerGroupBy): string {
+    return GROUP_BY_LABELS[option];
   }
 
-  get hasOwnPrice(): boolean {
-    return this.hasPrice(this.selected);
+  hasPrice(product: Product): boolean {
+    return product.price !== null && product.price !== undefined;
   }
 
-  get suggestedPriceMdl(): number | null {
-    const gammaPrice = this.selected?.gamma?.price;
-    if (gammaPrice === null || gammaPrice === undefined) {
-      return null;
+  format(cents: number | null | undefined): string {
+    if (cents === null || cents === undefined) {
+      return '';
     }
 
-    return toMdl(gammaPrice);
-  }
-
-  get canAdd(): boolean {
-    if (!this.selected || this.quantity < 1) {
-      return false;
-    }
-
-    if (this.hasOwnPrice) {
-      return true;
-    }
-
-    return this.priceMdl !== null && this.priceMdl >= 0;
-  }
-
-  hasPrice(product: Product | null): boolean {
-    return product?.price !== null && product?.price !== undefined;
+    return formatMdl(cents);
   }
 
   productKey(product: Product): string {
     return `${PRODUCT_KEY_PREFIX}${product.id}`;
+  }
+
+  focusSearch(): void {
+    this.searchInput?.nativeElement.focus();
+    this.searchInput?.nativeElement.select();
   }
 
   openGroup(group: PickerGroup): void {
@@ -213,54 +196,27 @@ export class ProductPickerDialogComponent implements OnInit {
     return this.highlightedKey === key;
   }
 
-  isSelected(product: Product): boolean {
-    return this.selected?.id === product.id;
-  }
-
-  select(product: Product): void {
-    this.selected = product;
-    this.quantity = 1;
-    this.priceMdl = this.suggestedPriceMdl;
+  pick(product: Product): void {
     this.highlightedKey = this.productKey(product);
-  }
-
-  changeQuantity(delta: number): void {
-    this.quantity = Math.max(1, this.quantity + delta);
-  }
-
-  format(cents: number | null | undefined): string {
-    if (cents === null || cents === undefined) {
-      return '';
-    }
-
-    return formatMdl(cents);
-  }
-
-  add(): void {
-    if (!this.canAdd || !this.selected) {
-      return;
-    }
-
-    const unitPrice = this.hasOwnPrice ? this.selected.price! : toCents(this.priceMdl!);
-    const existing = this.picked.find((pick) => pick.product.id === this.selected!.id && pick.unitPrice === unitPrice);
-    if (existing) {
-      existing.quantity += this.quantity;
-    } else {
-      this.picked.push({ product: this.selected, unitPrice, quantity: this.quantity });
-    }
-
-    this.selected = null;
-    this.quantity = 1;
-    this.priceMdl = null;
-  }
-
-  done(): void {
-    this.dialogRef.close(this.picked);
+    this.productPicked.emit(product);
   }
 
   @HostListener('keydown', ['$event'])
   onKeyDown(event: KeyboardEvent): void {
     if (!NAVIGATION_KEYS.includes(event.key) || !this.isNavigationTarget(event)) {
+      return;
+    }
+
+    if (event.key === 'Escape') {
+      if (this.isSearching) {
+        event.preventDefault();
+        this.search = '';
+        return;
+      }
+      if (!this.isAtRoot) {
+        event.preventDefault();
+        this.goBack();
+      }
       return;
     }
 
@@ -279,9 +235,9 @@ export class ProductPickerDialogComponent implements OnInit {
 
     const current = keys.findIndex((key) => key === this.highlightedKey);
     if (event.key === 'Enter') {
-      if (current >= 0) {
+      if (current >= 0 || this.isSearching) {
         event.preventDefault();
-        this.activate(keys[current]);
+        this.activate(keys[Math.max(current, 0)]);
       }
       return;
     }
@@ -315,13 +271,13 @@ export class ProductPickerDialogComponent implements OnInit {
 
     const product = this.visibleProducts.find((candidate) => this.productKey(candidate) === key);
     if (product) {
-      this.select(product);
+      this.pick(product);
     }
   }
 
   private isNavigationTarget(event: KeyboardEvent): boolean {
     const target = event.target as HTMLElement;
-    if (target.closest('mat-button-toggle-group')) {
+    if (target.closest('mat-select, .mat-mdc-select')) {
       return false;
     }
 
@@ -329,8 +285,8 @@ export class ProductPickerDialogComponent implements OnInit {
       return true;
     }
 
-    const isSearch = target.classList.contains('picker-search-input');
-    return isSearch && ['ArrowUp', 'ArrowDown', 'Enter'].includes(event.key);
+    const isSearch = target.classList.contains('product-grid-search-input');
+    return isSearch && ['ArrowUp', 'ArrowDown', 'Enter', 'Escape'].includes(event.key);
   }
 
   private navigationStep(key: string): number {
@@ -361,7 +317,7 @@ export class ProductPickerDialogComponent implements OnInit {
 
   private scrollHighlightedIntoView(): void {
     setTimeout(() => {
-      this.tileGrid?.nativeElement.querySelector('.picker-tile-highlighted')?.scrollIntoView({ block: 'nearest' });
+      this.tileGrid?.nativeElement.querySelector('.grid-tile-highlighted')?.scrollIntoView({ block: 'nearest' });
     });
   }
 

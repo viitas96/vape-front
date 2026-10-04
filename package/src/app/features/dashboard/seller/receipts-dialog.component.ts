@@ -9,6 +9,7 @@ import { RefundFlowService } from 'src/app/features/orders/refund-flow.service';
 import { OrderService } from 'src/app/services/order.service';
 import { getApiErrorMessage } from 'src/app/shared/http/api-error';
 import { formatMdl } from 'src/app/shared/money/money.util';
+import { PosPrintService } from 'src/app/shared/print/pos-print.service';
 
 export interface ReceiptsDialogData {
   shiftId: number | null;
@@ -51,6 +52,9 @@ const RECEIPTS_PAGE_SIZE = 50;
                 <span class="receipt-badge">{{ 'REFUNDS.STATUS_' + order.refundStatus | translate }}</span>
               }
               <strong>{{ format(order.total) }}</strong>
+              <button mat-icon-button type="button" (click)="print(order)" [title]="'POS.PRINT_LAST_RECEIPT' | translate">
+                <mat-icon>print</mat-icon>
+              </button>
               @if (canRefund(order)) {
                 <button mat-stroked-button color="warn" type="button" (click)="refund(order)">
                   <mat-icon>undo</mat-icon> {{ 'REFUNDS.ACTION' | translate }}
@@ -121,6 +125,7 @@ export class ReceiptsDialogComponent implements OnInit {
     private readonly orderService: OrderService,
     private readonly refundFlow: RefundFlowService,
     private readonly translateService: TranslateService,
+    private readonly posPrint: PosPrintService,
   ) {}
 
   ngOnInit(): void {
@@ -133,6 +138,10 @@ export class ReceiptsDialogComponent implements OnInit {
 
   format(cents: number): string {
     return formatMdl(cents);
+  }
+
+  print(order: Order): void {
+    this.posPrint.printSale(order);
   }
 
   findByNumber(): void {

@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, Inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -6,6 +6,18 @@ import { MaterialModule } from 'src/app/material.module';
 import { formatMdl, toCents } from 'src/app/shared/money/money.util';
 
 export type PaymentChoice = 'CASH' | 'CARD' | 'SPLIT';
+
+const PAYMENT_HOTKEYS: Record<string, PaymentChoice> = {
+  F2: 'CASH',
+  F3: 'CARD',
+  F4: 'SPLIT',
+};
+
+const AMOUNT_FIELD_SELECTORS: Record<PaymentChoice, string> = {
+  CASH: 'input[formcontrolname="tendered"]',
+  CARD: 'input[formcontrolname="tendered"]',
+  SPLIT: 'input[formcontrolname="cardAmount"]',
+};
 
 export interface PaymentDialogData {
   totalCents: number;
@@ -32,9 +44,9 @@ export interface PaymentDialogResult {
 
       <form [formGroup]="form" id="payment-form" (ngSubmit)="submit()">
         <mat-button-toggle-group formControlName="method" class="w-100 m-b-16">
-          <mat-button-toggle value="CASH" class="w-100">{{ 'PAYMENT.CASH' | translate }}</mat-button-toggle>
-          <mat-button-toggle value="CARD" class="w-100">{{ 'PAYMENT.CARD' | translate }}</mat-button-toggle>
-          <mat-button-toggle value="SPLIT" class="w-100">{{ 'PAYMENT.SPLIT' | translate }}</mat-button-toggle>
+          <mat-button-toggle value="CASH" class="w-100">{{ 'PAYMENT.CASH' | translate }} (F2)</mat-button-toggle>
+          <mat-button-toggle value="CARD" class="w-100">{{ 'PAYMENT.CARD' | translate }} (F3)</mat-button-toggle>
+          <mat-button-toggle value="SPLIT" class="w-100">{{ 'PAYMENT.SPLIT' | translate }} (F4)</mat-button-toggle>
         </mat-button-toggle-group>
 
         @if (method === 'SPLIT') {
@@ -95,7 +107,7 @@ export interface PaymentDialogResult {
     </mat-dialog-actions>
   `,
 })
-export class PaymentDialogComponent {
+export class PaymentDialogComponent implements AfterViewInit {
   readonly form = new FormGroup({
     method: new FormControl<PaymentChoice>('CASH'),
     cardAmount: new FormControl<number | null>(null),
@@ -107,8 +119,25 @@ export class PaymentDialogComponent {
   constructor(
     private readonly dialogRef: MatDialogRef<PaymentDialogComponent, PaymentDialogResult>,
     @Inject(MAT_DIALOG_DATA) public data: PaymentDialogData,
+    private readonly host: ElementRef<HTMLElement>,
   ) {
     this.quickTenderCents = this.buildQuickTenders();
+    this.form.controls.method.valueChanges.subscribe(() => this.focusAmountField());
+  }
+
+  ngAfterViewInit(): void {
+    this.focusAmountField();
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent): void {
+    const method = PAYMENT_HOTKEYS[event.key];
+    if (!method) {
+      return;
+    }
+
+    event.preventDefault();
+    this.form.controls.method.setValue(method);
   }
 
   get method(): PaymentChoice {
@@ -184,6 +213,13 @@ export class PaymentDialogComponent {
       cashAmount: this.cashDueCents,
       cardAmount: this.cardCents,
       changeCents: Math.max(0, this.changeCents),
+    });
+  }
+
+  private focusAmountField(): void {
+    setTimeout(() => {
+      const input = this.host.nativeElement.querySelector<HTMLInputElement>(AMOUNT_FIELD_SELECTORS[this.method]);
+      input?.focus();
     });
   }
 

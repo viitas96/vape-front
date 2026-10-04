@@ -88,5 +88,8 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
+  <button mat-stroked-button type="button" (click)="print()">
+    <mat-icon>print</mat-icon> {{ 'POS.PRINT_LAST_RECEIPT' | translate }}
+  </button>
   <button mat-flat-button color="primary" mat-dialog-close>{{ 'COMMON.CLOSE' | translate }}</button>
 </mat-dialog-actions>

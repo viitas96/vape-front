@@ -22,6 +22,10 @@ export class ShiftService {
     return this.http.get<Shift | null>(`${this.API_URL}/current`);
   }
 
+  getLastClosed(): Observable<Shift | null> {
+    return this.http.get<Shift | null>(`${this.API_URL}/last-closed`);
+  }
+
   open(dto: ShiftOpenDTO): Observable<void> {
     return this.http.post<void>(`${this.API_URL}/open`, dto);
   }

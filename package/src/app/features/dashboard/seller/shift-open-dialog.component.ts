@@ -1,9 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, Inject, Optional } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MaterialModule } from 'src/app/material.module';
-import { toCents } from 'src/app/shared/money/money.util';
+import { toCents, toMdl } from 'src/app/shared/money/money.util';
+
+export interface ShiftOpenDialogData {
+  suggestedStartingCash: number | null;
+}
 
 @Component({
   selector: 'app-shift-open-dialog',
@@ -36,7 +40,15 @@ export class ShiftOpenDialogComponent {
     startingCash: new FormControl<number | null>(0, [Validators.required, Validators.min(0)]),
   });
 
-  constructor(private readonly dialogRef: MatDialogRef<ShiftOpenDialogComponent, number>) {}
+  constructor(
+    private readonly dialogRef: MatDialogRef<ShiftOpenDialogComponent, number>,
+    @Optional() @Inject(MAT_DIALOG_DATA) data: ShiftOpenDialogData | null,
+  ) {
+    const suggested = data?.suggestedStartingCash;
+    if (suggested !== null && suggested !== undefined) {
+      this.form.controls.startingCash.setValue(toMdl(suggested));
+    }
+  }
 
   submit(): void {
     if (this.form.invalid) {

@@ -50,6 +50,7 @@ export interface Order {
   status: OrderStatus;
   total: number;
   customerId?: string;
+  customerEmail?: string | null;
   pointsUsed?: number;
   pointsEarned?: number;
   discount?: number;

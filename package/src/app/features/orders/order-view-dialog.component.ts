@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MaterialModule } from 'src/app/material.module';
 import { OrderService } from 'src/app/services/order.service';
+import { PosPrintService } from 'src/app/shared/print/pos-print.service';
 import { Order, Refund } from './order.models';
 
 export interface OrderViewDialogData {
@@ -46,7 +47,12 @@ export class OrderViewDialogComponent implements OnInit {
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: OrderViewDialogData,
     private readonly orderService: OrderService,
+    private readonly posPrint: PosPrintService,
   ) {}
+
+  print(): void {
+    this.posPrint.printSale(this.order);
+  }
 
   ngOnInit(): void {
     if ((this.order.refundStatus ?? 'NONE') === 'NONE') {

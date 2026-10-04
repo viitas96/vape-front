@@ -1,0 +1,127 @@
+<div class="product-grid">
+
+  <div class="product-grid-toolbar">
+    <mat-form-field appearance="outline" class="product-grid-search" subscriptSizing="dynamic">
+      <mat-icon matPrefix>search</mat-icon>
+      <mat-label>{{ 'POS.PICKER_SEARCH' | translate }} (F2)</mat-label>
+      <input
+        matInput
+        #searchInput
+        class="product-grid-search-input"
+        [(ngModel)]="search"
+        (ngModelChange)="onSearchChange()"
+        autocomplete="off"
+      />
+      @if (search) {
+        <button mat-icon-button matSuffix type="button" (click)="search = ''; onSearchChange()">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="product-grid-group-by" subscriptSizing="dynamic">
+      <mat-label>{{ 'POS.PICKER_GROUP_BY' | translate }}</mat-label>
+      <mat-select [(ngModel)]="groupBy" (ngModelChange)="onGroupByChange()">
+        @for (option of groupByOptions; track option) {
+          <mat-option [value]="option">{{ groupByLabel(option) | translate }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div class="product-grid-breadcrumb">
+    @if (isAtRoot) {
+      <span class="product-grid-breadcrumb-current">{{ rootLabel | translate }}</span>
+    } @else {
+      <button type="button" class="product-grid-breadcrumb-link" (click)="goToLevel(0)">
+        <mat-icon>chevron_left</mat-icon>
+        <span>{{ rootLabel | translate }}</span>
+      </button>
+
+      @if (isSearching) {
+        <span class="product-grid-breadcrumb-separator">/</span>
+        <span class="product-grid-breadcrumb-current">{{ 'POS.PICKER_SEARCH_RESULTS' | translate }}</span>
+      } @else {
+        @for (group of path; track $index; let level = $index; let last = $last) {
+          <span class="product-grid-breadcrumb-separator">/</span>
+          @if (last) {
+            <span class="product-grid-breadcrumb-current">
+              @if (group.key === otherGroupKey) {
+                {{ 'POS.PICKER_OTHER' | translate }}
+              } @else {
+                {{ group.label }}
+              }
+            </span>
+          } @else {
+            <button type="button" class="product-grid-breadcrumb-link" (click)="goToLevel(level + 1)">
+              @if (group.key === otherGroupKey) {
+                {{ 'POS.PICKER_OTHER' | translate }}
+              } @else {
+                {{ group.label }}
+              }
+            </button>
+          }
+        }
+      }
+    }
+  </div>
+
+  @if (errorMessage) {
+    <p class="text-danger f-s-14">{{ errorMessage | translate }}</p>
+  }
+
+  <div class="product-grid-scroll">
+    @if (loading) {
+      <p class="f-s-13 p-16">{{ 'POS.PICKER_LOADING' | translate }}</p>
+    }
+
+    @if (showGroups) {
+      <div #tileGrid class="product-grid-tiles product-grid-tiles-groups">
+        @for (group of groups; track group.key) {
+          <button
+            type="button"
+            class="grid-tile grid-group-tile"
+            [class.grid-tile-highlighted]="isHighlighted(group.key)"
+            (click)="openGroup(group)"
+          >
+            @if (group.key === otherGroupKey) {
+              <span class="grid-group-other-icon"><mat-icon>more_horiz</mat-icon></span>
+              <span class="grid-tile-name">{{ 'POS.PICKER_OTHER' | translate }}</span>
+            } @else {
+              <app-category-icon [category]="group.icon" [size]="56" />
+              <span class="grid-tile-name">{{ group.label }}</span>
+            }
+            <span class="grid-group-count">{{ group.productCount }}</span>
+          </button>
+        }
+      </div>
+
+      @if (!loading && groups.length === 0) {
+        <p class="f-s-13 p-16">{{ 'POS.PICKER_EMPTY' | translate }}</p>
+      }
+    } @else {
+      <div #tileGrid class="product-grid-tiles">
+        @for (product of visibleProducts; track product.id) {
+          <button
+            type="button"
+            class="grid-tile"
+            [class.grid-tile-highlighted]="isHighlighted(productKey(product))"
+            (click)="pick(product)"
+          >
+            <span class="grid-tile-name">{{ product.name }}</span>
+            @if (hasPrice(product)) {
+              <span class="grid-tile-price">{{ format(product.price) }}</span>
+            } @else {
+              <span class="grid-tile-no-price">{{ 'POS.PICKER_NO_PRICE' | translate }}</span>
+            }
+          </button>
+        }
+      </div>
+
+      @if (!loading && visibleProducts.length === 0) {
+        <p class="f-s-13 p-16">{{ 'POS.PICKER_EMPTY' | translate }}</p>
+      }
+    }
+  </div>
+
+</div>
