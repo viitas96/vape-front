@@ -342,7 +342,7 @@ export class SellerDashboardComponent implements OnInit {
   }
 
   openProductPicker(): void {
-    this.dialog.open(ProductPickerDialogComponent, { width: '860px', maxWidth: 'calc(100vw - 48px)' })
+    this.dialog.open(ProductPickerDialogComponent, { width: '90vw', maxWidth: '90vw', height: '85vh' })
       .afterClosed()
       .subscribe((picked?: PickedProduct[]) => {
         if (picked) {

@@ -27,4 +27,22 @@ export class ProductGroupCategoryService {
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.API_URL}/${id}`);
   }
+
+  uploadIcon(id: number, file: File): Observable<void> {
+    const body = new FormData();
+    body.append('file', file);
+    return this.http.put<void>(`${this.API_URL}/${id}/icon`, body);
+  }
+
+  removeIcon(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.API_URL}/${id}/icon`);
+  }
+
+  iconUrl(category: Pick<ProductGroupCategory, 'id' | 'iconVersion'>): string | null {
+    if (!category.iconVersion) {
+      return null;
+    }
+
+    return `${this.API_URL}/${category.id}/icon?v=${category.iconVersion}`;
+  }
 }

@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslatePipe } from '@ngx-translate/core';
+import { Observable, of, switchMap } from 'rxjs';
 import { MaterialModule } from 'src/app/material.module';
 import { ProductGroupCategoryService } from 'src/app/services/product-group-category.service';
 import { ConfirmDialogService } from 'src/app/shared/dialogs/confirm-dialog.service';
 import { getApiErrorMessage } from 'src/app/shared/http/api-error';
 import { ExpandableRowsPageState } from 'src/app/shared/page/page-state';
-import { ProductGroupCategory } from './product-group-category.models';
+import { CategoryIconComponent } from './category-icon.component';
+import { ProductGroupCategory, ProductGroupCategoryDialogResult } from './product-group-category.models';
 import {
   ProductGroupCategoryDialogComponent,
   ProductGroupCategoryDialogData,
@@ -15,13 +17,13 @@ import {
 @Component({
   selector: 'app-product-group-categories',
   standalone: true,
-  imports: [MaterialModule, TranslatePipe],
+  imports: [MaterialModule, TranslatePipe, CategoryIconComponent],
   templateUrl: './product-group-categories.component.html',
 })
 export class ProductGroupCategoriesComponent extends ExpandableRowsPageState implements OnInit {
   categories: ProductGroupCategory[] = [];
   // systemName column removed from the UI; kept on the model/backend for future use.
-  displayedColumns = ['id', 'name', 'actions', 'expand'];
+  displayedColumns = ['id', 'icon', 'name', 'actions', 'expand'];
   sortBy = 'id';
   sortDirection: 'asc' | 'desc' = 'asc';
 
@@ -39,23 +41,25 @@ export class ProductGroupCategoriesComponent extends ExpandableRowsPageState imp
 
   openDialog(category?: ProductGroupCategory): void {
     const data: ProductGroupCategoryDialogData = { category: category ?? null };
-    this.dialog.open(ProductGroupCategoryDialogComponent, { width: '400px', data }).afterClosed().subscribe((dto) => {
-      if (!dto) {
+    this.dialog.open(ProductGroupCategoryDialogComponent, { width: '400px', data }).afterClosed().subscribe((result) => {
+      if (!result) {
         return;
       }
 
       this.clearMessages();
+      const { dto } = result;
       const request = category
         ? this.productGroupCategoryService.update(category.id, dto)
         : this.productGroupCategoryService.create(dto);
 
-      request.subscribe({
+      request.pipe(switchMap((saved) => this.saveIcon(saved.id, result))).subscribe({
         next: () => {
           this.setSuccess(`Category "${dto.name}" ${category ? 'updated' : 'created'}.`);
           this.loadCategories();
         },
         error: (error) => {
           this.setError(getApiErrorMessage(error, `Failed to ${category ? 'update' : 'create'} category`));
+          this.loadCategories();
         },
       });
     });
@@ -89,6 +93,18 @@ export class ProductGroupCategoriesComponent extends ExpandableRowsPageState imp
     this.sortDirection = sort.direction || 'asc';
     this.collapseRowDetails();
     this.loadCategories();
+  }
+
+  private saveIcon(id: number, result: ProductGroupCategoryDialogResult): Observable<void> {
+    if (result.icon) {
+      return this.productGroupCategoryService.uploadIcon(id, result.icon);
+    }
+
+    if (result.removeIcon) {
+      return this.productGroupCategoryService.removeIcon(id);
+    }
+
+    return of(undefined);
   }
 
   private loadCategories(): void {

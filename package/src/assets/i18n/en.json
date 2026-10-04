@@ -155,6 +155,11 @@
     "PICKER_GAMMA_PRICE": "Suggested from the gamma price",
     "PICKER_ADD": "Add",
     "PICKER_ADDED": "Added: {{count}}",
+    "PICKER_ALL_CATEGORIES": "All categories",
+    "PICKER_ALL_GAMMAS": "All gammas",
+    "PICKER_ALL_BRANDS": "All brands",
+    "PICKER_SEARCH_RESULTS": "Search results",
+    "PICKER_BRAND_CATEGORY_GAMMA": "Brand › Category › Gamma",
     "FREE": "FREE",
     "APPLY_FREE_DRINK": "Use a free drink",
     "DRINK_PROGRESS": "Drinks toward a free one",
@@ -193,7 +198,13 @@
     "EMPTY": "No categories found.",
     "SYSTEM_NAME": "System name",
     "PLACEHOLDER_NAME": "Category name",
-    "PLACEHOLDER_SYSTEM_NAME": "e.g. SOUVENIR"
+    "PLACEHOLDER_SYSTEM_NAME": "e.g. SOUVENIR",
+    "ICON": "Icon",
+    "ICON_UPLOAD": "Upload icon",
+    "ICON_REMOVE": "Remove icon",
+    "ICON_HINT": "PNG or JPEG, up to 2 MB. It will be resized to 256×256.",
+    "ICON_INVALID_TYPE": "Only PNG and JPEG images are allowed.",
+    "ICON_TOO_LARGE": "The image must not be larger than 2 MB."
   },
   "GAMMAS": {
     "TITLE": "Gammas",

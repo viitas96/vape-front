@@ -155,6 +155,11 @@
     "PICKER_GAMMA_PRICE": "Sugerat din preţul gamei",
     "PICKER_ADD": "Adaugă",
     "PICKER_ADDED": "Adăugate: {{count}}",
+    "PICKER_ALL_CATEGORIES": "Toate categoriile",
+    "PICKER_ALL_GAMMAS": "Toate gamele",
+    "PICKER_ALL_BRANDS": "Toate brandurile",
+    "PICKER_SEARCH_RESULTS": "Rezultatele căutării",
+    "PICKER_BRAND_CATEGORY_GAMMA": "Brand › Categorie › Gamă",
     "FREE": "GRATIS",
     "APPLY_FREE_DRINK": "Foloseşte o băutură gratuită",
     "DRINK_PROGRESS": "Băuturi până la una gratuită",
@@ -193,7 +198,13 @@
     "EMPTY": "Nu au fost găsite categorii.",
     "SYSTEM_NAME": "Nume de sistem",
     "PLACEHOLDER_NAME": "Denumire categorie",
-    "PLACEHOLDER_SYSTEM_NAME": "ex. SOUVENIR"
+    "PLACEHOLDER_SYSTEM_NAME": "ex. SOUVENIR",
+    "ICON": "Pictogramă",
+    "ICON_UPLOAD": "Încarcă pictograma",
+    "ICON_REMOVE": "Elimină pictograma",
+    "ICON_HINT": "PNG sau JPEG, până la 2 MB. Va fi redimensionată la 256×256.",
+    "ICON_INVALID_TYPE": "Sunt permise doar imagini PNG şi JPEG.",
+    "ICON_TOO_LARGE": "Imaginea nu trebuie să depăşească 2 MB."
   },
   "GAMMAS": {
     "TITLE": "Game",

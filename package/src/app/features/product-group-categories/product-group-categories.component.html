@@ -23,6 +23,11 @@
           <mat-cell *matCellDef="let c; let i = dataIndex">{{ rowNumber(i) }}</mat-cell>
         </ng-container>
 
+        <ng-container matColumnDef="icon">
+          <mat-header-cell *matHeaderCellDef>{{ 'CATEGORIES.ICON' | translate }}</mat-header-cell>
+          <mat-cell *matCellDef="let c"><app-category-icon [category]="c" [size]="32" /></mat-cell>
+        </ng-container>
+
         <ng-container matColumnDef="name">
           <mat-header-cell *matHeaderCellDef mat-sort-header="name">{{ 'PRODUCTS.NAME' | translate }}</mat-header-cell>
           <mat-cell *matCellDef="let c">{{ c.name }}</mat-cell>

@@ -1,13 +1,15 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MaterialModule } from 'src/app/material.module';
 import { Product } from 'src/app/features/products/product.models';
+import { CategoryIconComponent } from 'src/app/features/product-group-categories/category-icon.component';
+import { ProductGroupCategory } from 'src/app/features/product-group-categories/product-group-category.models';
 import { ProductService } from 'src/app/services/product.service';
 import { formatMdl, toCents, toMdl } from 'src/app/shared/money/money.util';
 
-export type PickerGroupBy = 'CATEGORY' | 'GAMMA' | 'BRAND';
+export type PickerGroupBy = 'CATEGORY' | 'GAMMA' | 'BRAND' | 'BRAND_CATEGORY_GAMMA';
 
 export interface PickedProduct {
   product: Product;
@@ -15,24 +17,46 @@ export interface PickedProduct {
   quantity: number;
 }
 
+type PickerDimension = 'CATEGORY' | 'GAMMA' | 'BRAND';
+
 interface PickerGroup {
   key: string;
   label: string;
-  products: Product[];
+  icon: ProductGroupCategory;
+  productCount: number;
 }
 
 const OTHER_GROUP_KEY = '__OTHER__';
+const PRODUCT_KEY_PREFIX = 'product-';
 const CATALOG_PAGE_SIZE = 1000;
+const NAVIGATION_KEYS = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Enter', 'Backspace'];
+
+const GROUP_BY_LEVELS: Record<PickerGroupBy, PickerDimension[]> = {
+  CATEGORY: ['CATEGORY'],
+  GAMMA: ['GAMMA'],
+  BRAND: ['BRAND'],
+  BRAND_CATEGORY_GAMMA: ['BRAND', 'CATEGORY', 'GAMMA'],
+};
+
+const ROOT_LABELS: Record<PickerDimension, string> = {
+  CATEGORY: 'POS.PICKER_ALL_CATEGORIES',
+  GAMMA: 'POS.PICKER_ALL_GAMMAS',
+  BRAND: 'POS.PICKER_ALL_BRANDS',
+};
 
 @Component({
   selector: 'app-product-picker-dialog',
   standalone: true,
-  imports: [MaterialModule, FormsModule, TranslatePipe],
+  imports: [MaterialModule, FormsModule, TranslatePipe, CategoryIconComponent],
   templateUrl: './product-picker-dialog.component.html',
+  styleUrls: ['./product-picker-dialog.component.scss'],
 })
 export class ProductPickerDialogComponent implements OnInit {
+  @ViewChild('tileGrid') tileGrid?: ElementRef<HTMLElement>;
+
   products: Product[] = [];
   groupBy: PickerGroupBy = 'CATEGORY';
+  path: PickerGroup[] = [];
   search = '';
   loading = true;
   errorMessage = '';
@@ -42,8 +66,7 @@ export class ProductPickerDialogComponent implements OnInit {
   priceMdl: number | null = null;
 
   picked: PickedProduct[] = [];
-  collapsedGroups = new Set<string>();
-  highlightedId: number | null = null;
+  highlightedKey: string | null = null;
 
   readonly otherGroupKey = OTHER_GROUP_KEY;
 
@@ -65,20 +88,35 @@ export class ProductPickerDialogComponent implements OnInit {
     });
   }
 
+  get levels(): PickerDimension[] {
+    return GROUP_BY_LEVELS[this.groupBy];
+  }
+
+  get isSearching(): boolean {
+    return this.search.trim().length > 0;
+  }
+
+  get showGroups(): boolean {
+    return !this.isSearching && this.path.length < this.levels.length;
+  }
+
+  get isAtRoot(): boolean {
+    return !this.isSearching && this.path.length === 0;
+  }
+
   get groups(): PickerGroup[] {
-    const matching = this.filterProducts();
+    if (!this.showGroups) {
+      return [];
+    }
+
+    const dimension = this.levels[this.path.length];
     const byKey = new Map<string, PickerGroup>();
 
-    for (const product of matching) {
-      const key = this.groupKey(product);
-      const label = this.groupLabel(product);
-      const group = byKey.get(key);
-      if (group) {
-        group.products.push(product);
-        continue;
-      }
-
-      byKey.set(key, { key, label, products: [product] });
+    for (const product of this.productsInPath()) {
+      const key = this.groupKey(dimension, product);
+      const group = byKey.get(key) ?? this.createGroup(dimension, key, product);
+      group.productCount++;
+      byKey.set(key, group);
     }
 
     return [...byKey.values()].sort((left, right) => {
@@ -94,9 +132,20 @@ export class ProductPickerDialogComponent implements OnInit {
   }
 
   get visibleProducts(): Product[] {
-    return this.groups
-      .filter((group) => !this.collapsedGroups.has(group.key))
-      .flatMap((group) => group.products);
+    if (this.isSearching) {
+      const term = this.search.trim().toLowerCase();
+      return this.products.filter((product) => product.name.toLowerCase().includes(term));
+    }
+
+    if (this.showGroups) {
+      return [];
+    }
+
+    return this.productsInPath();
+  }
+
+  get rootLabel(): string {
+    return ROOT_LABELS[this.levels[0]];
   }
 
   get addedCount(): number {
@@ -104,7 +153,7 @@ export class ProductPickerDialogComponent implements OnInit {
   }
 
   get hasOwnPrice(): boolean {
-    return this.selected?.price !== null && this.selected?.price !== undefined;
+    return this.hasPrice(this.selected);
   }
 
   get suggestedPriceMdl(): number | null {
@@ -128,33 +177,51 @@ export class ProductPickerDialogComponent implements OnInit {
     return this.priceMdl !== null && this.priceMdl >= 0;
   }
 
-  isCollapsed(group: PickerGroup): boolean {
-    return this.collapsedGroups.has(group.key);
+  hasPrice(product: Product | null): boolean {
+    return product?.price !== null && product?.price !== undefined;
   }
 
-  toggleGroup(group: PickerGroup): void {
-    if (this.collapsedGroups.has(group.key)) {
-      this.collapsedGroups.delete(group.key);
-      return;
-    }
+  productKey(product: Product): string {
+    return `${PRODUCT_KEY_PREFIX}${product.id}`;
+  }
 
-    this.collapsedGroups.add(group.key);
+  openGroup(group: PickerGroup): void {
+    this.path = [...this.path, group];
+    this.highlightedKey = null;
+  }
+
+  goToLevel(level: number): void {
+    this.highlightedKey = this.path[level]?.key ?? null;
+    this.path = this.path.slice(0, level);
+    this.search = '';
+  }
+
+  goBack(): void {
+    this.goToLevel(Math.max(0, this.path.length - 1));
+  }
+
+  onSearchChange(): void {
+    this.highlightedKey = null;
   }
 
   onGroupByChange(): void {
-    this.collapsedGroups.clear();
-    this.highlightedId = null;
+    this.path = [];
+    this.highlightedKey = null;
   }
 
-  isHighlighted(product: Product): boolean {
-    return this.highlightedId === product.id;
+  isHighlighted(key: string): boolean {
+    return this.highlightedKey === key;
+  }
+
+  isSelected(product: Product): boolean {
+    return this.selected?.id === product.id;
   }
 
   select(product: Product): void {
     this.selected = product;
     this.quantity = 1;
     this.priceMdl = this.suggestedPriceMdl;
-    this.highlightedId = product.id;
+    this.highlightedKey = this.productKey(product);
   }
 
   changeQuantity(delta: number): void {
@@ -193,58 +260,139 @@ export class ProductPickerDialogComponent implements OnInit {
 
   @HostListener('keydown', ['$event'])
   onKeyDown(event: KeyboardEvent): void {
-    const visible = this.visibleProducts;
-    if (visible.length === 0) {
+    if (!NAVIGATION_KEYS.includes(event.key) || !this.isNavigationTarget(event)) {
       return;
     }
 
-    const current = visible.findIndex((product) => product.id === this.highlightedId);
-
-    if (event.key === 'ArrowDown') {
-      event.preventDefault();
-      this.highlightedId = visible[Math.min(visible.length - 1, current + 1)].id;
+    if (event.key === 'Backspace') {
+      if (!this.isAtRoot && !this.isSearching) {
+        event.preventDefault();
+        this.goBack();
+      }
       return;
     }
 
-    if (event.key === 'ArrowUp') {
-      event.preventDefault();
-      this.highlightedId = visible[Math.max(0, current - 1)].id;
+    const keys = this.tileKeys();
+    if (keys.length === 0) {
       return;
     }
 
-    if (event.key === 'Enter' && current >= 0) {
-      event.preventDefault();
-      this.select(visible[current]);
+    const current = keys.findIndex((key) => key === this.highlightedKey);
+    if (event.key === 'Enter') {
+      if (current >= 0) {
+        event.preventDefault();
+        this.activate(keys[current]);
+      }
+      return;
+    }
+
+    event.preventDefault();
+    const next = Math.min(keys.length - 1, Math.max(0, current + this.navigationStep(event.key)));
+    this.highlightedKey = keys[next];
+    this.scrollHighlightedIntoView();
+  }
+
+  private productsInPath(): Product[] {
+    return this.products.filter((product) =>
+      this.path.every((group, level) => this.groupKey(this.levels[level], product) === group.key),
+    );
+  }
+
+  private tileKeys(): string[] {
+    if (this.showGroups) {
+      return this.groups.map((group) => group.key);
+    }
+
+    return this.visibleProducts.map((product) => this.productKey(product));
+  }
+
+  private activate(key: string): void {
+    const group = this.groups.find((candidate) => candidate.key === key);
+    if (group) {
+      this.openGroup(group);
+      return;
+    }
+
+    const product = this.visibleProducts.find((candidate) => this.productKey(candidate) === key);
+    if (product) {
+      this.select(product);
     }
   }
 
-  private filterProducts(): Product[] {
-    const term = this.search.trim().toLowerCase();
-    if (!term) {
-      return this.products;
+  private isNavigationTarget(event: KeyboardEvent): boolean {
+    const target = event.target as HTMLElement;
+    if (target.closest('mat-button-toggle-group')) {
+      return false;
     }
 
-    return this.products.filter((product) => product.name.toLowerCase().includes(term));
+    if (target.tagName !== 'INPUT') {
+      return true;
+    }
+
+    const isSearch = target.classList.contains('picker-search-input');
+    return isSearch && ['ArrowUp', 'ArrowDown', 'Enter'].includes(event.key);
   }
 
-  private groupKey(product: Product): string {
-    if (this.groupBy === 'GAMMA') {
+  private navigationStep(key: string): number {
+    if (this.highlightedKey === null) {
+      return 1;
+    }
+
+    const columns = this.columnCount();
+    const steps: Record<string, number> = {
+      ArrowLeft: -1,
+      ArrowRight: 1,
+      ArrowUp: -columns,
+      ArrowDown: columns,
+    };
+
+    return steps[key] ?? 0;
+  }
+
+  private columnCount(): number {
+    const grid = this.tileGrid?.nativeElement;
+    if (!grid) {
+      return 1;
+    }
+
+    const columns = getComputedStyle(grid).gridTemplateColumns.split(' ').filter((column) => column.length > 0);
+    return Math.max(1, columns.length);
+  }
+
+  private scrollHighlightedIntoView(): void {
+    setTimeout(() => {
+      this.tileGrid?.nativeElement.querySelector('.picker-tile-highlighted')?.scrollIntoView({ block: 'nearest' });
+    });
+  }
+
+  private createGroup(dimension: PickerDimension, key: string, product: Product): PickerGroup {
+    const label = this.groupLabel(dimension, product);
+    const group: PickerGroup = { key, label, icon: { id: 0, name: label, iconVersion: null }, productCount: 0 };
+    if (dimension === 'CATEGORY' && product.category) {
+      group.icon = product.category;
+    }
+
+    return group;
+  }
+
+  private groupKey(dimension: PickerDimension, product: Product): string {
+    if (dimension === 'GAMMA') {
       return product.gamma ? `gamma-${product.gamma.id}` : OTHER_GROUP_KEY;
     }
 
-    if (this.groupBy === 'BRAND') {
+    if (dimension === 'BRAND') {
       return product.brand ? `brand-${product.brand.id}` : OTHER_GROUP_KEY;
     }
 
     return product.category ? `category-${product.category.id}` : OTHER_GROUP_KEY;
   }
 
-  private groupLabel(product: Product): string {
-    if (this.groupBy === 'GAMMA') {
+  private groupLabel(dimension: PickerDimension, product: Product): string {
+    if (dimension === 'GAMMA') {
       return product.gamma?.name ?? '';
     }
 
-    if (this.groupBy === 'BRAND') {
+    if (dimension === 'BRAND') {
       return product.brand?.name ?? '';
     }
 
