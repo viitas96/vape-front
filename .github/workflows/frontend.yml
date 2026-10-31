@@ -124,7 +124,7 @@ jobs:
           docker compose up -d --no-deps "${SERVICE}"
 
           for attempt in \$(seq 1 24); do
-            if curl -fsS "${HEALTH_URL}" >/dev/null; then
+            if curl -fsS "${HEALTH_URL}" >/dev/null 2>&1; then
               echo "${SERVICE} ${VERSION} is healthy"
               docker image prune -f >/dev/null
               exit 0
