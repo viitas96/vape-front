@@ -1,0 +1,95 @@
+<div class="coffee-seller">
+  <header class="coffee-seller__header">
+    <button mat-icon-button type="button" class="coffee-seller__back" (click)="back()" [attr.aria-label]="'COFFEE.BACK' | translate">
+      <i-tabler name="arrow-left"></i-tabler>
+    </button>
+    <h1 class="coffee-seller__title">{{ 'COFFEE.SELLER_TITLE' | translate }}</h1>
+  </header>
+
+  @if (!customer) {
+    <section class="coffee-seller__scan">
+      @if (loading) {
+        <div class="coffee-seller__loader">
+          <mat-spinner diameter="48"></mat-spinner>
+        </div>
+      } @else {
+        <app-qr-camera (scanned)="onScanned($event)"></app-qr-camera>
+      }
+
+      <p class="coffee-seller__hint">{{ 'COFFEE.SCAN_HINT' | translate }}</p>
+
+      <form class="coffee-seller__phone" (ngSubmit)="searchByPhone()">
+        <input
+          class="coffee-seller__input"
+          type="tel"
+          inputmode="tel"
+          name="phone"
+          autocomplete="off"
+          [(ngModel)]="phone"
+          [placeholder]="'COFFEE.PHONE_PLACEHOLDER' | translate"
+        />
+        <button type="submit" class="coffee-seller__button coffee-seller__button--secondary" [disabled]="loading || !phone.trim()">
+          {{ 'COFFEE.SEARCH' | translate }}
+        </button>
+      </form>
+
+      @if (errorMessage) {
+        <p class="coffee-seller__error">{{ errorMessage }}</p>
+      }
+    </section>
+  } @else {
+    <section class="coffee-seller__customer">
+      <div class="coffee-seller__card">
+        <p class="coffee-seller__name">{{ customerName }}</p>
+        @if (customer.phone) {
+          <p class="coffee-seller__meta">{{ customer.phone }}</p>
+        }
+
+        <app-stamp-row
+          class="coffee-seller__stamps"
+          [threshold]="threshold"
+          [count]="customer.drinkCount"
+          [hasFreeDrink]="customer.freeDrinksAvailable > 0"
+        ></app-stamp-row>
+
+        <div class="coffee-seller__stats">
+          <div>
+            <span class="coffee-seller__stat-value">{{ customer.drinkCount }}/{{ threshold }}</span>
+            <span class="coffee-seller__stat-label">{{ 'COFFEE.PROGRESS' | translate }}</span>
+          </div>
+          <div>
+            <span class="coffee-seller__stat-value">{{ customer.freeDrinksAvailable }}</span>
+            <span class="coffee-seller__stat-label">{{ 'COFFEE.FREE_AVAILABLE' | translate }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="coffee-seller__quantity">
+        <span class="coffee-seller__quantity-label">{{ 'COFFEE.QUANTITY' | translate }}</span>
+        <div class="coffee-seller__stepper">
+          <button type="button" class="coffee-seller__step" (click)="decrement()" [disabled]="loading || quantity <= 1">
+            <i-tabler name="minus"></i-tabler>
+          </button>
+          <span class="coffee-seller__quantity-value">{{ quantity }}</span>
+          <button type="button" class="coffee-seller__step" (click)="increment()" [disabled]="loading || quantity >= 20">
+            <i-tabler name="plus"></i-tabler>
+          </button>
+        </div>
+      </div>
+
+      <button type="button" class="coffee-seller__button coffee-seller__button--primary" (click)="stamp()" [disabled]="loading">
+        <i-tabler name="coffee"></i-tabler>
+        {{ 'COFFEE.STAMP_ACTION' | translate: { count: quantity } }}
+      </button>
+
+      <button type="button" class="coffee-seller__button coffee-seller__button--gift" (click)="redeem()" [disabled]="!canRedeem">
+        <i-tabler name="gift"></i-tabler>
+        {{ 'COFFEE.REDEEM_ACTION' | translate: { count: quantity } }}
+      </button>
+
+      <button type="button" class="coffee-seller__button coffee-seller__button--ghost" (click)="reset()" [disabled]="loading">
+        {{ 'COFFEE.NEXT_CUSTOMER' | translate }}
+      </button>
+    </section>
+  }
+</div>

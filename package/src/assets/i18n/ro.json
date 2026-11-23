@@ -142,6 +142,38 @@
     "RECEIPTS_EMPTY": "Încă nu ai bonuri. Hai la cumpărături!",
     "RECEIPT": "Bon #{{id}}"
   },
+  "COFFEE": {
+    "SELLER_TITLE": "Cafea",
+    "BACK": "Înapoi",
+    "SCAN_HINT": "Scanează QR-ul clientului sau caută după numărul de telefon",
+    "PHONE_PLACEHOLDER": "Număr de telefon",
+    "SEARCH": "Caută",
+    "CUSTOMER_NOT_FOUND": "Clientul nu a fost găsit",
+    "CAMERA_DENIED": "Accesul la cameră a fost refuzat. Permite camera în setările browserului sau caută după telefon.",
+    "CAMERA_MISSING": "Nu a fost găsită nicio cameră. Caută clientul după telefon.",
+    "PROGRESS": "Cafele",
+    "FREE_AVAILABLE": "Gratuite",
+    "QUANTITY": "Câte cafele",
+    "STAMP_ACTION": "Marchează {{count}} cafea(le)",
+    "REDEEM_ACTION": "Folosește {{count}} gratuită(e)",
+    "NEXT_CUSTOMER": "Client nou",
+    "STAMPED": "Marcat: {{count}} cafea(le)",
+    "REDEEMED": "Folosit: {{count}} cafea(le) gratuită(e)",
+    "UNDO": "Anulează",
+    "UNDONE": "Anulat",
+    "ACTION_FAILED": "Acțiunea a eșuat",
+    "CARD_TITLE": "Cardul de cafea",
+    "PROFILE": "Profil",
+    "LOGOUT": "Ieșire",
+    "EVERY_NTH_FREE": "Fiecare a {{n}}-a cafea – gratuită",
+    "FREE_READY": "Ai {{count}} cafea(le) gratuită(e)! Arată QR-ul la casă.",
+    "QR_ALT": "Codul QR al cardului de cafea",
+    "QR_HINT": "Arată acest cod vânzătorului",
+    "HISTORY": "Istoric",
+    "HISTORY_EMPTY": "Încă nu ai cafele marcate.",
+    "HISTORY_STAMP": "+{{count}} cafea(le)",
+    "HISTORY_REDEEM": "{{count}} cafea(le) gratuită(e) folosită(e)"
+  },
   "POS": {
     "PICKER_OPEN": "Nu găseşti codul de bare?",
     "PICKER_TITLE": "Alege un produs",
@@ -562,5 +594,6 @@
   "Settings": "Setări",
   "Users": "Utilizatori",
   "Workspace": "Spațiu de lucru",
-  "Customers": "Clienți"
+  "Customers": "Clienți",
+  "Coffee": "Cafea"
 }

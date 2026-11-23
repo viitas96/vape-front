@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { MyOrder, MyProfile } from '../features/dashboard/customer/customer.models';
 import { PageResponse } from '../shared/models/page-response.model';
+import { DrinkStampHistoryItem } from '../features/coffee/coffee.models';
 
 @Injectable({ providedIn: 'root' })
 export class MeService {
@@ -17,6 +18,12 @@ export class MeService {
 
   getOrders(page = 0, size = 10): Observable<PageResponse<MyOrder>> {
     return this.http.get<PageResponse<MyOrder>>(`${this.API_URL}/orders`, {
+      params: { page, size },
+    });
+  }
+
+  getDrinkStamps(page = 0, size = 10): Observable<PageResponse<DrinkStampHistoryItem>> {
+    return this.http.get<PageResponse<DrinkStampHistoryItem>>(`${this.API_URL}/drink-stamps`, {
       params: { page, size },
     });
   }

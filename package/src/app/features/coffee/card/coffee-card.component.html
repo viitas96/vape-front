@@ -1,0 +1,87 @@
+<div class="coffee-card">
+  @if (profile) {
+    <header class="coffee-card__header">
+      <button type="button" class="coffee-card__avatar" (click)="toggleProfile()" [attr.aria-label]="'COFFEE.PROFILE' | translate">
+        <i-tabler name="user"></i-tabler>
+      </button>
+      <span class="coffee-card__brand">{{ 'COFFEE.CARD_TITLE' | translate }}</span>
+      <span class="coffee-card__free-badge" [class.coffee-card__free-badge--ready]="profile.freeDrinksAvailable > 0">
+        <i-tabler name="gift"></i-tabler>
+        {{ profile.freeDrinksAvailable }}
+      </span>
+    </header>
+
+    @if (showProfile) {
+      <section class="coffee-card__profile">
+        <p class="coffee-card__profile-name">{{ displayName }}</p>
+        <div class="coffee-card__profile-row">
+          <i-tabler name="at"></i-tabler>
+          <span>{{ profile.email }}</span>
+        </div>
+        @if (profile.phone) {
+          <div class="coffee-card__profile-row">
+            <i-tabler name="phone"></i-tabler>
+            <span>{{ profile.phone }}</span>
+          </div>
+        }
+        <button type="button" class="coffee-card__profile-row coffee-card__logout" (click)="logout()">
+          <i-tabler name="logout"></i-tabler>
+          <span>{{ 'COFFEE.LOGOUT' | translate }}</span>
+        </button>
+      </section>
+    }
+
+    <section class="coffee-card__progress">
+      <p class="coffee-card__progress-title">{{ 'COFFEE.EVERY_NTH_FREE' | translate: { n: freeDrinkNumber } }}</p>
+      <app-stamp-row
+        [threshold]="threshold"
+        [count]="profile.drinkCount"
+        [hasFreeDrink]="profile.freeDrinksAvailable > 0"
+      ></app-stamp-row>
+    </section>
+
+    @if (profile.freeDrinksAvailable > 0) {
+      <section class="coffee-card__free">
+        <i-tabler name="gift"></i-tabler>
+        <span>{{ 'COFFEE.FREE_READY' | translate: { count: profile.freeDrinksAvailable } }}</span>
+      </section>
+    }
+
+    <section class="coffee-card__qr">
+      @if (qrDataUrl) {
+        <img class="coffee-card__qr-image" [src]="qrDataUrl" [alt]="'COFFEE.QR_ALT' | translate" />
+      } @else {
+        <mat-spinner diameter="48"></mat-spinner>
+      }
+    </section>
+    <p class="coffee-card__qr-hint">{{ 'COFFEE.QR_HINT' | translate }}</p>
+
+    <section class="coffee-card__history">
+      <h2 class="coffee-card__history-title">{{ 'COFFEE.HISTORY' | translate }}</h2>
+      @if (history.length === 0) {
+        <p class="coffee-card__history-empty">{{ 'COFFEE.HISTORY_EMPTY' | translate }}</p>
+      } @else {
+        <ul class="coffee-card__history-list">
+          @for (item of history; track item.id) {
+            <li class="coffee-card__history-item">
+              @if (item.type === 'REDEEM') {
+                <i-tabler name="gift" class="coffee-card__history-icon coffee-card__history-icon--gift"></i-tabler>
+                <span>{{ 'COFFEE.HISTORY_REDEEM' | translate: { count: item.quantity } }}</span>
+              } @else {
+                <i-tabler name="coffee" class="coffee-card__history-icon"></i-tabler>
+                <span>{{ 'COFFEE.HISTORY_STAMP' | translate: { count: item.quantity } }}</span>
+              }
+              <time class="coffee-card__history-date">{{ item.createdAt | date: 'dd.MM.yyyy HH:mm' }}</time>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  } @else if (loadFailed) {
+    <p class="coffee-card__error">{{ 'CUSTOMER.LOAD_FAILED' | translate }}</p>
+  } @else {
+    <div class="coffee-card__loader">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+  }
+</div>
