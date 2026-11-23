@@ -7,6 +7,7 @@ export interface AppFeatureRouteDefinition {
   path: string;
   title: string;
   roles: readonly AppRole[];
+  layout?: 'full' | 'blank';
   loadComponent: NonNullable<Route['loadComponent']>;
   sidebar?: {
     label: string;
@@ -20,7 +21,7 @@ export const APP_ROLE_HOME_PATHS: ReadonlyArray<readonly [AppRole, string]> = [
   ['SELLER', '/seller'],
   ['ACCOUNTANT', '/accountant'],
   ['OPERATOR', '/products'],
-  ['CUSTOMER', '/customer'],
+  ['CUSTOMER', '/card'],
 ] as const;
 
 export const APP_FEATURE_ROUTE_DEFINITIONS: readonly AppFeatureRouteDefinition[] = [
@@ -41,6 +42,13 @@ export const APP_FEATURE_ROUTE_DEFINITIONS: readonly AppFeatureRouteDefinition[]
     title: 'Customer Dashboard',
     roles: ['CUSTOMER'],
     loadComponent: () => import('../../features/dashboard/customer/customer-dashboard.component').then((m) => m.CustomerDashboardComponent),
+  },
+  {
+    path: 'card',
+    title: 'Coffee Card',
+    roles: ['CUSTOMER'],
+    layout: 'blank',
+    loadComponent: () => import('../../features/coffee/card/coffee-card.component').then((m) => m.CoffeeCardComponent),
   },
   {
     path: 'product-group-categories',
@@ -90,6 +98,14 @@ export const APP_FEATURE_ROUTE_DEFINITIONS: readonly AppFeatureRouteDefinition[]
     roles: ['SELLER'],
     sidebar: { label: 'Shift & Cash', iconName: 'report-money', bgcolor: 'primary' },
     loadComponent: () => import('../../features/dashboard/seller/seller-shift.component').then((m) => m.SellerShiftComponent),
+  },
+  {
+    path: 'coffee',
+    title: 'Coffee',
+    roles: ['ADMIN', 'SELLER'],
+    layout: 'blank',
+    sidebar: { label: 'Coffee', iconName: 'coffee', bgcolor: 'warning' },
+    loadComponent: () => import('../../features/coffee/seller/coffee-seller.component').then((m) => m.CoffeeSellerComponent),
   },
   {
     path: 'customers',

@@ -1,0 +1,49 @@
+.stamp-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.stamp-row__cup,
+.stamp-row__gift {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px dashed rgba(245, 235, 224, 0.45);
+  color: rgba(245, 235, 224, 0.45);
+
+  i-tabler {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.stamp-row__cup--filled {
+  border-style: solid;
+  border-color: #f5ebe0;
+  background: #f5ebe0;
+  color: #5b3a29;
+}
+
+.stamp-row__equals {
+  color: rgba(245, 235, 224, 0.7);
+  font-size: 20px;
+  font-weight: 600;
+  padding: 0 2px;
+}
+
+.stamp-row__gift {
+  border-style: solid;
+  border-color: #e0a84f;
+  color: #e0a84f;
+}
+
+.stamp-row__gift--ready {
+  background: #e0a84f;
+  color: #3b2418;
+}

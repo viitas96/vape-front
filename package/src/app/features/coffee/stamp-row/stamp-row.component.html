@@ -1,0 +1,11 @@
+<div class="stamp-row">
+  @for (filled of slots; track $index) {
+    <span class="stamp-row__cup" [class.stamp-row__cup--filled]="filled">
+      <i-tabler name="coffee"></i-tabler>
+    </span>
+  }
+  <span class="stamp-row__equals">=</span>
+  <span class="stamp-row__gift" [class.stamp-row__gift--ready]="hasFreeDrink">
+    <i-tabler name="gift"></i-tabler>
+  </span>
+</div>

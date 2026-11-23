@@ -142,6 +142,38 @@
     "RECEIPTS_EMPTY": "No receipts yet. Start shopping!",
     "RECEIPT": "Receipt #{{id}}"
   },
+  "COFFEE": {
+    "SELLER_TITLE": "Coffee",
+    "BACK": "Back",
+    "SCAN_HINT": "Scan the customer's QR or search by phone number",
+    "PHONE_PLACEHOLDER": "Phone number",
+    "SEARCH": "Search",
+    "CUSTOMER_NOT_FOUND": "Customer not found",
+    "CAMERA_DENIED": "Camera access was denied. Allow the camera in the browser settings or search by phone.",
+    "CAMERA_MISSING": "No camera found. Search the customer by phone.",
+    "PROGRESS": "Coffees",
+    "FREE_AVAILABLE": "Free",
+    "QUANTITY": "How many coffees",
+    "STAMP_ACTION": "Mark {{count}} coffee(s)",
+    "REDEEM_ACTION": "Use {{count}} free",
+    "NEXT_CUSTOMER": "Next customer",
+    "STAMPED": "Marked: {{count}} coffee(s)",
+    "REDEEMED": "Used: {{count}} free coffee(s)",
+    "UNDO": "Undo",
+    "UNDONE": "Undone",
+    "ACTION_FAILED": "Action failed",
+    "CARD_TITLE": "Coffee card",
+    "PROFILE": "Profile",
+    "LOGOUT": "Log out",
+    "EVERY_NTH_FREE": "Every {{n}}th coffee is free",
+    "FREE_READY": "You have {{count}} free coffee(s)! Show the QR at the counter.",
+    "QR_ALT": "Coffee card QR code",
+    "QR_HINT": "Show this code to the seller",
+    "HISTORY": "History",
+    "HISTORY_EMPTY": "No coffees marked yet.",
+    "HISTORY_STAMP": "+{{count}} coffee(s)",
+    "HISTORY_REDEEM": "{{count}} free coffee(s) used"
+  },
   "POS": {
     "PICKER_OPEN": "Can't find the barcode?",
     "PICKER_TITLE": "Choose a product",
@@ -562,5 +594,6 @@
   "Settings": "Settings",
   "Users": "Users",
   "Workspace": "Workspace",
-  "Customers": "Customers"
+  "Customers": "Customers",
+  "Coffee": "Coffee"
 }

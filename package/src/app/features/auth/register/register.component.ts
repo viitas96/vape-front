@@ -1,6 +1,7 @@
 ﻿import { Component } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { switchMap } from 'rxjs';
 import { MaterialModule } from 'src/app/material.module';
 import { AuthService } from 'src/app/services/auth.service';
 import { getApiErrorMessage } from 'src/app/shared/http/api-error';
@@ -54,8 +55,10 @@ export class AppRegisterComponent {
       phone: phone!,
       password: password!,
       dateOfBirth: toIsoDate(dateOfBirth ?? null),
-    }).subscribe({
-      next: () => this.router.navigate(['/customer']),
+    }).pipe(
+      switchMap(() => this.authService.login(email!, password!)),
+    ).subscribe({
+      next: () => this.router.navigateByUrl(this.authService.getRedirectPath()),
       error: (error) => {
         this.errorMessage = getApiErrorMessage(error, this.translateService.instant('AUTH.REGISTER.FAILED'));
         this.loading = false;
