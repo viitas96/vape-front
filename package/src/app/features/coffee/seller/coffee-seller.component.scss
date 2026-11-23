@@ -1,28 +1,22 @@
+@use '../coffee-theme' as coffee;
+
 :host {
+  @include coffee.light-tokens;
   display: block;
-  min-height: 100vh;
-  min-height: 100dvh;
-  background: #f5ebe0;
-  color: #2b1d14;
+  color: var(--coffee-ink);
+}
+
+:host-context(.dark-theme) {
+  @include coffee.dark-tokens;
 }
 
 .coffee-seller {
-  max-width: 480px;
+  max-width: 560px;
   margin: 0 auto;
-  padding: 16px 16px calc(24px + env(safe-area-inset-bottom));
+  padding: 16px 0 24px;
   display: flex;
   flex-direction: column;
   gap: 16px;
-}
-
-.coffee-seller__header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.coffee-seller__back {
-  color: #5b3a29;
 }
 
 .coffee-seller__title {
@@ -42,16 +36,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  aspect-ratio: 1 / 1;
-  border-radius: 20px;
-  background: #e8d8c6;
+  padding: 16px 0;
 }
 
 .coffee-seller__hint {
   margin: 0;
-  text-align: center;
   font-size: 14px;
-  color: #7a5a45;
+  color: var(--coffee-muted);
 }
 
 .coffee-seller__phone {
@@ -64,15 +55,20 @@
   min-width: 0;
   height: 52px;
   padding: 0 14px;
-  border: 1px solid #cdb5a0;
+  border: 1px solid var(--coffee-border);
   border-radius: 14px;
-  background: #fffaf4;
-  color: #2b1d14;
+  background: var(--coffee-surface);
+  color: var(--coffee-ink);
   font-size: 17px;
 
+  &::placeholder {
+    color: var(--coffee-muted);
+  }
+
   &:focus {
-    outline: 2px solid #5b3a29;
-    outline-offset: 1px;
+    outline: none;
+    border-color: var(--coffee-accent);
+    box-shadow: 0 0 0 3px var(--coffee-focus);
   }
 }
 
@@ -80,16 +76,16 @@
   margin: 0;
   padding: 12px 14px;
   border-radius: 12px;
-  background: #fbe3dc;
-  color: #9c2f16;
+  background: var(--coffee-error-background);
+  color: var(--coffee-error-ink);
   font-size: 14px;
 }
 
 .coffee-seller__card {
   padding: 20px 16px;
+  border: 1px solid var(--coffee-border);
   border-radius: 20px;
-  background: linear-gradient(160deg, #5b3a29 0%, #3b2418 100%);
-  color: #f5ebe0;
+  background: var(--coffee-surface);
   text-align: center;
 }
 
@@ -103,7 +99,7 @@
 .coffee-seller__meta {
   margin: 4px 0 0;
   font-size: 14px;
-  opacity: 0.75;
+  color: var(--coffee-muted);
 }
 
 .coffee-seller__stamps {
@@ -130,7 +126,7 @@
 
 .coffee-seller__stat-label {
   font-size: 12px;
-  opacity: 0.75;
+  color: var(--coffee-muted);
 }
 
 .coffee-seller__quantity {
@@ -138,8 +134,9 @@
   align-items: center;
   justify-content: space-between;
   padding: 10px 14px;
+  border: 1px solid var(--coffee-border);
   border-radius: 16px;
-  background: #fffaf4;
+  background: var(--coffee-surface);
 }
 
 .coffee-seller__quantity-label {
@@ -161,8 +158,8 @@
   height: 44px;
   border: none;
   border-radius: 50%;
-  background: #e8d8c6;
-  color: #3b2418;
+  background: var(--coffee-page);
+  color: var(--coffee-ink);
   cursor: pointer;
 
   &:disabled {
@@ -198,26 +195,26 @@
 }
 
 .coffee-seller__button--primary {
-  background: #5b3a29;
-  color: #fffaf4;
+  background: var(--coffee-accent);
+  color: var(--coffee-accent-contrast);
 }
 
 .coffee-seller__button--gift {
-  background: #e0a84f;
-  color: #3b2418;
+  background: var(--coffee-highlight);
+  color: var(--coffee-highlight-contrast);
 }
 
 .coffee-seller__button--secondary {
   min-height: 52px;
-  background: #5b3a29;
-  color: #fffaf4;
+  background: var(--coffee-accent);
+  color: var(--coffee-accent-contrast);
   font-size: 15px;
 }
 
 .coffee-seller__button--ghost {
   min-height: 48px;
   background: transparent;
-  color: #5b3a29;
-  border: 1px solid #cdb5a0;
+  color: var(--coffee-ink);
+  border: 1px solid var(--coffee-border);
   font-size: 15px;
 }

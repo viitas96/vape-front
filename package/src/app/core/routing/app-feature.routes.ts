@@ -18,7 +18,7 @@ export interface AppFeatureRouteDefinition {
 
 export const APP_ROLE_HOME_PATHS: ReadonlyArray<readonly [AppRole, string]> = [
   ['ADMIN', '/products'],
-  ['SELLER', '/seller'],
+  ['SELLER', '/coffee'],
   ['ACCOUNTANT', '/accountant'],
   ['OPERATOR', '/products'],
   ['CUSTOMER', '/card'],
@@ -103,7 +103,6 @@ export const APP_FEATURE_ROUTE_DEFINITIONS: readonly AppFeatureRouteDefinition[]
     path: 'coffee',
     title: 'Coffee',
     roles: ['ADMIN', 'SELLER'],
-    layout: 'blank',
     sidebar: { label: 'Coffee', iconName: 'coffee', bgcolor: 'warning' },
     loadComponent: () => import('../../features/coffee/seller/coffee-seller.component').then((m) => m.CoffeeSellerComponent),
   },

@@ -1,9 +1,18 @@
+@use '../coffee-theme' as coffee;
+
 :host {
+  @include coffee.light-tokens;
   display: block;
   min-height: 100vh;
   min-height: 100dvh;
-  background: linear-gradient(180deg, #5b3a29 0%, #3b2418 100%);
-  color: #f5ebe0;
+  background: var(--coffee-page);
+  color: var(--coffee-ink);
+}
+
+@media (prefers-color-scheme: dark) {
+  :host {
+    @include coffee.dark-tokens;
+  }
 }
 
 .coffee-card {
@@ -28,10 +37,10 @@
   justify-content: center;
   width: 48px;
   height: 48px;
-  border: none;
+  border: 1px solid var(--coffee-border);
   border-radius: 50%;
-  background: rgba(245, 235, 224, 0.18);
-  color: #f5ebe0;
+  background: var(--coffee-surface);
+  color: var(--coffee-ink);
   cursor: pointer;
 }
 
@@ -48,23 +57,26 @@
   min-width: 48px;
   height: 48px;
   padding: 0 12px;
+  border: 1px solid var(--coffee-border);
   border-radius: 14px;
-  background: rgba(245, 235, 224, 0.18);
+  background: var(--coffee-surface);
   font-size: 18px;
   font-weight: 700;
 }
 
 .coffee-card__free-badge--ready {
-  background: #e0a84f;
-  color: #3b2418;
+  border-color: var(--coffee-highlight);
+  background: var(--coffee-highlight);
+  color: var(--coffee-highlight-contrast);
 }
 
 .coffee-card__profile {
   display: flex;
   flex-direction: column;
   padding: 8px 16px;
+  border: 1px solid var(--coffee-border);
   border-radius: 18px;
-  background: rgba(245, 235, 224, 0.1);
+  background: var(--coffee-surface);
 }
 
 .coffee-card__profile-name {
@@ -79,7 +91,7 @@
   align-items: center;
   gap: 12px;
   min-height: 48px;
-  border-top: 1px solid rgba(245, 235, 224, 0.15);
+  border-top: 1px solid var(--coffee-border);
   color: inherit;
   font-size: 15px;
   text-decoration: none;
@@ -100,8 +112,9 @@
 
 .coffee-card__progress {
   padding: 16px 12px 18px;
-  border: 1.5px solid rgba(245, 235, 224, 0.4);
+  border: 1px solid var(--coffee-border);
   border-radius: 20px;
+  background: var(--coffee-surface);
   text-align: center;
 }
 
@@ -118,8 +131,8 @@
   gap: 8px;
   padding: 14px;
   border-radius: 16px;
-  background: #e0a84f;
-  color: #3b2418;
+  background: var(--coffee-highlight);
+  color: var(--coffee-highlight-contrast);
   font-size: 16px;
   font-weight: 700;
   text-align: center;
@@ -131,6 +144,7 @@
   justify-content: center;
   aspect-ratio: 1 / 1;
   padding: 20px;
+  border: 1px solid var(--coffee-border);
   border-radius: 24px;
   background: #ffffff;
 }
@@ -146,13 +160,14 @@
   margin: -6px 0 0;
   text-align: center;
   font-size: 14px;
-  opacity: 0.75;
+  color: var(--coffee-muted);
 }
 
 .coffee-card__history {
   padding: 16px;
+  border: 1px solid var(--coffee-border);
   border-radius: 18px;
-  background: rgba(245, 235, 224, 0.1);
+  background: var(--coffee-surface);
 }
 
 .coffee-card__history-title {
@@ -164,7 +179,7 @@
 .coffee-card__history-empty {
   margin: 0;
   font-size: 14px;
-  opacity: 0.75;
+  color: var(--coffee-muted);
 }
 
 .coffee-card__history-list {
@@ -178,7 +193,7 @@
   align-items: center;
   gap: 10px;
   padding: 10px 0;
-  border-top: 1px solid rgba(245, 235, 224, 0.12);
+  border-top: 1px solid var(--coffee-border);
   font-size: 15px;
 
   &:first-child {
@@ -193,13 +208,13 @@
 }
 
 .coffee-card__history-icon--gift {
-  color: #e0a84f;
+  color: var(--coffee-highlight-ink);
 }
 
 .coffee-card__history-date {
   margin-left: auto;
   font-size: 13px;
-  opacity: 0.7;
+  color: var(--coffee-muted);
   white-space: nowrap;
 }
 
