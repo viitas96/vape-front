@@ -1,16 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { TablerIconsModule } from 'angular-tabler-icons';
 import { MaterialModule } from 'src/app/material.module';
-import { AuthService } from 'src/app/services/auth.service';
 import { CoffeeService } from 'src/app/services/coffee.service';
 import { StoreSettingsService } from 'src/app/services/store-settings.service';
 import { getApiErrorMessage } from 'src/app/shared/http/api-error';
 import { CoffeeCustomer, DrinkStampEventResponse } from '../coffee.models';
-import { QrCameraComponent } from '../qr-camera/qr-camera.component';
 import { StampRowComponent } from '../stamp-row/stamp-row.component';
 
 const MIN_QUANTITY = 1;
@@ -20,7 +17,7 @@ const UNDO_WINDOW_MS = 30000;
 @Component({
   selector: 'app-coffee-seller',
   standalone: true,
-  imports: [FormsModule, MaterialModule, TranslatePipe, TablerIconsModule, QrCameraComponent, StampRowComponent],
+  imports: [FormsModule, MaterialModule, TranslatePipe, TablerIconsModule, StampRowComponent],
   templateUrl: './coffee-seller.component.html',
   styleUrls: ['./coffee-seller.component.scss'],
 })
@@ -28,15 +25,18 @@ export class CoffeeSellerComponent implements OnInit {
   customer: CoffeeCustomer | null = null;
   threshold = 6;
   quantity = MIN_QUANTITY;
-  phone = '';
+  code = '';
   loading = false;
   errorMessage = '';
+
+  @ViewChild('codeInput')
+  set codeInput(input: ElementRef<HTMLInputElement> | undefined) {
+    input?.nativeElement.focus();
+  }
 
   constructor(
     private readonly coffeeService: CoffeeService,
     private readonly settingsService: StoreSettingsService,
-    private readonly authService: AuthService,
-    private readonly router: Router,
     private readonly snackBar: MatSnackBar,
     private readonly translateService: TranslateService,
   ) {}
@@ -60,17 +60,13 @@ export class CoffeeSellerComponent implements OnInit {
     return !!this.customer && !this.loading && this.quantity <= this.customer.freeDrinksAvailable;
   }
 
-  onScanned(code: string): void {
-    this.lookup(code);
-  }
-
-  searchByPhone(): void {
-    const phone = this.phone.trim();
-    if (!phone) {
+  search(): void {
+    const code = this.code.trim();
+    if (!code || this.loading) {
       return;
     }
 
-    this.lookup(phone);
+    this.lookup(code);
   }
 
   increment(): void {
@@ -110,13 +106,9 @@ export class CoffeeSellerComponent implements OnInit {
   reset(): void {
     this.customer = null;
     this.quantity = MIN_QUANTITY;
-    this.phone = '';
+    this.code = '';
     this.errorMessage = '';
     this.loading = false;
-  }
-
-  back(): void {
-    this.router.navigateByUrl(this.authService.getRedirectPath());
   }
 
   private lookup(code: string): void {

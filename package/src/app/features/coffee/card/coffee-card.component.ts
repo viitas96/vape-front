@@ -109,7 +109,7 @@ export class CoffeeCardComponent implements OnInit {
   }
 
   private generateQrCode(uuid: string): void {
-    toDataURL(uuid, { width: 320, margin: 1, color: { dark: '#2b1d14', light: '#ffffff' } }).then((url) => {
+    toDataURL(uuid, { width: 320, margin: 1, color: { dark: '#18191b', light: '#ffffff' } }).then((url) => {
       this.qrDataUrl = url;
     });
   }

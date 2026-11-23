@@ -1,37 +1,30 @@
 <div class="coffee-seller">
-  <header class="coffee-seller__header">
-    <button mat-icon-button type="button" class="coffee-seller__back" (click)="back()" [attr.aria-label]="'COFFEE.BACK' | translate">
-      <i-tabler name="arrow-left"></i-tabler>
-    </button>
-    <h1 class="coffee-seller__title">{{ 'COFFEE.SELLER_TITLE' | translate }}</h1>
-  </header>
+  <h1 class="coffee-seller__title">{{ 'COFFEE.SELLER_TITLE' | translate }}</h1>
 
   @if (!customer) {
     <section class="coffee-seller__scan">
-      @if (loading) {
-        <div class="coffee-seller__loader">
-          <mat-spinner diameter="48"></mat-spinner>
-        </div>
-      } @else {
-        <app-qr-camera (scanned)="onScanned($event)"></app-qr-camera>
-      }
-
       <p class="coffee-seller__hint">{{ 'COFFEE.SCAN_HINT' | translate }}</p>
 
-      <form class="coffee-seller__phone" (ngSubmit)="searchByPhone()">
+      <form class="coffee-seller__phone" (ngSubmit)="search()">
         <input
+          #codeInput
           class="coffee-seller__input"
-          type="tel"
-          inputmode="tel"
-          name="phone"
+          type="text"
+          name="code"
           autocomplete="off"
-          [(ngModel)]="phone"
+          [(ngModel)]="code"
           [placeholder]="'COFFEE.PHONE_PLACEHOLDER' | translate"
         />
-        <button type="submit" class="coffee-seller__button coffee-seller__button--secondary" [disabled]="loading || !phone.trim()">
+        <button type="submit" class="coffee-seller__button coffee-seller__button--secondary" [disabled]="loading || !code.trim()">
           {{ 'COFFEE.SEARCH' | translate }}
         </button>
       </form>
+
+      @if (loading) {
+        <div class="coffee-seller__loader">
+          <mat-spinner diameter="40"></mat-spinner>
+        </div>
+      }
 
       @if (errorMessage) {
         <p class="coffee-seller__error">{{ errorMessage }}</p>

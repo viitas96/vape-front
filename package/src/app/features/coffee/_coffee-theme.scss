@@ -1,0 +1,31 @@
+@mixin light-tokens {
+  --coffee-page: #f2f2f3;
+  --coffee-surface: #fdfdfd;
+  --coffee-ink: #18191b;
+  --coffee-muted: #6a6b70;
+  --coffee-accent: #1d1e21;
+  --coffee-accent-contrast: #fafafa;
+  --coffee-border: #dddde1;
+  --coffee-focus: rgb(24 25 27 / 32%);
+  --coffee-highlight: #f5c518;
+  --coffee-highlight-contrast: #18191b;
+  --coffee-highlight-ink: #a37c00;
+  --coffee-error-background: #fbe3dc;
+  --coffee-error-ink: #9c2f16;
+}
+
+@mixin dark-tokens {
+  --coffee-page: #0e0f10;
+  --coffee-surface: #17181a;
+  --coffee-ink: #f1f1f3;
+  --coffee-muted: #a2a3a8;
+  --coffee-accent: #ececef;
+  --coffee-accent-contrast: #121315;
+  --coffee-border: #2c2d31;
+  --coffee-focus: rgb(236 236 239 / 36%);
+  --coffee-highlight: #f5c518;
+  --coffee-highlight-contrast: #18191b;
+  --coffee-highlight-ink: #f5c518;
+  --coffee-error-background: #3a1d17;
+  --coffee-error-ink: #f4a08c;
+}
